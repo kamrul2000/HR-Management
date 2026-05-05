@@ -114,6 +114,7 @@ builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IDesignationService, DesignationService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();

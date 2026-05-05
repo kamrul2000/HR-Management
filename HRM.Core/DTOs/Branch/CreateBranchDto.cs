@@ -1,11 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace HRM.Core.Entities;
+namespace HRM.Core.DTOs.Branch;
 
-public class Branch
+public class CreateBranchDto
 {
-    public int Id { get; set; }
-
     [Required]
     [MaxLength(150)]
     public string Name { get; set; } = string.Empty;
@@ -23,6 +21,7 @@ public class Branch
     public string Phone { get; set; } = string.Empty;
 
     [Required]
+    [EmailAddress]
     [MaxLength(150)]
     public string Email { get; set; } = string.Empty;
 
@@ -30,18 +29,6 @@ public class Branch
     public string? ManagerName { get; set; }
 
     [Required]
+    [Range(1, int.MaxValue)]
     public int CompanyId { get; set; }
-
-    public Company Company { get; set; } = null!;
-
-    [Required]
-    public int SubscriptionId { get; set; }
-
-    public bool IsActive { get; set; } = true;
-
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
-
-    public ICollection<Department> Departments { get; set; } = new List<Department>();
 }

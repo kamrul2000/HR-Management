@@ -1,0 +1,17 @@
+e:\Kamrul\HRM\HRM.Infrastructure\bin\Debug\net8.0\HRM.Infrastructure.deps.json
+e:\Kamrul\HRM\HRM.Infrastructure\bin\Debug\net8.0\HRM.Infrastructure.runtimeconfig.json
+e:\Kamrul\HRM\HRM.Infrastructure\bin\Debug\net8.0\HRM.Infrastructure.dll
+e:\Kamrul\HRM\HRM.Infrastructure\bin\Debug\net8.0\HRM.Infrastructure.pdb
+e:\Kamrul\HRM\HRM.Infrastructure\bin\Debug\net8.0\HRM.Core.dll
+e:\Kamrul\HRM\HRM.Infrastructure\bin\Debug\net8.0\HRM.Core.pdb
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\HRM.Infrastructure.csproj.AssemblyReference.cache
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\HRM.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\HRM.Infrastructure.AssemblyInfoInputs.cache
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\HRM.Infrastructure.AssemblyInfo.cs
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\HRM.Infrastructure.csproj.CoreCompileInputs.cache
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\HRM.Infr.94868923.Up2Date
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\HRM.Infrastructure.dll
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\refint\HRM.Infrastructure.dll
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\HRM.Infrastructure.pdb
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\HRM.Infrastructure.genruntimeconfig.cache
+e:\Kamrul\HRM\HRM.Infrastructure\obj\Debug\net8.0\ref\HRM.Infrastructure.dll

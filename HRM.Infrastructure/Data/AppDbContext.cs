@@ -23,6 +23,7 @@ public class AppDbContext : DbContext
     public DbSet<LeaveAllotment> LeaveAllotments => Set<LeaveAllotment>();
     public DbSet<HolidayCalendar> HolidayCalendars => Set<HolidayCalendar>();
     public DbSet<OffDay> OffDays => Set<OffDay>();
+    public DbSet<Overtime> Overtimes => Set<Overtime>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -195,6 +196,16 @@ public class AppDbContext : DbContext
             entity.ToTable("Attendances");
             entity.HasKey(e => e.Id);
 
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.DutySlotId).IsRequired();
+            entity.Property(e => e.AttendanceDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.IsLate).IsRequired();
+            entity.Property(e => e.LateMinutes).IsRequired();
+            entity.Property(e => e.ActualWorkingMinutes).IsRequired();
+            entity.Property(e => e.ScheduledWorkingMinutes).IsRequired();
+            entity.Property(e => e.OvertimeMinutes).IsRequired();
+            entity.Property(e => e.Remarks).HasMaxLength(500);
             entity.Property(e => e.SubscriptionId).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();
@@ -212,6 +223,8 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.EmployeeId);
             entity.HasIndex(e => e.DutySlotId);
+            entity.HasIndex(e => e.AttendanceDate);
+            entity.HasIndex(e => new { e.EmployeeId, e.AttendanceDate, e.SubscriptionId }).IsUnique();
         });
 
         modelBuilder.Entity<LeaveApplication>(entity =>
@@ -383,6 +396,31 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.BranchId);
             entity.HasIndex(e => e.DayOfWeek);
+        });
+
+        modelBuilder.Entity<Overtime>(entity =>
+        {
+            entity.ToTable("Overtimes");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Attendance)
+                .WithMany()
+                .HasForeignKey(e => e.AttendanceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.AttendanceId);
+            entity.HasIndex(e => e.EmployeeId);
         });
     }
 }

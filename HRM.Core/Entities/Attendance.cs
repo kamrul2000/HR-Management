@@ -1,21 +1,47 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace HRM.Core.Entities;
 
-// Stub introduced in Module 6 so EmployeeService.DeleteAsync can guard against
-// hard-deleting employees with attendance records. Module 7 added DutySlotId so
-// DutySlotService.DeleteAsync can guard against deleting slots referenced by
-// attendance. Module 12 extends this with the full attendance-tracking fields.
 public class Attendance
 {
     public int Id { get; set; }
 
+    [Required]
     public int EmployeeId { get; set; }
 
     public Employee Employee { get; set; } = null!;
 
-    public int? DutySlotId { get; set; }
+    [Required]
+    public int DutySlotId { get; set; }
 
-    public DutySlot? DutySlot { get; set; }
+    public DutySlot DutySlot { get; set; } = null!;
 
+    [Required]
+    public DateTime AttendanceDate { get; set; }
+
+    public TimeSpan? PunchInTime { get; set; }
+
+    public TimeSpan? PunchOutTime { get; set; }
+
+    [Required]
+    [MaxLength(30)]
+    public string Status { get; set; } = string.Empty;
+
+    public bool IsLate { get; set; }
+
+    public int LateMinutes { get; set; }
+
+    public int ActualWorkingMinutes { get; set; }
+
+    [Required]
+    public int ScheduledWorkingMinutes { get; set; }
+
+    public int OvertimeMinutes { get; set; }
+
+    [MaxLength(500)]
+    public string? Remarks { get; set; }
+
+    [Required]
     public int SubscriptionId { get; set; }
 
     public DateTime CreatedAt { get; set; }

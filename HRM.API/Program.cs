@@ -121,6 +121,7 @@ builder.Services.AddScoped<ILeaveAllotmentService, LeaveAllotmentService>();
 builder.Services.AddScoped<IHolidayCalendarService, HolidayCalendarService>();
 builder.Services.AddScoped<IOffDayService, OffDayService>();
 builder.Services.AddScoped<IWorkingDayCalculator, WorkingDayCalculator>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();

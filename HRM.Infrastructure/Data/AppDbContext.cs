@@ -305,18 +305,33 @@ public class AppDbContext : DbContext
             entity.ToTable("LeaveAllotments");
             entity.HasKey(e => e.Id);
 
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.LeaveTypeId).IsRequired();
+            entity.Property(e => e.Year).IsRequired();
+            entity.Property(e => e.AllocatedDays).HasColumnType("decimal(6,2)").IsRequired();
+            entity.Property(e => e.UsedDays).HasColumnType("decimal(6,2)").IsRequired();
+            entity.Property(e => e.CarriedForwardDays).HasColumnType("decimal(6,2)").IsRequired();
             entity.Property(e => e.SubscriptionId).IsRequired();
             entity.Property(e => e.IsActive).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.Ignore(e => e.RemainingDays);
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(e => e.LeaveType)
                 .WithMany(t => t.LeaveAllotments)
                 .HasForeignKey(e => e.LeaveTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            entity.HasIndex(e => new { e.EmployeeId, e.LeaveTypeId, e.Year, e.SubscriptionId }).IsUnique();
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.LeaveTypeId);
+            entity.HasIndex(e => e.EmployeeId);
         });
     }
 }

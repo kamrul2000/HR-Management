@@ -4407,8 +4407,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "E:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj": {
-              "projectPath": "E:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj"
+            "e:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj": {
+              "projectPath": "e:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj"
             }
           }
         }

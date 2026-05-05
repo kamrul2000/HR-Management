@@ -232,6 +232,18 @@ public class AppDbContext : DbContext
             entity.ToTable("LeaveApplications");
             entity.HasKey(e => e.Id);
 
+            entity.Property(e => e.ApplicationNo).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.LeaveTypeId).IsRequired();
+            entity.Property(e => e.LeaveAllotmentId).IsRequired();
+            entity.Property(e => e.FromDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.ToDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.TotalDays).HasColumnType("decimal(6,2)").IsRequired();
+            entity.Property(e => e.Reason).IsRequired().HasMaxLength(1000);
+            entity.Property(e => e.AttachmentPath).HasMaxLength(500);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.ApprovalRemarks).HasMaxLength(500);
+            entity.Property(e => e.CancellationReason).HasMaxLength(500);
             entity.Property(e => e.SubscriptionId).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();
@@ -246,9 +258,17 @@ public class AppDbContext : DbContext
                 .HasForeignKey(e => e.LeaveTypeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            entity.HasOne(e => e.LeaveAllotment)
+                .WithMany()
+                .HasForeignKey(e => e.LeaveAllotmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.EmployeeId);
             entity.HasIndex(e => e.LeaveTypeId);
+            entity.HasIndex(e => e.LeaveAllotmentId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => new { e.ApplicationNo, e.SubscriptionId }).IsUnique();
         });
 
         modelBuilder.Entity<SalaryCreate>(entity =>

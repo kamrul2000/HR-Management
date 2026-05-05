@@ -19,6 +19,8 @@ public class AppDbContext : DbContext
     public DbSet<LeaveApplication> LeaveApplications => Set<LeaveApplication>();
     public DbSet<SalaryCreate> SalaryCreates => Set<SalaryCreate>();
     public DbSet<DutySlot> DutySlots => Set<DutySlot>();
+    public DbSet<LeaveType> LeaveTypes => Set<LeaveType>();
+    public DbSet<LeaveAllotment> LeaveAllotments => Set<LeaveAllotment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -224,8 +226,14 @@ public class AppDbContext : DbContext
                 .HasForeignKey(e => e.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            entity.HasOne(e => e.LeaveType)
+                .WithMany(t => t.LeaveApplications)
+                .HasForeignKey(e => e.LeaveTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.LeaveTypeId);
         });
 
         modelBuilder.Entity<SalaryCreate>(entity =>
@@ -265,6 +273,50 @@ public class AppDbContext : DbContext
 
             entity.HasIndex(e => new { e.SlotName, e.SubscriptionId }).IsUnique();
             entity.HasIndex(e => e.SubscriptionId);
+        });
+
+        modelBuilder.Entity<LeaveType>(entity =>
+        {
+            entity.ToTable("LeaveTypes");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Code).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.IsPaid).IsRequired();
+            entity.Property(e => e.IsCarryForward).IsRequired();
+            entity.Property(e => e.MaxCarryForwardDays).IsRequired();
+            entity.Property(e => e.RequiresApproval).IsRequired();
+            entity.Property(e => e.RequiresDocument).IsRequired();
+            entity.Property(e => e.MinNoticeDays).IsRequired();
+            entity.Property(e => e.GenderRestriction).HasMaxLength(20);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasIndex(e => new { e.Name, e.SubscriptionId }).IsUnique();
+            entity.HasIndex(e => new { e.Code, e.SubscriptionId }).IsUnique();
+            entity.HasIndex(e => e.SubscriptionId);
+        });
+
+        modelBuilder.Entity<LeaveAllotment>(entity =>
+        {
+            entity.ToTable("LeaveAllotments");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.LeaveType)
+                .WithMany(t => t.LeaveAllotments)
+                .HasForeignKey(e => e.LeaveTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.LeaveTypeId);
         });
     }
 }

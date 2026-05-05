@@ -116,6 +116,7 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IDesignationService, DesignationService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IDutySlotService, DutySlotService>();
+builder.Services.AddScoped<ILeaveTypeService, LeaveTypeService>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();

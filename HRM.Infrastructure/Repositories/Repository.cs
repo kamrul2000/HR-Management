@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using HRM.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -41,5 +42,20 @@ public class Repository<T> : IRepository<T> where T : class
     {
         _dbSet.Remove(entity);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    {
+        return await _dbSet.Where(predicate).ToListAsync();
+    }
+
+    public async Task<T?> FindFirstAsync(Expression<Func<T, bool>> predicate)
+    {
+        return await _dbSet.FirstOrDefaultAsync(predicate);
+    }
+
+    public IQueryable<T> Query()
+    {
+        return _dbSet.AsQueryable();
     }
 }

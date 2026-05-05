@@ -22,6 +22,7 @@ public class AppDbContext : DbContext
     public DbSet<LeaveType> LeaveTypes => Set<LeaveType>();
     public DbSet<LeaveAllotment> LeaveAllotments => Set<LeaveAllotment>();
     public DbSet<HolidayCalendar> HolidayCalendars => Set<HolidayCalendar>();
+    public DbSet<OffDay> OffDays => Set<OffDay>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -359,6 +360,29 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.HolidayDate);
             entity.HasIndex(e => e.BranchId);
+        });
+
+        modelBuilder.Entity<OffDay>(entity =>
+        {
+            entity.ToTable("OffDays");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.DayOfWeek).IsRequired();
+            entity.Property(e => e.DayName).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Branch)
+                .WithMany()
+                .HasForeignKey(e => e.BranchId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.BranchId);
+            entity.HasIndex(e => e.DayOfWeek);
         });
     }
 }

@@ -9,3 +9,4 @@ e:\Kamrul\HRM\HRM.Core\obj\Debug\net8.0\HRM.Core.dll
 e:\Kamrul\HRM\HRM.Core\obj\Debug\net8.0\refint\HRM.Core.dll
 e:\Kamrul\HRM\HRM.Core\obj\Debug\net8.0\HRM.Core.pdb
 e:\Kamrul\HRM\HRM.Core\obj\Debug\net8.0\ref\HRM.Core.dll
+e:\Kamrul\HRM\HRM.Core\obj\Debug\net8.0\HRM.Core.sourcelink.json

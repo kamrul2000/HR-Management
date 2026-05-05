@@ -2,8 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRM.Core.Entities;
 
-// Stub introduced in Module 3 so Branch.Departments navigation compiles.
-// Module 4 extends this with full department-management fields.
 public class Department
 {
     public int Id { get; set; }
@@ -12,6 +10,10 @@ public class Department
     [MaxLength(150)]
     public string Name { get; set; } = string.Empty;
 
+    [MaxLength(500)]
+    public string? Description { get; set; }
+
+    [Required]
     public int BranchId { get; set; }
 
     public Branch Branch { get; set; } = null!;
@@ -24,4 +26,6 @@ public class Department
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
+
+    public ICollection<Designation> Designations { get; set; } = new List<Designation>();
 }

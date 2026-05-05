@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "e:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj": {}
+    "E:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj": {}
   },
   "projects": {
     "e:\\Kamrul\\HRM\\HRM.Core\\HRM.Core.csproj": {
@@ -84,14 +84,14 @@
         }
       }
     },
-    "e:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj": {
+    "E:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "e:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj",
+        "projectUniqueName": "E:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj",
         "projectName": "HRM.Infrastructure",
-        "projectPath": "e:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj",
+        "projectPath": "E:\\Kamrul\\HRM\\HRM.Infrastructure\\HRM.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\MdKamrulHassanKhan\\.nuget\\packages\\",
-        "outputPath": "e:\\Kamrul\\HRM\\HRM.Infrastructure\\obj\\",
+        "outputPath": "E:\\Kamrul\\HRM\\HRM.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

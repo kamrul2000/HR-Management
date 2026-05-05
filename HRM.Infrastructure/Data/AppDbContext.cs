@@ -21,6 +21,7 @@ public class AppDbContext : DbContext
     public DbSet<DutySlot> DutySlots => Set<DutySlot>();
     public DbSet<LeaveType> LeaveTypes => Set<LeaveType>();
     public DbSet<LeaveAllotment> LeaveAllotments => Set<LeaveAllotment>();
+    public DbSet<HolidayCalendar> HolidayCalendars => Set<HolidayCalendar>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -332,6 +333,32 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.LeaveTypeId);
             entity.HasIndex(e => e.EmployeeId);
+        });
+
+        modelBuilder.Entity<HolidayCalendar>(entity =>
+        {
+            entity.ToTable("HolidayCalendars");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.HolidayName).IsRequired().HasMaxLength(150);
+            entity.Property(e => e.HolidayDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.HolidayType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.IsRecurringYearly).IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Branch)
+                .WithMany()
+                .HasForeignKey(e => e.BranchId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.HolidayDate);
+            entity.HasIndex(e => e.BranchId);
         });
     }
 }

@@ -423,8 +423,16 @@ public class AppDbContext : DbContext
             entity.ToTable("Overtimes");
             entity.HasKey(e => e.Id);
 
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.AttendanceId).IsRequired();
+            entity.Property(e => e.OvertimeDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.RequestedMinutes).IsRequired();
+            entity.Property(e => e.ApprovedMinutes).IsRequired();
+            entity.Property(e => e.OvertimeType).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.Reason).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.ApprovalRemarks).HasMaxLength(500);
             entity.Property(e => e.SubscriptionId).IsRequired();
-            entity.Property(e => e.IsActive).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();
 
@@ -441,6 +449,8 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.AttendanceId);
             entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => new { e.AttendanceId, e.SubscriptionId }).IsUnique();
         });
     }
 }

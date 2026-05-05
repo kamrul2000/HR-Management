@@ -1,53 +1,28 @@
-using System.ComponentModel.DataAnnotations;
+namespace HRM.Core.DTOs.Overtime;
 
-namespace HRM.Core.Entities;
-
-public class Overtime
+public class OvertimeResponseDto
 {
     public int Id { get; set; }
-
-    [Required]
     public int EmployeeId { get; set; }
-
-    public Employee Employee { get; set; } = null!;
-
-    [Required]
+    public string EmployeeCode { get; set; } = string.Empty;
+    public string EmployeeFullName { get; set; } = string.Empty;
     public int AttendanceId { get; set; }
-
-    public Attendance Attendance { get; set; } = null!;
-
-    [Required]
     public DateTime OvertimeDate { get; set; }
-
-    [Required]
-    [Range(1, 720)]
+    public string OvertimeDateFormatted { get; set; } = string.Empty;
     public int RequestedMinutes { get; set; }
-
+    public string RequestedFormatted { get; set; } = string.Empty;
     public int ApprovedMinutes { get; set; }
-
-    [Required]
-    [MaxLength(30)]
+    public string ApprovedFormatted { get; set; } = string.Empty;
     public string OvertimeType { get; set; } = string.Empty;
-
-    [Required]
-    [MaxLength(500)]
+    public string OvertimeTypeLabel { get; set; } = string.Empty;
     public string Reason { get; set; } = string.Empty;
-
-    [Required]
-    [MaxLength(30)]
     public string Status { get; set; } = string.Empty;
-
+    public string StatusLabel { get; set; } = string.Empty;
     public int? ApprovedById { get; set; }
-
     public DateTime? ApprovalDate { get; set; }
-
-    [MaxLength(500)]
+    public string? ApprovalDateFormatted { get; set; }
     public string? ApprovalRemarks { get; set; }
-
-    [Required]
     public int SubscriptionId { get; set; }
-
     public DateTime CreatedAt { get; set; }
-
     public DateTime UpdatedAt { get; set; }
 }

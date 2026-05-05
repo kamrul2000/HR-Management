@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<Attendance> Attendances => Set<Attendance>();
     public DbSet<LeaveApplication> LeaveApplications => Set<LeaveApplication>();
     public DbSet<SalaryCreate> SalaryCreates => Set<SalaryCreate>();
+    public DbSet<DutySlot> DutySlots => Set<DutySlot>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -199,8 +200,14 @@ public class AppDbContext : DbContext
                 .HasForeignKey(e => e.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            entity.HasOne(e => e.DutySlot)
+                .WithMany()
+                .HasForeignKey(e => e.DutySlotId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.DutySlotId);
         });
 
         modelBuilder.Entity<LeaveApplication>(entity =>
@@ -237,6 +244,27 @@ public class AppDbContext : DbContext
 
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.EmployeeId);
+        });
+
+        modelBuilder.Entity<DutySlot>(entity =>
+        {
+            entity.ToTable("DutySlots");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.SlotName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.StartTime).IsRequired();
+            entity.Property(e => e.EndTime).IsRequired();
+            entity.Property(e => e.BreakDurationMinutes).IsRequired();
+            entity.Property(e => e.LateToleranceMinutes).IsRequired();
+            entity.Property(e => e.TotalWorkingHours).HasColumnType("decimal(5,2)").IsRequired();
+            entity.Property(e => e.IsNightShift).IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasIndex(e => new { e.SlotName, e.SubscriptionId }).IsUnique();
+            entity.HasIndex(e => e.SubscriptionId);
         });
     }
 }

@@ -140,6 +140,7 @@ builder.Services.AddScoped<IPfInterestService, PfInterestService>();
 builder.Services.AddScoped<IGratuityRuleService, GratuityRuleService>();
 builder.Services.AddScoped<IGratuityCalculationService, GratuityCalculationService>();
 builder.Services.AddScoped<IEmployeeSeparationService, EmployeeSeparationService>();
+builder.Services.AddScoped<ISeparationReasonService, SeparationReasonService>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();

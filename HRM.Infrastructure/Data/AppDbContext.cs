@@ -1077,15 +1077,16 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
 
             entity.Property(e => e.ReasonName).IsRequired().HasMaxLength(150);
-            entity.Property(e => e.Category).HasMaxLength(20);
+            entity.Property(e => e.SeparationType).IsRequired().HasMaxLength(30);
             entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.DisplayOrder).IsRequired();
             entity.Property(e => e.IsActive).IsRequired();
             entity.Property(e => e.SubscriptionId).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();
 
             entity.HasIndex(e => e.SubscriptionId);
-            entity.HasIndex(e => new { e.ReasonName, e.SubscriptionId }).IsUnique();
+            entity.HasIndex(e => new { e.ReasonName, e.SeparationType, e.SubscriptionId }).IsUnique();
         });
 
         modelBuilder.Entity<EmployeeSeparation>(entity =>

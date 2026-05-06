@@ -32,6 +32,8 @@ public class AppDbContext : DbContext
     public DbSet<LoanApplication> LoanApplications => Set<LoanApplication>();
     public DbSet<LoanRecommendation> LoanRecommendations => Set<LoanRecommendation>();
     public DbSet<LoanApproval> LoanApprovals => Set<LoanApproval>();
+    public DbSet<EmployeeLoan> EmployeeLoans => Set<EmployeeLoan>();
+    public DbSet<LoanInstallment> LoanInstallments => Set<LoanInstallment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -721,6 +723,89 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.LoanApplicationId);
             entity.HasIndex(e => new { e.LoanApplicationId, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<EmployeeLoan>(entity =>
+        {
+            entity.ToTable("EmployeeLoans");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.LoanApplicationId).IsRequired();
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.LoanNo).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.PrincipalAmount).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.InterestRate).HasColumnType("decimal(6,4)").IsRequired();
+            entity.Property(e => e.InterestType).HasMaxLength(20);
+            entity.Property(e => e.TenureMonths).IsRequired();
+            entity.Property(e => e.MonthlyInstallment).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.TotalRepayable).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.DisbursementDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.FirstInstallmentMonth).IsRequired();
+            entity.Property(e => e.FirstInstallmentYear).IsRequired();
+            entity.Property(e => e.TotalPaid).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.OutstandingBalance).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.PaidInstallments).IsRequired();
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Remarks).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.LoanApplication)
+                .WithMany()
+                .HasForeignKey(e => e.LoanApplicationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => new { e.LoanApplicationId, e.SubscriptionId }).IsUnique();
+            entity.HasIndex(e => new { e.LoanNo, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<LoanInstallment>(entity =>
+        {
+            entity.ToTable("LoanInstallments");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmployeeLoanId).IsRequired();
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.InstallmentNo).IsRequired();
+            entity.Property(e => e.DueMonth).IsRequired();
+            entity.Property(e => e.DueYear).IsRequired();
+            entity.Property(e => e.InstallmentAmount).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.PaidAmount).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.EmployeeLoan)
+                .WithMany(l => l.Installments)
+                .HasForeignKey(e => e.EmployeeLoanId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.SalaryCalculation)
+                .WithMany()
+                .HasForeignKey(e => e.SalaryCalculationId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeLoanId);
+            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => new { e.EmployeeId, e.DueYear, e.DueMonth, e.Status });
         });
     }
 }

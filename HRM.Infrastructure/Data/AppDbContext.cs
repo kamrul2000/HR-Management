@@ -41,6 +41,7 @@ public class AppDbContext : DbContext
     public DbSet<EmployeePfContribution> EmployeePfContributions => Set<EmployeePfContribution>();
     public DbSet<PfInterestRate> PfInterestRates => Set<PfInterestRate>();
     public DbSet<EmployeePfInterest> EmployeePfInterests => Set<EmployeePfInterest>();
+    public DbSet<GratuityRule> GratuityRules => Set<GratuityRule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -999,6 +1000,29 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.EmployeeId);
             entity.HasIndex(e => e.PfInterestRateId);
             entity.HasIndex(e => new { e.EmployeeId, e.FiscalYear, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<GratuityRule>(entity =>
+        {
+            entity.ToTable("GratuityRules");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.RuleName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.MinServiceYears).HasColumnType("decimal(5,2)").IsRequired();
+            entity.Property(e => e.CalculationBasis).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.RatePerYear).HasColumnType("decimal(6,2)").IsRequired();
+            entity.Property(e => e.MaxGratuityAmount).HasColumnType("decimal(14,2)");
+            entity.Property(e => e.MaxServiceYearsCapped);
+            entity.Property(e => e.ProRataEnabled).IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.EffectiveFrom).HasColumnType("date").IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => new { e.RuleName, e.SubscriptionId }).IsUnique();
         });
     }
 }

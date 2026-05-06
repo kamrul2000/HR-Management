@@ -1,0 +1,72 @@
+<hrm-page-header title="Duty Slots" subtitle="Shift patterns used for attendance tracking.">
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    Add Slot
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <hrm-loading-skeleton *ngIf="loading()" rows="3"></hrm-loading-skeleton>
+
+  <ng-container *ngIf="!loading()">
+    <hrm-empty-state
+      *ngIf="slots().length === 0; else cardsTpl"
+      icon="heroClock"
+      title="No duty slots configured"
+      description="Add your first shift pattern to start tracking attendance."
+      actionLabel="Add Slot"
+      (action)="openCreate()"
+    ></hrm-empty-state>
+
+    <ng-template #cardsTpl>
+      <div class="duty-grid">
+        <article *ngFor="let s of slots()" class="duty-card" [class.is-inactive]="!s.isActive">
+          <header>
+            <h3>{{ s.slotName }}</h3>
+            <span *ngIf="s.isNightShift" class="duty-card__night">
+              <ng-icon name="heroMoon" size="12" />
+              Night
+            </span>
+          </header>
+
+          <div class="duty-card__time">
+            <ng-icon name="heroClock" size="16" />
+            <span>{{ formatTime(s.startTime) }} – {{ formatTime(s.endTime) }}</span>
+          </div>
+
+          <div class="duty-card__total">
+            <span class="text-label">Total Working</span>
+            <strong>{{ hoursLabel(s.totalWorkingHours) }}</strong>
+          </div>
+
+          <dl class="duty-card__meta">
+            <dt>Break</dt><dd>{{ s.breakDurationMinutes }} mins</dd>
+            <dt>Late tolerance</dt><dd>{{ s.lateToleranceMinutes }} mins</dd>
+          </dl>
+
+          <footer>
+            <span class="duty-card__status" [class.is-inactive]="!s.isActive">
+              {{ s.isActive ? 'Active' : 'Inactive' }}
+            </span>
+            <div class="duty-card__actions">
+              <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="openEdit(s)" aria-label="Edit">
+                <ng-icon name="heroPencilSquare" size="16" />
+              </button>
+              <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="delete(s)" aria-label="Delete">
+                <ng-icon name="heroTrash" size="16" />
+              </button>
+            </div>
+          </footer>
+        </article>
+      </div>
+    </ng-template>
+  </ng-container>
+</div>
+
+<ng-container *ngIf="drawerOpen()">
+  <hrm-duty-slot-form
+    [slot]="editingSlot()"
+    (saved)="onSaved($event)"
+    (dismiss)="closeDrawer()"
+  ></hrm-duty-slot-form>
+</ng-container>

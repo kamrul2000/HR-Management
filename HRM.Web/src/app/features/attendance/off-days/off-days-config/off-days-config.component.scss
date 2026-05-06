@@ -1,0 +1,100 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.off-days {
+  &__scope {
+    display: inline-flex;
+    background: $neutral-100;
+    border-radius: $radius-md;
+    padding: 4px;
+    margin-bottom: $spacing-lg;
+    gap: 4px;
+  }
+
+  &__scope-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: none;
+    background: transparent;
+    border-radius: $radius-sm;
+    font-size: $text-sm;
+    font-weight: 500;
+    color: $neutral-600;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover { color: $neutral-900; }
+
+    &.is-active {
+      background: #fff;
+      color: $brand-primary;
+      box-shadow: $shadow-xs;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+
+    @include mobile { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  &__day {
+    border: 2px solid $neutral-200;
+    background: #fff;
+    border-radius: $radius-md;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    cursor: pointer;
+    transition: all $transition-fast;
+    position: relative;
+
+    &:hover:not(:disabled) {
+      border-color: $brand-primary;
+      background: $brand-primary-light;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &.is-selected {
+      border-color: $brand-primary;
+      background: $brand-primary-light;
+
+      .off-days__day-short { color: $brand-primary; }
+      .off-days__day-name  { color: $brand-primary-dark; }
+    }
+  }
+
+  &__day-short {
+    font-size: $text-lg;
+    font-weight: 700;
+    color: $neutral-700;
+    letter-spacing: 0.5px;
+  }
+
+  &__day-name {
+    font-size: $text-xs;
+    color: $neutral-500;
+  }
+
+  &__day-check {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    color: $brand-primary;
+  }
+}
+
+.card__footer {
+  justify-content: space-between;
+}

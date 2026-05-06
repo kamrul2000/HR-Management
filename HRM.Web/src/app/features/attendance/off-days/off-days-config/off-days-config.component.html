@@ -1,0 +1,75 @@
+<hrm-page-header title="Off Days" subtitle="Configure weekly non-working days for the organization or specific branches."></hrm-page-header>
+
+<div class="page-content">
+  <div class="card">
+    <div class="card__body">
+      <!-- Scope toggle -->
+      <div class="off-days__scope">
+        <button
+          type="button"
+          class="off-days__scope-btn"
+          [class.is-active]="scope() === 'org'"
+          (click)="setScope('org')"
+        >
+          <ng-icon name="heroGlobeAlt" size="16" />
+          Organization-wide
+        </button>
+        <button
+          type="button"
+          class="off-days__scope-btn"
+          [class.is-active]="scope() === 'branch'"
+          (click)="setScope('branch')"
+        >
+          <ng-icon name="heroBuildingOffice2" size="16" />
+          Branch-specific
+        </button>
+      </div>
+
+      <div *ngIf="scope() === 'branch'" class="form-group" style="max-width: 320px">
+        <label class="form-label">Branch <span class="required">*</span></label>
+        <select
+          class="form-control"
+          [ngModel]="selectedBranchId()"
+          (ngModelChange)="onBranchChange($event ? +$event : null)"
+        >
+          <option [ngValue]="null">Select a branch…</option>
+          <option *ngFor="let b of branchOptions()" [ngValue]="b.id">{{ b.name }}</option>
+        </select>
+      </div>
+
+      <hrm-loading-skeleton *ngIf="loading()" rows="2"></hrm-loading-skeleton>
+
+      <div *ngIf="!loading()" class="off-days__grid">
+        <button
+          *ngFor="let name of dayNames; let i = index"
+          type="button"
+          class="off-days__day"
+          [class.is-selected]="isSelected(i)"
+          [disabled]="scope() === 'branch' && !selectedBranchId()"
+          (click)="toggleDay(i)"
+        >
+          <span class="off-days__day-short">{{ name.slice(0, 3) }}</span>
+          <span class="off-days__day-name">{{ name }}</span>
+          <ng-icon *ngIf="isSelected(i)" name="heroCheck" size="18" class="off-days__day-check" />
+        </button>
+      </div>
+    </div>
+
+    <div class="card__footer">
+      <span class="text-muted text-sm" *ngIf="scope() === 'org'">
+        These days apply to all branches unless overridden.
+      </span>
+      <span class="text-muted text-sm" *ngIf="scope() === 'branch' && selectedBranchId()">
+        These days override the organization-wide setting for the selected branch.
+      </span>
+      <button
+        type="button"
+        class="btn btn--primary"
+        [disabled]="!canSave() || saving()"
+        (click)="save()"
+      >
+        {{ saving() ? 'Saving…' : 'Save Off Days' }}
+      </button>
+    </div>
+  </div>
+</div>

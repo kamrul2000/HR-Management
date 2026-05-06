@@ -1,0 +1,91 @@
+@use 'styles/variables' as *;
+
+.duty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $spacing-md;
+}
+
+.duty-card {
+  background: #fff;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: $shadow-xs;
+
+  &.is-inactive { opacity: 0.7; }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-sm;
+
+    h3 { margin: 0; font-size: $text-lg; font-weight: 600; }
+  }
+
+  &__night {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #F5F3FF;
+    color: #7C3AED;
+    font-size: $text-xs;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+
+  &__time {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: $neutral-700;
+    font-family: $font-mono;
+    font-size: $text-sm;
+
+    ng-icon { color: $neutral-500; }
+  }
+
+  &__total {
+    background: $brand-primary-light;
+    border-radius: $radius-md;
+    padding: 10px 12px;
+
+    .text-label { display: block; margin-bottom: 2px; }
+    strong { color: $brand-primary; font-size: $text-xl; }
+  }
+
+  &__meta {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    row-gap: 4px;
+    font-size: $text-sm;
+    margin: 0;
+
+    dt { color: $neutral-500; }
+    dd { margin: 0; color: $neutral-800; }
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: $spacing-sm;
+    border-top: 1px dashed $neutral-200;
+  }
+
+  &__status {
+    font-size: $text-xs;
+    font-weight: 600;
+    color: $success;
+
+    &.is-inactive { color: $neutral-500; }
+  }
+
+  &__actions { display: flex; gap: 2px; }
+}

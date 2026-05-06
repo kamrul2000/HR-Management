@@ -223,6 +223,22 @@ public class SalaryCreateService : ISalaryCreateService
         return await LoadResponseAsync(structure.Id, subscriptionId);
     }
 
+    public async Task<SalaryStructureResponseDto?> GetActiveByEmployeeInternalAsync(int employeeId, int subscriptionId)
+    {
+        var structure = await _structureRepository.Query()
+            .AsNoTracking()
+            .Include(s => s.Employee)
+            .Include(s => s.Items)
+                .ThenInclude(i => i.SalaryHead)
+            .Where(s =>
+                s.EmployeeId == employeeId &&
+                s.SubscriptionId == subscriptionId &&
+                s.IsActive)
+            .FirstOrDefaultAsync();
+
+        return structure is null ? null : MapToResponseDto(structure);
+    }
+
     public async Task<SalaryStructure?> GetStructureActiveOnDateAsync(int employeeId, DateTime date)
     {
         var subscriptionId = GetSubscriptionId();

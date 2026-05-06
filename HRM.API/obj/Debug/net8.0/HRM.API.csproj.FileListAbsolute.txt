@@ -153,3 +153,4 @@ e:\Kamrul\HRM\HRM.API\obj\Debug\net8.0\HRM.API.genruntimeconfig.cache
 e:\Kamrul\HRM\HRM.API\obj\Debug\net8.0\ref\HRM.API.dll
 e:\Kamrul\HRM\HRM.API\bin\Debug\net8.0\HRM.API.staticwebassets.runtime.json
 e:\Kamrul\HRM\HRM.API\obj\Debug\net8.0\HRM.API.sourcelink.json
+E:\Kamrul\HRM\HRM.API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

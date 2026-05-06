@@ -36,6 +36,9 @@ public class AppDbContext : DbContext
     public DbSet<LoanInstallment> LoanInstallments => Set<LoanInstallment>();
     public DbSet<TaxSlabConfig> TaxSlabConfigs => Set<TaxSlabConfig>();
     public DbSet<TaxSlab> TaxSlabs => Set<TaxSlab>();
+    public DbSet<TaxExclusion> TaxExclusions => Set<TaxExclusion>();
+    public DbSet<PfRule> PfRules => Set<PfRule>();
+    public DbSet<EmployeePfContribution> EmployeePfContributions => Set<EmployeePfContribution>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -850,6 +853,98 @@ public class AppDbContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasIndex(e => e.TaxSlabConfigId);
+        });
+
+        modelBuilder.Entity<TaxExclusion>(entity =>
+        {
+            entity.ToTable("TaxExclusions");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.Reason).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.ExclusionType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.PartialExclusionAmount).HasColumnType("decimal(12,2)");
+            entity.Property(e => e.EffectiveFrom).HasColumnType("date").IsRequired();
+            entity.Property(e => e.EffectiveTo).HasColumnType("date");
+            entity.Property(e => e.CertificateNo).HasMaxLength(100);
+            entity.Property(e => e.AttachmentPath).HasMaxLength(500);
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => new { e.EmployeeId, e.IsActive, e.EffectiveFrom });
+        });
+
+        modelBuilder.Entity<PfRule>(entity =>
+        {
+            entity.ToTable("PfRules");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.RuleName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.EmployeeContributionRate).HasColumnType("decimal(6,4)").IsRequired();
+            entity.Property(e => e.EmployerContributionRate).HasColumnType("decimal(6,4)").IsRequired();
+            entity.Property(e => e.PfBase).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.MinEligibleSalary).HasColumnType("decimal(12,2)");
+            entity.Property(e => e.MaxContributionAmount).HasColumnType("decimal(12,2)");
+            entity.Property(e => e.EffectiveFrom).HasColumnType("date").IsRequired();
+            entity.Property(e => e.EffectiveTo).HasColumnType("date");
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => new { e.RuleName, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<EmployeePfContribution>(entity =>
+        {
+            entity.ToTable("EmployeePfContributions");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.PfRuleId).IsRequired();
+            entity.Property(e => e.Year).IsRequired();
+            entity.Property(e => e.Month).IsRequired();
+            entity.Property(e => e.PfBase).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.EmployeeContributionRate).HasColumnType("decimal(6,4)").IsRequired();
+            entity.Property(e => e.EmployerContributionRate).HasColumnType("decimal(6,4)").IsRequired();
+            entity.Property(e => e.EmployeeContribution).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.EmployerContribution).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.TotalContribution).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.PfRule)
+                .WithMany()
+                .HasForeignKey(e => e.PfRuleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.SalaryCalculation)
+                .WithMany()
+                .HasForeignKey(e => e.SalaryCalculationId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.PfRuleId);
+            entity.HasIndex(e => new { e.EmployeeId, e.Year, e.Month, e.SubscriptionId }).IsUnique();
         });
     }
 }

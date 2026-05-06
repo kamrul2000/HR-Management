@@ -30,6 +30,8 @@ public class SalaryCalculationService : ISalaryCalculationService
     private readonly IOvertimeService _overtimeService;
     private readonly ILoanInstallmentService _loanInstallmentService;
     private readonly ITaxSlabService _taxSlabService;
+    private readonly ITaxExclusionService _taxExclusionService;
+    private readonly IPfContributionService _pfContributionService;
     private readonly IWorkingDayCalculator _workingDayCalculator;
     private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -47,6 +49,8 @@ public class SalaryCalculationService : ISalaryCalculationService
         IOvertimeService overtimeService,
         ILoanInstallmentService loanInstallmentService,
         ITaxSlabService taxSlabService,
+        ITaxExclusionService taxExclusionService,
+        IPfContributionService pfContributionService,
         IWorkingDayCalculator workingDayCalculator,
         IConfiguration configuration,
         IHttpContextAccessor httpContextAccessor,
@@ -63,6 +67,8 @@ public class SalaryCalculationService : ISalaryCalculationService
         _overtimeService = overtimeService;
         _loanInstallmentService = loanInstallmentService;
         _taxSlabService = taxSlabService;
+        _taxExclusionService = taxExclusionService;
+        _pfContributionService = pfContributionService;
         _workingDayCalculator = workingDayCalculator;
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
@@ -447,7 +453,14 @@ public class SalaryCalculationService : ISalaryCalculationService
             .Where(d => d.HeadType == "Deduction")
             .Sum(d => d.ComputedAmount);
 
-        decimal totalDeductions = Math.Round(headDeductions + loanDeduction + taxDeduction, 2);
+        bool pfAlreadyInHeads = structure.Items
+            .Any(i => i.SalaryHead.HeadCode == "PF" && i.SalaryHead.HeadType == "Deduction");
+
+        decimal pfDeduction = pfAlreadyInHeads
+            ? 0m
+            : await _pfContributionService.GetEmployeeMonthlyPfAsync(employee.Id, subscriptionId);
+
+        decimal totalDeductions = Math.Round(headDeductions + loanDeduction + taxDeduction + pfDeduction, 2);
 
         decimal netSalary = Math.Round(totalEarnings + overtimePay - totalDeductions, 2);
 
@@ -739,8 +752,12 @@ public class SalaryCalculationService : ISalaryCalculationService
     private async Task<decimal> GetMonthlyTaxDeductionAsync(
         int employeeId, int year, int month, decimal taxableIncome, int subscriptionId)
     {
-        // TODO Module 25 integration — short-circuit when employee is tax-exempt:
-        //   if (await _excludeTaxService.IsExcludedAsync(employeeId, subscriptionId)) return 0m;
+        var exclusion = await _taxExclusionService.CheckExclusionAsync(employeeId, subscriptionId);
+
+        if (exclusion.IsExcluded && exclusion.ExclusionType == "Full")
+        {
+            return 0m;
+        }
 
         var config = await _taxSlabService.GetActiveConfigAsync(subscriptionId);
         if (config is null)
@@ -749,6 +766,15 @@ public class SalaryCalculationService : ISalaryCalculationService
         }
 
         decimal projectedAnnualIncome = taxableIncome * 12m;
+
+        if (exclusion.IsExcluded &&
+            exclusion.ExclusionType == "Partial" &&
+            exclusion.PartialExclusionAmount.HasValue)
+        {
+            projectedAnnualIncome = Math.Max(0m,
+                projectedAnnualIncome - exclusion.PartialExclusionAmount.Value);
+        }
+
         var result = TaxSlabService.ComputeTax(projectedAnnualIncome, config);
         return result.MonthlyTax;
     }

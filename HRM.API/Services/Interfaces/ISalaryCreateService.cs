@@ -20,4 +20,12 @@ public interface ISalaryCreateService
     /// the structure active on the 1st of the month is the one applied.
     /// </summary>
     Task<SalaryStructure?> GetStructureActiveOnDateAsync(int employeeId, DateTime date);
+
+    /// <summary>
+    /// Returns the currently active salary structure DTO for the given employee
+    /// using a caller-supplied subscriptionId — bypasses IHttpContextAccessor.
+    /// Used by Module 26 (PfContribution) when computing PF inside other services.
+    /// Returns null when no active structure exists; never throws.
+    /// </summary>
+    Task<SalaryStructureResponseDto?> GetActiveByEmployeeInternalAsync(int employeeId, int subscriptionId);
 }

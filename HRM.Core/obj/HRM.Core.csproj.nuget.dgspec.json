@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "e:\\Kamrul\\HRM\\HRM.Core\\HRM.Core.csproj": {}
+    "E:\\Kamrul\\HRM\\HRM.Core\\HRM.Core.csproj": {}
   },
   "projects": {
-    "e:\\Kamrul\\HRM\\HRM.Core\\HRM.Core.csproj": {
+    "E:\\Kamrul\\HRM\\HRM.Core\\HRM.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "e:\\Kamrul\\HRM\\HRM.Core\\HRM.Core.csproj",
+        "projectUniqueName": "E:\\Kamrul\\HRM\\HRM.Core\\HRM.Core.csproj",
         "projectName": "HRM.Core",
-        "projectPath": "e:\\Kamrul\\HRM\\HRM.Core\\HRM.Core.csproj",
+        "projectPath": "E:\\Kamrul\\HRM\\HRM.Core\\HRM.Core.csproj",
         "packagesPath": "C:\\Users\\MdKamrulHassanKhan\\.nuget\\packages\\",
-        "outputPath": "e:\\Kamrul\\HRM\\HRM.Core\\obj\\",
+        "outputPath": "E:\\Kamrul\\HRM\\HRM.Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

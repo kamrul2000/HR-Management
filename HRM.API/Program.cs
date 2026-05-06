@@ -136,6 +136,7 @@ builder.Services.AddScoped<ILoanInstallmentService, LoanInstallmentService>();
 builder.Services.AddScoped<ITaxSlabService, TaxSlabService>();
 builder.Services.AddScoped<ITaxExclusionService, TaxExclusionService>();
 builder.Services.AddScoped<IPfContributionService, PfContributionService>();
+builder.Services.AddScoped<IPfInterestService, PfInterestService>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();

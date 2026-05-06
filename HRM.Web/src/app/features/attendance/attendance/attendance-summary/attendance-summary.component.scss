@@ -1,0 +1,120 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.att-summary {
+  &__autocomplete {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 4px;
+    background: #fff;
+    border: 1px solid $neutral-200;
+    border-radius: $radius-md;
+    box-shadow: $shadow-md;
+    position: absolute;
+    width: 100%;
+    z-index: 5;
+    max-height: 280px;
+    overflow-y: auto;
+    @include scrollbar;
+
+    li {
+      padding: 8px 10px;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      font-size: $text-sm;
+
+      &:hover { background: $neutral-100; }
+    }
+  }
+
+  &__head .card__body { padding: $spacing-md $spacing-lg; }
+  &__head-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+  }
+
+  &__nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+  }
+
+  &__stat {
+    background: #fff;
+    border: 1px solid $neutral-200;
+    border-radius: $radius-md;
+    padding: 12px 14px;
+    border-left: 4px solid $neutral-300;
+
+    .text-label { display: block; margin-bottom: 4px; }
+    strong { font-size: $text-2xl; font-weight: 700; color: $neutral-900; }
+
+    &[data-tone="success"] { border-left-color: $success; strong { color: $success; } }
+    &[data-tone="danger"]  { border-left-color: $danger;  strong { color: $danger; } }
+    &[data-tone="warn"]    { border-left-color: $warning; strong { color: $warning; } }
+    &[data-tone="purple"]  { border-left-color: #7C3AED;  strong { color: #7C3AED; } }
+    &[data-tone="info"]    { border-left-color: $info;    strong { color: $info; } }
+  }
+}
+
+.att-cal {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+
+  &__head {
+    background: $neutral-50;
+    color: $neutral-500;
+    font-size: $text-xs;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    border-bottom: 1px solid $neutral-200;
+    text-align: center;
+  }
+
+  &__cell {
+    border-right: 1px solid $neutral-100;
+    border-bottom: 1px solid $neutral-100;
+    min-height: 70px;
+    padding: 8px;
+    background: #fff;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    &:nth-child(7n) { border-right: none; }
+    &.is-out { background: $neutral-50; }
+  }
+
+  &__day {
+    font-size: $text-sm;
+    font-weight: 500;
+    color: $neutral-700;
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: $neutral-200;
+  }
+
+  // Color the dot based on the status data attribute on the parent.
+  &__cell[data-status="Present"]   .att-cal__dot { background: $success; }
+  &__cell[data-status="Late"]      .att-cal__dot { background: #C2410C; }
+  &__cell[data-status="HalfDay"]   .att-cal__dot { background: #C2410C; }
+  &__cell[data-status="Absent"]    .att-cal__dot { background: $danger; }
+  &__cell[data-status="Holiday"]   .att-cal__dot { background: #7C3AED; }
+  &__cell[data-status="WeeklyOff"] .att-cal__dot { background: #6366F1; }
+  &__cell[data-status="OnLeave"]   .att-cal__dot { background: $info; }
+}

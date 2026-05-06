@@ -1,0 +1,109 @@
+<hrm-page-header title="Monthly Attendance" subtitle="Per-employee attendance calendar.">
+  <a routerLink="../records" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="card">
+    <div class="card__body">
+      <div class="form-group" style="position: relative; max-width: 480px;">
+        <label class="form-label">Employee <span class="required">*</span></label>
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Search by name or code…"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearchInput($event)"
+        />
+        <ul *ngIf="results().length > 0" class="att-summary__autocomplete">
+          <li *ngFor="let emp of results()" (click)="selectEmployee(emp)">
+            <strong>{{ emp.fullName }}</strong>
+            <span class="text-muted text-mono"> · {{ emp.employeeCode }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <ng-container *ngIf="selectedEmployee() as emp">
+    <div class="card mt-md att-summary__head">
+      <div class="card__body att-summary__head-body">
+        <div>
+          <h3 style="margin:0">{{ emp.fullName }} <span class="text-muted text-sm text-mono">{{ emp.employeeCode }}</span></h3>
+          <p class="text-muted text-sm">{{ emp.designationTitle || '—' }} · {{ emp.branchName || '—' }}</p>
+        </div>
+
+        <div class="att-summary__nav">
+          <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="prevMonth()" aria-label="Previous month">
+            <ng-icon name="heroChevronLeft" size="16" />
+          </button>
+          <strong style="min-width: 140px; text-align:center">{{ monthLabel() }}</strong>
+          <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="nextMonth()" aria-label="Next month">
+            <ng-icon name="heroChevronRight" size="16" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <hrm-loading-skeleton *ngIf="loading()" rows="6" class="mt-md"></hrm-loading-skeleton>
+
+    <ng-container *ngIf="!loading() && summary() as s">
+      <!-- Summary stats row -->
+      <div class="att-summary__stats">
+        <div class="att-summary__stat" data-tone="success">
+          <span class="text-label">Present</span>
+          <strong>{{ s.presentDays }}</strong>
+        </div>
+        <div class="att-summary__stat" data-tone="danger">
+          <span class="text-label">Absent</span>
+          <strong>{{ s.absentDays }}</strong>
+        </div>
+        <div class="att-summary__stat" data-tone="warn">
+          <span class="text-label">Late</span>
+          <strong>{{ s.lateDays }}</strong>
+        </div>
+        <div class="att-summary__stat" data-tone="warn">
+          <span class="text-label">Half Day</span>
+          <strong>{{ s.halfDays }}</strong>
+        </div>
+        <div class="att-summary__stat" data-tone="purple">
+          <span class="text-label">Holiday</span>
+          <strong>{{ s.holidayDays }}</strong>
+        </div>
+        <div class="att-summary__stat" data-tone="purple">
+          <span class="text-label">Off Days</span>
+          <strong>{{ s.weeklyOffDays }}</strong>
+        </div>
+        <div class="att-summary__stat" data-tone="info">
+          <span class="text-label">On Leave</span>
+          <strong>{{ s.leaveDays }}</strong>
+        </div>
+      </div>
+
+      <!-- Calendar -->
+      <div class="card mt-md">
+        <div class="card__body card__body--flush">
+          <div class="att-cal">
+            <div class="att-cal__head" *ngFor="let n of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']">{{ n }}</div>
+            <div
+              *ngFor="let cell of cells()"
+              class="att-cal__cell"
+              [class.is-out]="!cell.inMonth"
+              [attr.data-status]="cell.inMonth ? cell.status : null"
+              [attr.title]="
+                cell.inMonth
+                  ? (cell.status + (cell.punchInTimeFormatted ? ' · ' + cell.punchInTimeFormatted + ' → ' + (cell.punchOutTimeFormatted || '—') : ''))
+                  : null
+              "
+            >
+              <span *ngIf="cell.inMonth" class="att-cal__day">{{ cell.day }}</span>
+              <span *ngIf="cell.inMonth" class="att-cal__dot"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>

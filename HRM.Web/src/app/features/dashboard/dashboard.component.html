@@ -1,0 +1,186 @@
+<hrm-page-header
+  title="Dashboard"
+  subtitle="Live snapshot of your organization."
+></hrm-page-header>
+
+<div class="page-content dashboard">
+  <!-- ── Stat cards ─────────────────────────────────────── -->
+  <section class="dashboard__stats">
+    <hrm-stat-card
+      label="Total Employees"
+      [value]="employeeCount() ?? '—'"
+      [loading]="employeeCount() === null"
+      icon="heroUsers"
+      tone="primary"
+    ></hrm-stat-card>
+
+    <hrm-stat-card
+      label="Present Today"
+      [value]="presentCount()"
+      [loading]="attendance() === null"
+      icon="heroBriefcase"
+      tone="success"
+    ></hrm-stat-card>
+
+    <hrm-stat-card
+      label="Pending Leaves"
+      [value]="pendingLeavesCount() ?? '—'"
+      [loading]="pendingLeavesCount() === null"
+      icon="heroDocumentText"
+      tone="warning"
+    ></hrm-stat-card>
+
+    <hrm-stat-card
+      label="Pending Loans"
+      [value]="pendingLoansCount() ?? '—'"
+      [loading]="pendingLoansCount() === null"
+      icon="heroBanknotes"
+      tone="info"
+    ></hrm-stat-card>
+  </section>
+
+  <!-- ── Charts row ─────────────────────────────────────── -->
+  <section class="dashboard__charts">
+    <article class="card dashboard__chart-card">
+      <header class="card__header">
+        <h3>Today's Attendance</h3>
+        <span class="text-muted text-sm" *ngIf="attendance() as a">{{ a.total }} records</span>
+      </header>
+      <div class="card__body">
+        <hrm-loading-skeleton *ngIf="attendanceLoading()" rows="4"></hrm-loading-skeleton>
+        <ng-container *ngIf="!attendanceLoading()">
+          <div
+            *ngIf="attendance() && attendance()!.total > 0; else attendanceEmpty"
+            echarts
+            [options]="attendanceChart()"
+            class="dashboard__chart"
+          ></div>
+          <ng-template #attendanceEmpty>
+            <hrm-empty-state
+              title="No attendance recorded today"
+              description="Attendance entries will appear here as they are logged."
+            ></hrm-empty-state>
+          </ng-template>
+        </ng-container>
+      </div>
+    </article>
+
+    <article class="card dashboard__chart-card">
+      <header class="card__header">
+        <h3>Headcount by Department</h3>
+        <span class="text-muted text-sm">Active employees</span>
+      </header>
+      <div class="card__body">
+        <hrm-loading-skeleton *ngIf="departmentsLoading()" rows="5"></hrm-loading-skeleton>
+        <ng-container *ngIf="!departmentsLoading()">
+          <div
+            *ngIf="departments().length > 0; else departmentsEmpty"
+            echarts
+            [options]="departmentChart()"
+            class="dashboard__chart"
+          ></div>
+          <ng-template #departmentsEmpty>
+            <hrm-empty-state
+              title="No employees yet"
+              description="Once you add employees, the department distribution will appear here."
+            ></hrm-empty-state>
+          </ng-template>
+        </ng-container>
+      </div>
+    </article>
+  </section>
+
+  <!-- ── Recent activity row ────────────────────────────── -->
+  <section class="dashboard__lists">
+    <article class="card">
+      <header class="card__header">
+        <h3>Recent Leave Applications</h3>
+        <span class="text-muted text-sm">Pending • last 10</span>
+      </header>
+      <div class="card__body card__body--flush">
+        <hrm-loading-skeleton *ngIf="recentLeavesLoading()" rows="5"></hrm-loading-skeleton>
+
+        <ng-container *ngIf="!recentLeavesLoading()">
+          <div *ngIf="recentLeaves().length > 0; else leavesEmpty" class="dashboard__table-wrap">
+            <table class="dashboard__table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Type</th>
+                  <th>Period</th>
+                  <th class="text-right">Days</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of recentLeaves(); trackBy: trackById">
+                  <td>
+                    <div class="dashboard__primary">{{ row.employeeFullName }}</div>
+                    <div class="dashboard__sub">{{ row.employeeCode }}</div>
+                  </td>
+                  <td>{{ row.leaveTypeName }}</td>
+                  <td class="text-mono text-sm">
+                    {{ row.fromDateFormatted }} → {{ row.toDateFormatted }}
+                  </td>
+                  <td class="text-right text-strong">{{ row.totalDays }}</td>
+                  <td><hrm-status-badge [variant]="row.status"></hrm-status-badge></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #leavesEmpty>
+            <hrm-empty-state
+              title="No pending leave applications"
+              description="When employees submit leave requests, they will appear here."
+            ></hrm-empty-state>
+          </ng-template>
+        </ng-container>
+      </div>
+    </article>
+
+    <article class="card">
+      <header class="card__header">
+        <h3>Recent Salary Calculations</h3>
+        <span class="text-muted text-sm">Last 5</span>
+      </header>
+      <div class="card__body card__body--flush">
+        <hrm-loading-skeleton *ngIf="recentSalariesLoading()" rows="5"></hrm-loading-skeleton>
+
+        <ng-container *ngIf="!recentSalariesLoading()">
+          <div
+            *ngIf="recentSalaries().length > 0; else salariesEmpty"
+            class="dashboard__table-wrap"
+          >
+            <table class="dashboard__table">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Period</th>
+                  <th class="text-right">Net</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of recentSalaries(); trackBy: trackById">
+                  <td>
+                    <div class="dashboard__primary">{{ row.employeeFullName }}</div>
+                    <div class="dashboard__sub">{{ row.employeeCode }}</div>
+                  </td>
+                  <td>{{ row.monthLabel }}</td>
+                  <td class="text-right text-strong">{{ row.netSalary | currencyBd }}</td>
+                  <td><hrm-status-badge [variant]="row.status"></hrm-status-badge></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #salariesEmpty>
+            <hrm-empty-state
+              title="No salary calculations yet"
+              description="Run a payroll cycle from the Payroll module to see entries here."
+            ></hrm-empty-state>
+          </ng-template>
+        </ng-container>
+      </div>
+    </article>
+  </section>
+</div>

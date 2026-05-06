@@ -1,0 +1,28 @@
+<div class="drawer-overlay" (click)="onBackdropClick()"></div>
+<aside
+  class="drawer"
+  [class.drawer--lg]="size === 'lg'"
+  role="dialog"
+  aria-modal="true"
+>
+  <header class="drawer__header">
+    <div>
+      <h3>{{ title }}</h3>
+      <p *ngIf="subtitle" class="text-muted text-sm" style="margin-top:2px">{{ subtitle }}</p>
+    </div>
+    <button
+      type="button"
+      class="btn btn--icon btn--ghost-neutral"
+      (click)="dismiss.emit()"
+      aria-label="Close drawer"
+    >
+      <ng-icon name="heroXMark" size="18" />
+    </button>
+  </header>
+  <div class="drawer__body">
+    <ng-content></ng-content>
+  </div>
+  <footer class="drawer__footer">
+    <ng-content select="[drawer-footer]"></ng-content>
+  </footer>
+</aside>

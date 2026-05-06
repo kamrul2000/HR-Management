@@ -1,0 +1,239 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.login {
+  min-height: 100vh;
+  display: flex;
+
+  @include mobile {
+    flex-direction: column;
+  }
+
+  // ─────────────────────────────────────── Brand panel
+  &__brand {
+    width: 45%;
+    background: $neutral-900;
+    color: $neutral-200;
+    padding: 40px 48px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+
+    @include mobile {
+      width: 100%;
+      padding: 24px;
+      min-height: 200px;
+    }
+  }
+
+  &__brand-mark {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1;
+  }
+
+  &__logo {
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-md;
+    background: $brand-primary;
+    color: #fff;
+    font-weight: 700;
+    font-size: $text-xl;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__brand-name {
+    font-size: $text-md;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  &__brand-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: $spacing-lg;
+    z-index: 1;
+  }
+
+  &__brand-headline {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #fff;
+    margin: 0;
+
+    @include mobile {
+      font-size: 24px;
+    }
+  }
+
+  &__brand-accent {
+    color: $brand-accent;
+  }
+
+  &__brand-tagline {
+    font-size: $text-md;
+    color: $neutral-400;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0;
+  }
+
+  &__brand-points {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: $text-sm;
+      color: $neutral-300;
+
+      ng-icon { color: $brand-accent; flex-shrink: 0; }
+    }
+
+    @include mobile { display: none; }
+  }
+
+  &__brand-footer {
+    font-size: $text-xs;
+    color: $neutral-500;
+    z-index: 1;
+  }
+
+  &__blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    pointer-events: none;
+
+    &--1 {
+      width: 360px;
+      height: 360px;
+      background: $brand-primary;
+      top: -120px;
+      right: -120px;
+    }
+
+    &--2 {
+      width: 280px;
+      height: 280px;
+      background: $brand-accent;
+      bottom: -100px;
+      left: -80px;
+    }
+  }
+
+  // ─────────────────────────────────────── Form panel
+  &__form-panel {
+    flex: 1;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  &__form-wrap {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &__form-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__alert {
+    padding: 10px 12px;
+    background: $danger-light;
+    color: $danger;
+    border: 1px solid rgba($danger, 0.2);
+    border-radius: $radius-md;
+    font-size: $text-sm;
+    line-height: 1.4;
+  }
+
+  &__password {
+    position: relative;
+
+    .form-control { padding-right: 40px; }
+  }
+
+  &__password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: $neutral-500;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: $radius-sm;
+    display: inline-flex;
+    align-items: center;
+
+    &:hover { color: $neutral-800; }
+  }
+
+  &__remember {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: $text-sm;
+    color: $neutral-700;
+    cursor: pointer;
+    user-select: none;
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: $brand-primary;
+      cursor: pointer;
+    }
+  }
+
+  &__hint {
+    font-size: $text-xs;
+    line-height: 1.5;
+    text-align: center;
+    margin: 0;
+  }
+
+  &__spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

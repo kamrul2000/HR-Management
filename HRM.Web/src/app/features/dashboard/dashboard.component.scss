@@ -1,0 +1,89 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: $spacing-md;
+  }
+
+  &__charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-md;
+
+    @include mobile { grid-template-columns: 1fr; }
+  }
+
+  &__chart-card .card__body { min-height: 320px; }
+  &__chart { width: 100%; height: 280px; }
+
+  &__lists {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: $spacing-md;
+
+    @include mobile { grid-template-columns: 1fr; }
+  }
+
+  // Bring tables flush against the card edges so they share the table styling
+  // without re-implementing the full data-table component.
+  &__table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    @include scrollbar;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $text-sm;
+
+    thead th {
+      text-align: left;
+      padding: 10px 16px;
+      font-size: $text-xs;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: $neutral-500;
+      background: $neutral-50;
+      border-bottom: 1px solid $neutral-200;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 11px 16px;
+      color: $neutral-800;
+      border-bottom: 1px solid $neutral-100;
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: $neutral-50; }
+
+    .text-right { text-align: right; }
+    .text-strong { font-weight: 600; color: $neutral-900; }
+  }
+
+  &__primary {
+    font-weight: 500;
+    color: $neutral-900;
+    line-height: 1.2;
+  }
+
+  &__sub {
+    font-size: $text-xs;
+    color: $neutral-500;
+    font-family: $font-mono;
+    margin-top: 2px;
+  }
+}
+
+// Strip default body padding when we want flush tables in cards.
+.card__body--flush { padding: 0; }

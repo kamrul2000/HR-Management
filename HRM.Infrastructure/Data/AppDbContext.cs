@@ -781,6 +781,7 @@ public class AppDbContext : DbContext
             entity.Property(e => e.InstallmentAmount).HasColumnType("decimal(12,2)").IsRequired();
             entity.Property(e => e.PaidAmount).HasColumnType("decimal(12,2)").IsRequired();
             entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Remarks).HasMaxLength(500);
             entity.Property(e => e.SubscriptionId).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();

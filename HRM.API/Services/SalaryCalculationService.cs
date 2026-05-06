@@ -5,6 +5,7 @@ using HRM.API.Helpers;
 using HRM.API.Services.Interfaces;
 using HRM.Core.DTOs.Employee;
 using HRM.Core.DTOs.LeaveAllotment;
+using HRM.Core.DTOs.LoanInstallment;
 using HRM.Core.DTOs.SalaryCalculation;
 using HRM.Core.Entities;
 using HRM.Infrastructure.Data;
@@ -26,6 +27,7 @@ public class SalaryCalculationService : ISalaryCalculationService
     private readonly ISalaryCreateService _salaryCreateService;
     private readonly IAttendanceService _attendanceService;
     private readonly IOvertimeService _overtimeService;
+    private readonly ILoanInstallmentService _loanInstallmentService;
     private readonly IWorkingDayCalculator _workingDayCalculator;
     private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -41,6 +43,7 @@ public class SalaryCalculationService : ISalaryCalculationService
         ISalaryCreateService salaryCreateService,
         IAttendanceService attendanceService,
         IOvertimeService overtimeService,
+        ILoanInstallmentService loanInstallmentService,
         IWorkingDayCalculator workingDayCalculator,
         IConfiguration configuration,
         IHttpContextAccessor httpContextAccessor,
@@ -55,6 +58,7 @@ public class SalaryCalculationService : ISalaryCalculationService
         _salaryCreateService = salaryCreateService;
         _attendanceService = attendanceService;
         _overtimeService = overtimeService;
+        _loanInstallmentService = loanInstallmentService;
         _workingDayCalculator = workingDayCalculator;
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
@@ -322,6 +326,19 @@ public class SalaryCalculationService : ISalaryCalculationService
         calculation.UpdatedAt = now;
 
         await _calculationRepository.UpdateAsync(calculation);
+
+        // Post-finalization hook: pay the loan installment for this period (Module 23 integration)
+        var pending = await _loanInstallmentService.GetPendingInstallmentAsync(
+            calculation.EmployeeId, calculation.Year, calculation.Month);
+
+        if (pending is not null)
+        {
+            await _loanInstallmentService.ProcessPaymentAsync(pending.InstallmentId, new ProcessInstallmentDto
+            {
+                PaidAmount = pending.InstallmentAmount,
+                SalaryCalculationId = calculation.Id
+            });
+        }
 
         return await LoadResponseAsync(calculation.Id, subscriptionId);
     }
@@ -709,10 +726,10 @@ public class SalaryCalculationService : ISalaryCalculationService
         return unpaid;
     }
 
-    private Task<decimal> GetMonthlyLoanDeductionAsync(int employeeId, int year, int month, int subscriptionId)
+    private async Task<decimal> GetMonthlyLoanDeductionAsync(int employeeId, int year, int month, int subscriptionId)
     {
-        // TODO Module 23 integration — return monthly loan installment for the period.
-        return Task.FromResult(0m);
+        var pending = await _loanInstallmentService.GetPendingInstallmentAsync(employeeId, year, month);
+        return pending?.InstallmentAmount ?? 0m;
     }
 
     private Task<decimal> GetMonthlyTaxDeductionAsync(

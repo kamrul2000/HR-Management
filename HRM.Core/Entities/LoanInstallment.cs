@@ -38,6 +38,9 @@ public class LoanInstallment
     [MaxLength(20)]
     public string Status { get; set; } = "Pending";
 
+    [MaxLength(500)]
+    public string? Remarks { get; set; }
+
     public int? SalaryCalculationId { get; set; }
 
     public SalaryCalculation? SalaryCalculation { get; set; }

@@ -1,0 +1,44 @@
+@use 'styles/variables' as *;
+
+.company-form {
+  &__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    font-size: $text-sm;
+    color: $neutral-700;
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: $brand-primary;
+    }
+  }
+
+  &__section-title {
+    font-size: $text-md;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+
+  &__logo-preview {
+    width: 96px;
+    height: 96px;
+    border: 1px solid $neutral-200;
+    border-radius: $radius-md;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background: $neutral-50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}

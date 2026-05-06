@@ -1,0 +1,45 @@
+@use 'styles/variables' as *;
+
+.company-list {
+  &__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    ng-icon {
+      position: absolute;
+      left: 12px;
+      color: $neutral-400;
+      pointer-events: none;
+    }
+
+    .form-control { padding-left: 36px; }
+  }
+
+  &__logo {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-md;
+    overflow: hidden;
+    margin: 0 auto;
+    background: $neutral-100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  &__logo-fallback {
+    font-size: $text-xs;
+    font-weight: 600;
+    color: $brand-primary;
+    background: $brand-primary-light;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.5px;
+  }
+}

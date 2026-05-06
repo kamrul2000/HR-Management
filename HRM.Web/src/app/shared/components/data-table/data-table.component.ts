@@ -39,7 +39,7 @@ import { PageState, SortState, TableColumn } from './data-table.types';
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.scss',
 })
-export class DataTableComponent<T extends Record<string, unknown> = Record<string, unknown>> {
+export class DataTableComponent<T = unknown> {
   @Input({ required: true }) columns: TableColumn<T>[] = [];
   @Input({ required: true }) rows: T[] = [];
   @Input() rowKey: keyof T | ((row: T) => string | number) = 'id' as keyof T;
@@ -50,7 +50,7 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   @Input() emptyTitle = 'No records found';
   @Input() emptyMessage = 'There is nothing to display here yet.';
-  @Input() actionsTemplate?: TemplateRef<{ $implicit: T; row: T }>;
+  @Input() actionsTemplate?: TemplateRef<{ $implicit: T; row?: T }>;
 
   @Output() sortChange = new EventEmitter<SortState>();
   @Output() pageChange = new EventEmitter<number>();
@@ -64,12 +64,12 @@ export class DataTableComponent<T extends Record<string, unknown> = Record<strin
 
   trackRow = (index: number, row: T): string | number => {
     if (typeof this.rowKey === 'function') return this.rowKey(row);
-    const value = row[this.rowKey];
+    const value = (row as Record<string, unknown>)[this.rowKey as string];
     return typeof value === 'string' || typeof value === 'number' ? value : index;
   };
 
   cellValue(row: T, key: string): unknown {
-    if (!key.includes('.')) return row[key as keyof T];
+    if (!key.includes('.')) return (row as Record<string, unknown>)[key];
     return key.split('.').reduce<unknown>((acc, part) => {
       if (acc && typeof acc === 'object' && part in (acc as Record<string, unknown>)) {
         return (acc as Record<string, unknown>)[part];

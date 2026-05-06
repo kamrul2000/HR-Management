@@ -1,0 +1,146 @@
+<hrm-drawer
+  [title]="isEdit ? 'Edit Branch' : 'Add Branch'"
+  [subtitle]="isEdit ? 'Update branch details and assignments.' : 'Create a new branch under a company.'"
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-group">
+      <label class="form-label" for="branch-company">
+        Company <span class="required">*</span>
+      </label>
+      <select
+        id="branch-company"
+        class="form-control"
+        formControlName="companyId"
+        [class.is-invalid]="hasError('companyId', 'required') || hasError('companyId', 'min')"
+      >
+        <option [ngValue]="0" disabled>
+          {{ companiesLoading() ? 'Loading companies…' : 'Select a company' }}
+        </option>
+        <option *ngFor="let c of companyOptions()" [ngValue]="c.id">
+          {{ c.name }}
+        </option>
+      </select>
+      <span class="form-error" *ngIf="hasError('companyId', 'min') || hasError('companyId', 'required')">
+        Please select a company.
+      </span>
+    </div>
+
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label class="form-label" for="branch-name">
+          Name <span class="required">*</span>
+        </label>
+        <input
+          id="branch-name"
+          type="text"
+          class="form-control"
+          formControlName="name"
+          placeholder="Dhaka HQ"
+          [class.is-invalid]="hasError('name', 'required')"
+        />
+        <span class="form-error" *ngIf="hasError('name', 'required')">Name is required.</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="branch-code">
+          Code <span class="required">*</span>
+        </label>
+        <input
+          id="branch-code"
+          type="text"
+          class="form-control text-mono"
+          formControlName="code"
+          placeholder="DHK-HQ"
+          maxlength="20"
+          [class.is-invalid]="hasError('code', 'required')"
+        />
+        <span class="form-hint">Short, unique within the company.</span>
+        <span class="form-error" *ngIf="hasError('code', 'required')">Code is required.</span>
+      </div>
+    </div>
+
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label class="form-label" for="branch-phone">
+          Phone <span class="required">*</span>
+        </label>
+        <input
+          id="branch-phone"
+          type="tel"
+          class="form-control"
+          formControlName="phone"
+          [class.is-invalid]="hasError('phone', 'required')"
+        />
+        <span class="form-error" *ngIf="hasError('phone', 'required')">Phone is required.</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="branch-email">
+          Email <span class="required">*</span>
+        </label>
+        <input
+          id="branch-email"
+          type="email"
+          class="form-control"
+          formControlName="email"
+          [class.is-invalid]="hasError('email', 'required') || hasError('email', 'email')"
+        />
+        <span class="form-error" *ngIf="hasError('email', 'required')">Email is required.</span>
+        <span class="form-error" *ngIf="hasError('email', 'email')">Enter a valid email.</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="branch-address">
+        Address <span class="required">*</span>
+      </label>
+      <textarea
+        id="branch-address"
+        class="form-control"
+        formControlName="address"
+        rows="3"
+        [class.is-invalid]="hasError('address', 'required')"
+      ></textarea>
+      <span class="form-error" *ngIf="hasError('address', 'required')">Address is required.</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="branch-manager">Manager</label>
+      <input
+        id="branch-manager"
+        type="text"
+        class="form-control"
+        formControlName="managerName"
+        placeholder="Optional"
+      />
+    </div>
+
+    <div *ngIf="isEdit" class="form-group">
+      <label class="company-form__toggle">
+        <input type="checkbox" formControlName="isActive" />
+        <span>Branch is active</span>
+      </label>
+    </div>
+  </form>
+
+  <ng-container drawer-footer>
+    <button
+      type="button"
+      class="btn btn--secondary"
+      [disabled]="saving()"
+      (click)="dismiss.emit()"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="btn btn--primary"
+      [disabled]="saving()"
+      (click)="submit()"
+    >
+      {{ saving() ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Branch' }}
+    </button>
+  </ng-container>
+</hrm-drawer>

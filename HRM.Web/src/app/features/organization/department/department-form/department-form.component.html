@@ -1,0 +1,82 @@
+<hrm-drawer
+  [title]="isEdit ? 'Edit Department' : 'Add Department'"
+  [subtitle]="isEdit ? 'Update department details.' : 'Create a department under a branch.'"
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-group">
+      <label class="form-label" for="department-branch">
+        Branch <span class="required">*</span>
+      </label>
+      <select
+        id="department-branch"
+        class="form-control"
+        formControlName="branchId"
+        [class.is-invalid]="hasError('branchId', 'min') || hasError('branchId', 'required')"
+      >
+        <option [ngValue]="0" disabled>
+          {{ branchesLoading() ? 'Loading branches…' : 'Select a branch' }}
+        </option>
+        <option *ngFor="let b of branchOptions()" [ngValue]="b.id">
+          {{ branchLabel(b) }}
+        </option>
+      </select>
+      <span class="form-error" *ngIf="hasError('branchId', 'min') || hasError('branchId', 'required')">
+        Please select a branch.
+      </span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="department-name">
+        Name <span class="required">*</span>
+      </label>
+      <input
+        id="department-name"
+        type="text"
+        class="form-control"
+        formControlName="name"
+        placeholder="Engineering"
+        [class.is-invalid]="hasError('name', 'required')"
+      />
+      <span class="form-error" *ngIf="hasError('name', 'required')">Name is required.</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="department-description">Description</label>
+      <textarea
+        id="department-description"
+        class="form-control"
+        formControlName="description"
+        rows="3"
+        placeholder="Optional"
+      ></textarea>
+    </div>
+
+    <div *ngIf="isEdit" class="form-group">
+      <label class="company-form__toggle">
+        <input type="checkbox" formControlName="isActive" />
+        <span>Department is active</span>
+      </label>
+    </div>
+  </form>
+
+  <ng-container drawer-footer>
+    <button
+      type="button"
+      class="btn btn--secondary"
+      [disabled]="saving()"
+      (click)="dismiss.emit()"
+    >
+      Cancel
+    </button>
+    <button
+      type="button"
+      class="btn btn--primary"
+      [disabled]="saving()"
+      (click)="submit()"
+    >
+      {{ saving() ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Department' }}
+    </button>
+  </ng-container>
+</hrm-drawer>

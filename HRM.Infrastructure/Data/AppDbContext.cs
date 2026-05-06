@@ -26,6 +26,8 @@ public class AppDbContext : DbContext
     public DbSet<OffDay> OffDays => Set<OffDay>();
     public DbSet<Overtime> Overtimes => Set<Overtime>();
     public DbSet<SalaryHead> SalaryHeads => Set<SalaryHead>();
+    public DbSet<SalaryCalculation> SalaryCalculations => Set<SalaryCalculation>();
+    public DbSet<SalaryCalculationDetail> SalaryCalculationDetails => Set<SalaryCalculationDetail>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -597,5 +597,46 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.SalaryCalculationId);
             entity.HasIndex(e => e.SalaryHeadId);
         });
+
+        modelBuilder.Entity<BonusCalculation>(entity =>
+        {
+            entity.ToTable("BonusCalculations");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.BonusType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.BonusTitle).IsRequired().HasMaxLength(150);
+            entity.Property(e => e.CalculationBasis).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.BasisPercentage).HasColumnType("decimal(6,4)");
+            entity.Property(e => e.BasicSalarySnapshot).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.GrossSalarySnapshot).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.ComputedAmount).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.FinalAmount).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.DisbursementMonth).IsRequired();
+            entity.Property(e => e.DisbursementYear).IsRequired();
+            entity.Property(e => e.IsDisbursedWithSalary).IsRequired();
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.ApprovalRemarks).HasMaxLength(500);
+            entity.Property(e => e.Remarks).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.SalaryCalculation)
+                .WithMany()
+                .HasForeignKey(e => e.SalaryCalculationId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => new { e.DisbursementYear, e.DisbursementMonth });
+        });
     }
 }

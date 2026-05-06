@@ -1,0 +1,125 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.data-table-wrapper {
+  background: #fff;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-lg;
+  overflow: hidden;
+}
+
+.data-table-scroll {
+  overflow-x: auto;
+  @include scrollbar;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $text-sm;
+
+  thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: $text-xs;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: $neutral-500;
+    background: $neutral-50;
+    border-bottom: 1px solid $neutral-200;
+    white-space: nowrap;
+    user-select: none;
+
+    &.is-sortable {
+      cursor: pointer;
+      &:hover { color: $neutral-700; }
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid $neutral-100;
+    transition: background $transition-fast;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: $neutral-50; }
+  }
+
+  tbody td {
+    padding: 13px 16px;
+    color: $neutral-800;
+    vertical-align: middle;
+  }
+
+  &__th {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__actions {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .text-center { text-align: center; }
+  .text-right  { text-align: right; }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: 12px 16px;
+  border-top: 1px solid $neutral-200;
+  font-size: $text-sm;
+  color: $neutral-500;
+  flex-wrap: wrap;
+
+  &__summary {
+    color: $neutral-500;
+  }
+
+  &__nav {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__btn {
+    min-width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-md;
+    border: 1px solid $neutral-200;
+    background: #fff;
+    cursor: pointer;
+    font-size: $text-sm;
+    color: $neutral-700;
+    transition: all $transition-fast;
+
+    &:hover:not(:disabled) {
+      background: $neutral-100;
+      border-color: $neutral-300;
+    }
+
+    &--active {
+      background: $brand-primary;
+      color: #fff;
+      border-color: $brand-primary;
+
+      &:hover {
+        background: $brand-primary-dark;
+        border-color: $brand-primary-dark;
+        color: #fff;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}

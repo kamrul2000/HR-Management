@@ -1,0 +1,19 @@
+<div class="toast-container" aria-live="polite" aria-atomic="true">
+  <div
+    *ngFor="let toast of toasts()"
+    class="toast"
+    [ngClass]="'toast--' + toast.type"
+    role="status"
+  >
+    <ng-icon [name]="iconFor(toast.type)" size="20" class="toast__icon" />
+    <span class="toast__message">{{ toast.message }}</span>
+    <button
+      type="button"
+      class="toast__close"
+      (click)="dismiss(toast.id)"
+      aria-label="Dismiss notification"
+    >
+      <ng-icon name="heroXMark" size="16" />
+    </button>
+  </div>
+</div>

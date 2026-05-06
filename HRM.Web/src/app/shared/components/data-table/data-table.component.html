@@ -1,0 +1,88 @@
+<div class="data-table-wrapper">
+  <div class="data-table-scroll">
+    <table class="data-table" *ngIf="!loading && rows.length > 0">
+      <thead>
+        <tr>
+          <th
+            *ngFor="let col of columns"
+            [style.width]="col.width"
+            [class.is-sortable]="col.sortable"
+            [class.text-center]="col.align === 'center'"
+            [class.text-right]="col.align === 'right'"
+            (click)="toggleSort(col)"
+          >
+            <span class="data-table__th">
+              {{ col.label }}
+              <ng-icon *ngIf="col.sortable" [name]="sortIcon(col)" size="14" />
+            </span>
+          </th>
+          <th *ngIf="actionsTemplate" class="text-right" style="width: 1%">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows; let i = index; trackBy: trackRow">
+          <td
+            *ngFor="let col of columns"
+            [class.text-center]="col.align === 'center'"
+            [class.text-right]="col.align === 'right'"
+          >
+            <ng-container *ngIf="col.template; else defaultCell">
+              <ng-container
+                *ngTemplateOutlet="col.template; context: { $implicit: row, row: row }"
+              ></ng-container>
+            </ng-container>
+            <ng-template #defaultCell>{{ cellValue(row, col.key) }}</ng-template>
+          </td>
+          <td *ngIf="actionsTemplate" class="data-table__actions">
+            <ng-container
+              *ngTemplateOutlet="actionsTemplate; context: { $implicit: row, row: row }"
+            ></ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <hrm-loading-skeleton *ngIf="loading" rows="6"></hrm-loading-skeleton>
+
+    <hrm-empty-state
+      *ngIf="!loading && rows.length === 0"
+      [title]="emptyTitle"
+      [description]="emptyMessage"
+    ></hrm-empty-state>
+  </div>
+
+  <div *ngIf="showPagination && rows.length > 0 && !loading" class="pagination">
+    <span class="pagination__summary">
+      Showing {{ pageRangeStart() }}–{{ pageRangeEnd() }} of {{ page.totalCount }}
+    </span>
+    <div class="pagination__nav">
+      <button
+        type="button"
+        class="pagination__btn"
+        [disabled]="page.pageNumber <= 1"
+        (click)="gotoPage(page.pageNumber - 1)"
+        aria-label="Previous page"
+      >
+        <ng-icon name="heroChevronLeft" size="14" />
+      </button>
+      <button
+        *ngFor="let p of visiblePages()"
+        type="button"
+        class="pagination__btn"
+        [class.pagination__btn--active]="p === page.pageNumber"
+        (click)="gotoPage(p)"
+      >
+        {{ p }}
+      </button>
+      <button
+        type="button"
+        class="pagination__btn"
+        [disabled]="page.pageNumber >= totalPages()"
+        (click)="gotoPage(page.pageNumber + 1)"
+        aria-label="Next page"
+      >
+        <ng-icon name="heroChevronRight" size="14" />
+      </button>
+    </div>
+  </div>
+</div>

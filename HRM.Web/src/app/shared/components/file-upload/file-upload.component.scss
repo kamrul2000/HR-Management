@@ -1,0 +1,59 @@
+@use 'styles/variables' as *;
+
+.file-upload {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  background: $neutral-50;
+  border: 2px dashed $neutral-300;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover:not(.is-disabled) {
+    border-color: $brand-primary;
+    background: $brand-primary-light;
+  }
+
+  &.is-dragging {
+    border-color: $brand-primary;
+    background: $brand-primary-light;
+  }
+
+  &.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &__icon { color: $brand-primary; flex-shrink: 0; }
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: $text-sm;
+    color: $neutral-700;
+
+    strong { font-weight: 600; }
+  }
+
+  &__preview {
+    margin-top: $spacing-sm;
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid $neutral-200;
+    border-radius: $radius-md;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__name {
+    flex: 1;
+    font-size: $text-sm;
+    color: $neutral-800;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

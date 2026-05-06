@@ -1,0 +1,47 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+@mixin shimmer-bg {
+  background: linear-gradient(90deg, $neutral-100 0px, $neutral-200 60px, $neutral-100 120px);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+.skeleton {
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__cell--avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: $neutral-100;
+    @include shimmer-bg;
+  }
+
+  &__bars {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__bar {
+    height: 12px;
+    border-radius: $radius-sm;
+    background: $neutral-100;
+    @include shimmer-bg;
+
+    &--lg { width: 70%; }
+    &--sm { width: 40%; height: 10px; }
+  }
+}

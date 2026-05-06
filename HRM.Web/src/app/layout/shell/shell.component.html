@@ -1,0 +1,19 @@
+<div class="shell" [class.is-collapsed]="sidebarCollapsed()">
+  <hrm-sidebar
+    [collapsed]="sidebarCollapsed()"
+    [mobileOpen]="mobileNavOpen()"
+    (mobileClose)="closeMobileNav()"
+  ></hrm-sidebar>
+
+  <div *ngIf="mobileNavOpen()" class="shell__mobile-overlay" (click)="closeMobileNav()"></div>
+
+  <div class="shell__main">
+    <hrm-topbar (menuToggle)="toggleSidebar()"></hrm-topbar>
+    <main class="shell__content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <hrm-toast-container></hrm-toast-container>
+  <hrm-confirm-dialog></hrm-confirm-dialog>
+</div>

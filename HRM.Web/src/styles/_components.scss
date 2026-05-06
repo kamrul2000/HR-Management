@@ -1,0 +1,364 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// =============================================================
+// Buttons
+// =============================================================
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-family: $font-sans;
+  font-size: $text-sm;
+  font-weight: 500;
+  border-radius: $radius-md;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+  text-decoration: none;
+  line-height: 1;
+  user-select: none;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    @include focus-ring($brand-primary);
+  }
+
+  &--primary {
+    background: $brand-primary;
+    color: #fff;
+    border-color: $brand-primary;
+    &:hover:not(:disabled) {
+      background: $brand-primary-dark;
+      border-color: $brand-primary-dark;
+    }
+  }
+
+  &--secondary {
+    background: #fff;
+    color: $neutral-700;
+    border-color: $neutral-300;
+    &:hover:not(:disabled) {
+      background: $neutral-100;
+      border-color: $neutral-400;
+      color: $neutral-900;
+    }
+  }
+
+  &--danger {
+    background: $danger;
+    color: #fff;
+    border-color: $danger;
+    &:hover:not(:disabled) {
+      background: #B91C1C;
+      border-color: #B91C1C;
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: $brand-primary;
+    border-color: transparent;
+    &:hover:not(:disabled) { background: $brand-primary-light; }
+  }
+
+  &--ghost-neutral {
+    background: transparent;
+    color: $neutral-600;
+    border-color: transparent;
+    &:hover:not(:disabled) {
+      background: $neutral-100;
+      color: $neutral-900;
+    }
+  }
+
+  &--sm { padding: 6px 12px; font-size: $text-xs; }
+  &--lg { padding: 10px 20px; font-size: $text-md; }
+  &--icon { padding: 8px; min-width: 36px; }
+  &--block { width: 100%; }
+}
+
+// =============================================================
+// Form fields
+// =============================================================
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: $spacing-md;
+
+  &:last-child { margin-bottom: 0; }
+}
+
+.form-label {
+  font-size: $text-xs;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: $neutral-600;
+
+  .required { color: $danger; margin-left: 2px; }
+}
+
+.form-control {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: $text-base;
+  font-family: $font-sans;
+  color: $neutral-900;
+  background: #fff;
+  border: 1px solid $neutral-300;
+  border-radius: $radius-md;
+  transition: all $transition-fast;
+  outline: none;
+
+  &:focus {
+    border-color: $brand-primary;
+    box-shadow: 0 0 0 3px rgba($brand-primary, 0.12);
+  }
+
+  &::placeholder { color: $neutral-400; }
+
+  &.is-invalid {
+    border-color: $danger;
+    &:focus { box-shadow: 0 0 0 3px rgba($danger, 0.12); }
+  }
+
+  &:disabled,
+  &[readonly] {
+    background: $neutral-100;
+    color: $neutral-500;
+    cursor: not-allowed;
+  }
+}
+
+textarea.form-control {
+  min-height: 88px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.form-hint {
+  font-size: $text-xs;
+  color: $neutral-500;
+  line-height: 1.4;
+}
+
+.form-error {
+  font-size: $text-xs;
+  color: $danger;
+  line-height: 1.4;
+}
+
+.form-grid {
+  display: grid;
+  gap: $spacing-md;
+
+  &--2 { grid-template-columns: repeat(2, 1fr); }
+  &--3 { grid-template-columns: repeat(3, 1fr); }
+  &--4 { grid-template-columns: repeat(4, 1fr); }
+
+  @include mobile {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+// =============================================================
+// Card
+// =============================================================
+.card {
+  @include card-base;
+  overflow: hidden;
+
+  &__header {
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $neutral-200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+
+    h3 { margin: 0; font-size: $text-lg; font-weight: 600; }
+  }
+
+  &__body { padding: $spacing-lg; }
+
+  &__footer {
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $neutral-200;
+    background: $neutral-50;
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+  }
+}
+
+// =============================================================
+// Page
+// =============================================================
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.page-content {
+  padding: $spacing-lg $spacing-xl;
+  max-width: $content-max-width;
+  margin: 0 auto;
+  width: 100%;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+// =============================================================
+// Toolbar (filters row above tables)
+// =============================================================
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: #fff;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-md;
+  flex-wrap: wrap;
+
+  &__field {
+    flex: 0 1 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 140px;
+  }
+
+  &__field--grow { flex: 1 1 240px; }
+
+  &__actions {
+    margin-left: auto;
+    display: flex;
+    gap: $spacing-sm;
+  }
+}
+
+// =============================================================
+// Drawer (slide-in right)
+// =============================================================
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: $z-drawer;
+  animation: fade-in $transition-base;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 420px;
+  max-width: 100vw;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  z-index: calc($z-drawer + 1);
+  box-shadow: $shadow-lg;
+  animation: slide-in-right $transition-base;
+
+  &--lg { width: 640px; }
+
+  &__header {
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $neutral-200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+
+    h3 { margin: 0; font-size: $text-lg; }
+  }
+
+  &__body {
+    padding: $spacing-lg;
+    overflow-y: auto;
+    flex: 1;
+    @include scrollbar;
+  }
+
+  &__footer {
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $neutral-200;
+    background: $neutral-50;
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+  }
+
+  @include mobile {
+    width: 100vw;
+    &--lg { width: 100vw; }
+  }
+}
+
+// =============================================================
+// Utility helpers
+// =============================================================
+.flex          { display: flex; }
+.flex-col      { display: flex; flex-direction: column; }
+.flex-center   { display: flex; align-items: center; justify-content: center; }
+.flex-between  { display: flex; align-items: center; justify-content: space-between; }
+.gap-xs        { gap: $spacing-xs; }
+.gap-sm        { gap: $spacing-sm; }
+.gap-md        { gap: $spacing-md; }
+.gap-lg        { gap: $spacing-lg; }
+
+.mt-sm { margin-top: $spacing-sm; }
+.mt-md { margin-top: $spacing-md; }
+.mt-lg { margin-top: $spacing-lg; }
+.mb-sm { margin-bottom: $spacing-sm; }
+.mb-md { margin-bottom: $spacing-md; }
+.mb-lg { margin-bottom: $spacing-lg; }
+
+.divider {
+  height: 1px;
+  background: $neutral-200;
+  margin: $spacing-md 0;
+}
+
+// =============================================================
+// Print
+// =============================================================
+@media print {
+  .sidebar,
+  .topbar,
+  .toolbar,
+  .btn,
+  .pagination,
+  .drawer,
+  .drawer-overlay,
+  .toast-container,
+  .confirm-overlay { display: none !important; }
+  .card { box-shadow: none; border: 1px solid #ddd; }
+  body { background: #fff; }
+}

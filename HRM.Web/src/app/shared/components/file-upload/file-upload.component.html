@@ -1,0 +1,29 @@
+<label
+  class="file-upload"
+  [class.is-dragging]="isDragging()"
+  [class.is-disabled]="disabled"
+  (drop)="onDrop($event)"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+>
+  <input
+    type="file"
+    [accept]="accept"
+    [disabled]="disabled"
+    (change)="onFileChange($event)"
+    hidden
+  />
+  <ng-icon name="heroCloudArrowUp" size="32" class="file-upload__icon" aria-hidden="true" />
+  <div class="file-upload__text">
+    <strong>{{ label }}</strong>
+    <span class="form-hint">{{ hint }}</span>
+  </div>
+</label>
+
+<div *ngIf="fileName()" class="file-upload__preview">
+  <span class="file-upload__name">{{ fileName() }}</span>
+  <span class="text-muted text-xs">{{ formatSize(fileSize()) }}</span>
+  <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="clear()" aria-label="Remove">
+    <ng-icon name="heroXMark" size="16" />
+  </button>
+</div>

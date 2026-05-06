@@ -1,0 +1,72 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.stat-card {
+  background: #fff;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-md;
+  box-shadow: $shadow-xs;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  &__label {
+    font-size: $text-sm;
+    color: $neutral-500;
+    font-weight: 500;
+  }
+
+  &__value {
+    font-size: $text-3xl;
+    font-weight: 700;
+    color: $neutral-900;
+    line-height: 1.1;
+  }
+
+  &__skeleton {
+    height: 28px;
+    width: 80px;
+    border-radius: $radius-sm;
+    background: linear-gradient(90deg, $neutral-100 0px, $neutral-200 40px, $neutral-100 80px);
+    background-size: 600px;
+    animation: shimmer 1.4s infinite linear;
+  }
+
+  &__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: $brand-primary-light;
+    color: $brand-primary;
+  }
+
+  &__trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: $text-xs;
+    font-weight: 600;
+    margin-top: 4px;
+
+    &--up   { color: $success; }
+    &--down { color: $danger; }
+  }
+
+  &--success .stat-card__icon { background: $success-light; color: $success; }
+  &--warning .stat-card__icon { background: $warning-light; color: $warning; }
+  &--danger  .stat-card__icon { background: $danger-light;  color: $danger; }
+  &--info    .stat-card__icon { background: $info-light;    color: $info; }
+}

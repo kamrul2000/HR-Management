@@ -1,0 +1,63 @@
+@use 'styles/variables' as *;
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: $z-confirm;
+  animation: fade-in 150ms ease;
+}
+
+.confirm-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  width: calc(100% - 32px);
+  max-width: 420px;
+  box-shadow: $shadow-lg;
+  z-index: calc($z-confirm + 1);
+  animation: slide-up 200ms ease;
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: $brand-primary-light;
+    color: $brand-primary;
+    margin-bottom: $spacing-md;
+
+    &--danger {
+      background: $danger-light;
+      color: $danger;
+    }
+  }
+
+  &__title {
+    font-size: $text-xl;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: $neutral-900;
+  }
+
+  &__message {
+    font-size: $text-sm;
+    color: $neutral-600;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+    justify-content: flex-end;
+    margin-top: $spacing-lg;
+  }
+}

@@ -1,0 +1,49 @@
+@use 'styles/variables' as *;
+
+.toast-container {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: $z-toast;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border-radius: $radius-md;
+  border: 1px solid $neutral-200;
+  border-left-width: 4px;
+  box-shadow: $shadow-md;
+  font-size: $text-sm;
+  color: $neutral-800;
+  min-width: 280px;
+  max-width: 420px;
+  animation: slide-up 200ms ease;
+
+  &__icon { flex-shrink: 0; margin-top: 1px; }
+  &__message { flex: 1; line-height: 1.4; }
+  &__close {
+    background: none;
+    border: none;
+    color: $neutral-400;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+
+    &:hover { color: $neutral-700; }
+  }
+
+  &--success { border-left-color: $success; .toast__icon { color: $success; } }
+  &--error   { border-left-color: $danger;  .toast__icon { color: $danger; } }
+  &--warning { border-left-color: $warning; .toast__icon { color: $warning; } }
+  &--info    { border-left-color: $info;    .toast__icon { color: $info; } }
+}

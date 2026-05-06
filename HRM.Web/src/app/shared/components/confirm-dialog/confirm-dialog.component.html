@@ -1,0 +1,28 @@
+<ng-container *ngIf="confirm.request() as request">
+  <div class="confirm-overlay" (click)="cancel()"></div>
+  <div class="confirm-dialog" role="dialog" aria-modal="true" [attr.aria-labelledby]="'confirm-title-' + request.id">
+    <div class="confirm-dialog__icon" [class.confirm-dialog__icon--danger]="request.danger">
+      <ng-icon
+        [name]="request.danger ? 'heroExclamationTriangle' : 'heroQuestionMarkCircle'"
+        size="28"
+      />
+    </div>
+    <h3 class="confirm-dialog__title" [id]="'confirm-title-' + request.id">{{ request.title }}</h3>
+    <p class="confirm-dialog__message">{{ request.message }}</p>
+    <div class="confirm-dialog__actions">
+      <button type="button" class="btn btn--secondary" (click)="cancel()">
+        {{ request.cancelLabel }}
+      </button>
+      <button
+        type="button"
+        class="btn"
+        [class.btn--primary]="!request.danger"
+        [class.btn--danger]="request.danger"
+        (click)="accept()"
+        cdkFocusInitial
+      >
+        {{ request.confirmLabel }}
+      </button>
+    </div>
+  </div>
+</ng-container>

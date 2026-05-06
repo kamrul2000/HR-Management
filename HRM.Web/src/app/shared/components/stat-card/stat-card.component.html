@@ -1,0 +1,19 @@
+<div class="stat-card" [ngClass]="'stat-card--' + tone">
+  <div class="stat-card__content">
+    <div class="stat-card__label">{{ label }}</div>
+
+    <div *ngIf="!loading" class="stat-card__value">{{ value }}</div>
+    <div *ngIf="loading" class="stat-card__skeleton"></div>
+
+    <div *ngIf="trend" class="stat-card__trend" [ngClass]="'stat-card__trend--' + trend.direction">
+      <ng-icon
+        [name]="trend.direction === 'up' ? 'heroArrowTrendingUp' : 'heroArrowTrendingDown'"
+        size="14"
+      />
+      <span>{{ trend.value }}</span>
+    </div>
+  </div>
+  <div class="stat-card__icon">
+    <ng-icon [name]="icon" size="22" />
+  </div>
+</div>

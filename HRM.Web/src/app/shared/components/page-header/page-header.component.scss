@@ -1,0 +1,42 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $neutral-200;
+  background: #fff;
+
+  &__title {
+    font-size: $text-2xl;
+    font-weight: 600;
+    color: $neutral-900;
+    margin: 0;
+  }
+
+  &__subtitle {
+    font-size: $text-sm;
+    color: $neutral-500;
+    margin: 4px 0 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    padding: $spacing-md;
+
+    &__actions {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+  }
+}

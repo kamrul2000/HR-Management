@@ -1,0 +1,71 @@
+@use 'styles/variables' as *;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: $text-xs;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  text-transform: capitalize;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  // Greens (positive / settled)
+  &--active,
+  &--present,
+  &--paid,
+  &--approved,
+  &--finalized,
+  &--processed,
+  &--disbursed,
+  &--completed,
+  &--eligible {
+    background: $success-light;
+    color: $success;
+  }
+
+  // Ambers (in-flight / waiting)
+  &--pending,
+  &--draft,
+  &--recommended {
+    background: $warning-light;
+    color: $warning;
+  }
+
+  // Reds (negative / blocking)
+  &--inactive,
+  &--absent,
+  &--rejected,
+  &--cancelled,
+  &--overdue,
+  &--ineligible {
+    background: $danger-light;
+    color: $danger;
+  }
+
+  // Orange-tinted (partial / late)
+  &--late,
+  &--half-day {
+    background: #FFF7ED;
+    color: #C2410C;
+  }
+
+  // Purple (informational / scheduled)
+  &--holiday,
+  &--weekly-off,
+  &--skipped {
+    background: #F5F3FF;
+    color: #7C3AED;
+  }
+}

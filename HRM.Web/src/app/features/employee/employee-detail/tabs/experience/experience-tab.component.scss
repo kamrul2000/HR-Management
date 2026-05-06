@@ -1,0 +1,119 @@
+@use 'styles/variables' as *;
+
+.experience-tab {
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-md;
+
+    h3 { margin: 0; font-size: $text-lg; }
+  }
+}
+
+.exp-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 24px;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: $neutral-200;
+    border-radius: 2px;
+  }
+
+  &__item {
+    position: relative;
+    padding-bottom: $spacing-lg;
+
+    &:last-child { padding-bottom: 0; }
+  }
+
+  &__dot {
+    position: absolute;
+    left: -23px;
+    top: 18px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: $brand-primary;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px $neutral-200;
+
+    &--current {
+      background: $success;
+      box-shadow: 0 0 0 1px $success, 0 0 0 4px rgba($success, 0.15);
+    }
+  }
+
+  &__card {
+    background: #fff;
+    border: 1px solid $neutral-200;
+    border-radius: $radius-md;
+    padding: $spacing-md;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: $spacing-sm;
+
+      h4 { margin: 0; font-size: $text-md; font-weight: 600; }
+    }
+
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: $spacing-sm;
+      padding-top: $spacing-sm;
+      border-top: 1px dashed $neutral-200;
+    }
+  }
+
+  &__org {
+    margin: 2px 0 0;
+    color: $neutral-600;
+    font-size: $text-sm;
+  }
+
+  &__duration {
+    font-size: $text-xs;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: $brand-primary-light;
+    color: $brand-primary;
+    flex-shrink: 0;
+  }
+
+  &__dates {
+    font-family: $font-mono;
+    font-size: $text-xs;
+    color: $neutral-500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__resp {
+    margin: 0;
+    line-height: 1.5;
+    color: $neutral-700;
+    font-size: $text-sm;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 2px;
+  }
+}

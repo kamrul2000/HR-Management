@@ -1,0 +1,95 @@
+<div class="experience-tab">
+  <div class="experience-tab__head">
+    <h3>Experience</h3>
+    <button type="button" class="btn btn--primary btn--sm" (click)="openCreate()">
+      <ng-icon name="heroPlus" size="14" />
+      Add Experience
+    </button>
+  </div>
+
+  <hrm-loading-skeleton *ngIf="loading()" rows="3"></hrm-loading-skeleton>
+
+  <ng-container *ngIf="!loading()">
+    <hrm-empty-state
+      *ngIf="records().length === 0; else timeline"
+      icon="heroBriefcase"
+      title="No work experience"
+      description="Add previous positions to build a richer employee profile."
+      actionLabel="Add Experience"
+      (action)="openCreate()"
+    ></hrm-empty-state>
+
+    <ng-template #timeline>
+      <ol class="exp-timeline">
+        <li *ngFor="let r of records()" class="exp-timeline__item">
+          <span class="exp-timeline__dot" [class.exp-timeline__dot--current]="r.isCurrent"></span>
+          <div class="exp-timeline__card">
+            <header>
+              <div>
+                <h4>{{ r.designation }}</h4>
+                <p class="exp-timeline__org">{{ r.organizationName }}</p>
+              </div>
+              <span class="exp-timeline__duration" *ngIf="r.serviceDurationLabel">
+                {{ r.serviceDurationLabel }}
+              </span>
+            </header>
+
+            <div class="exp-timeline__dates">
+              <span>{{ r.fromDateFormatted || r.fromDate }}</span>
+              <span>→</span>
+              <span *ngIf="r.isCurrent" class="text-success text-strong">Present</span>
+              <span *ngIf="!r.isCurrent">{{ r.toDateFormatted || r.toDate || '—' }}</span>
+            </div>
+
+            <p *ngIf="r.responsibilities" class="exp-timeline__resp">{{ r.responsibilities }}</p>
+
+            <p *ngIf="r.reasonForLeaving" class="text-muted text-sm">
+              <strong>Reason for leaving:</strong> {{ r.reasonForLeaving }}
+            </p>
+
+            <footer>
+              <a
+                *ngIf="r.attachmentUrl"
+                [href]="r.attachmentUrl"
+                target="_blank"
+                rel="noopener"
+                class="btn btn--ghost btn--sm"
+              >
+                <ng-icon name="heroDocumentArrowDown" size="14" />
+                Letter
+              </a>
+              <label class="btn btn--ghost btn--sm" *ngIf="!r.attachmentUrl">
+                <ng-icon name="heroPaperClip" size="14" />
+                Upload
+                <input
+                  type="file"
+                  accept="application/pdf,image/png,image/jpeg"
+                  hidden
+                  (change)="onAttachmentChange(r, $event)"
+                />
+              </label>
+
+              <div class="exp-timeline__actions">
+                <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="openEdit(r)" aria-label="Edit">
+                  <ng-icon name="heroPencilSquare" size="16" />
+                </button>
+                <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="delete(r)" aria-label="Delete">
+                  <ng-icon name="heroTrash" size="16" />
+                </button>
+              </div>
+            </footer>
+          </div>
+        </li>
+      </ol>
+    </ng-template>
+  </ng-container>
+</div>
+
+<ng-container *ngIf="drawerOpen()">
+  <hrm-experience-form
+    [employeeId]="employeeId"
+    [record]="editingRecord()"
+    (saved)="onSaved()"
+    (dismiss)="closeDrawer()"
+  ></hrm-experience-form>
+</ng-container>

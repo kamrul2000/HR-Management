@@ -1,0 +1,85 @@
+<hrm-drawer
+  [title]="isEdit ? 'Edit Experience' : 'Add Experience'"
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-group">
+      <label class="form-label">Organization <span class="required">*</span></label>
+      <input
+        type="text"
+        class="form-control"
+        formControlName="organizationName"
+        [class.is-invalid]="hasError('organizationName', 'required')"
+      />
+      <span class="form-error" *ngIf="hasError('organizationName', 'required')">Required.</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Designation <span class="required">*</span></label>
+      <input
+        type="text"
+        class="form-control"
+        formControlName="designation"
+        [class.is-invalid]="hasError('designation', 'required')"
+      />
+      <span class="form-error" *ngIf="hasError('designation', 'required')">Required.</span>
+    </div>
+
+    <div class="form-group">
+      <label class="company-form__toggle">
+        <input type="checkbox" formControlName="isCurrent" />
+        <span>I currently work here</span>
+      </label>
+    </div>
+
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label class="form-label">From <span class="required">*</span></label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="fromDate"
+          [class.is-invalid]="hasError('fromDate', 'required')"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">To {{ form.value.isCurrent ? '' : '*' }}</label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="toDate"
+          [disabled]="form.value.isCurrent"
+        />
+        <span class="form-error" *ngIf="formError('toRequired') && !form.value.isCurrent">
+          Required for past experience.
+        </span>
+        <span class="form-error" *ngIf="formError('toBeforeFrom')">
+          End date cannot be before start date.
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Responsibilities</label>
+      <textarea
+        class="form-control"
+        formControlName="responsibilities"
+        rows="3"
+        placeholder="Key responsibilities and achievements"
+      ></textarea>
+    </div>
+
+    <div class="form-group" *ngIf="!form.value.isCurrent">
+      <label class="form-label">Reason for Leaving</label>
+      <input type="text" class="form-control" formControlName="reasonForLeaving" />
+    </div>
+  </form>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="dismiss.emit()">Cancel</button>
+    <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+      {{ saving() ? 'Saving…' : isEdit ? 'Save Changes' : 'Add Experience' }}
+    </button>
+  </ng-container>
+</hrm-drawer>

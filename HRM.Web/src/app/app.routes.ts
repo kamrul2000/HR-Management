@@ -25,6 +25,10 @@ export const routes: Routes = [
         path: 'organization',
         loadChildren: () => import('./features/organization/organization.routes'),
       },
+      {
+        path: 'employees',
+        loadChildren: () => import('./features/employee/employee.routes'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

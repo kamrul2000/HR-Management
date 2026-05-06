@@ -1,0 +1,83 @@
+<hrm-page-header
+  [title]="employee()?.fullName || 'Employee'"
+  [subtitle]="employee() ? employee()!.employeeCode : ''"
+>
+  <a routerLink="/employees" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back to list
+  </a>
+  <a
+    *ngIf="employee()"
+    [routerLink]="['/employees', employee()!.id, 'edit']"
+    class="btn btn--primary"
+  >
+    <ng-icon name="heroPencilSquare" size="14" />
+    Edit
+  </a>
+</hrm-page-header>
+
+<div class="page-content" *ngIf="loading()">
+  <div class="card"><div class="card__body"><hrm-loading-skeleton rows="6"></hrm-loading-skeleton></div></div>
+</div>
+
+<div class="page-content" *ngIf="!loading() && employee() as emp">
+  <!-- Header card -->
+  <div class="card detail-header">
+    <div class="card__body detail-header__body">
+      <div class="detail-header__avatar" (click)="togglePhoto()" tabindex="0" role="button">
+        <hrm-avatar [name]="emp.fullName" [photoUrl]="emp.photoUrl" [size]="80"></hrm-avatar>
+        <span class="detail-header__avatar-edit"><ng-icon name="heroCamera" size="14" /></span>
+      </div>
+
+      <div class="detail-header__main">
+        <h2>{{ emp.fullName }}</h2>
+        <div class="detail-header__meta">
+          <span class="text-mono">{{ emp.employeeCode }}</span>
+          <span *ngIf="emp.designationTitle">• {{ emp.designationTitle }}</span>
+          <span *ngIf="emp.branchName">• {{ emp.branchName }}</span>
+        </div>
+        <div class="detail-header__badges">
+          <hrm-status-badge [variant]="emp.status" [label]="emp.statusLabel || emp.status"></hrm-status-badge>
+          <span class="detail-header__type">{{ emp.employmentType }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="photoOpen()" class="detail-header__photo-panel">
+      <div class="detail-header__photo-head">
+        <h4>Update photo</h4>
+        <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="togglePhoto()" aria-label="Close">
+          <ng-icon name="heroXMark" size="16" />
+        </button>
+      </div>
+      <hrm-photo-upload
+        [employee]="emp"
+        (uploaded)="onPhotoUploaded($event)"
+      ></hrm-photo-upload>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="card mt-md">
+    <div class="tabs">
+      <button
+        *ngFor="let tab of tabs"
+        type="button"
+        class="tabs__tab"
+        [class.is-active]="activeTab() === tab.key"
+        (click)="selectTab(tab.key)"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
+
+    <div class="card__body">
+      <ng-container [ngSwitch]="activeTab()">
+        <hrm-personal-info-tab     *ngSwitchCase="'personal'"   [employee]="emp"></hrm-personal-info-tab>
+        <hrm-emergency-contacts-tab *ngSwitchCase="'contacts'"   [employeeId]="emp.id"></hrm-emergency-contacts-tab>
+        <hrm-education-tab          *ngSwitchCase="'education'"  [employeeId]="emp.id"></hrm-education-tab>
+        <hrm-experience-tab         *ngSwitchCase="'experience'" [employeeId]="emp.id"></hrm-experience-tab>
+      </ng-container>
+    </div>
+  </div>
+</div>

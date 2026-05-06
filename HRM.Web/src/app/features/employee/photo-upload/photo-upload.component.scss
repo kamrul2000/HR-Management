@@ -1,0 +1,39 @@
+@use 'styles/variables' as *;
+
+.photo-upload {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  &__current {
+    flex-shrink: 0;
+  }
+
+  &__drop {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: $spacing-md;
+    border: 2px dashed $neutral-300;
+    border-radius: $radius-lg;
+    background: $neutral-50;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover { border-color: $brand-primary; background: $brand-primary-light; }
+    &.is-dragging { border-color: $brand-primary; background: $brand-primary-light; }
+    &.is-uploading { opacity: 0.6; cursor: wait; }
+  }
+
+  &__icon { color: $brand-primary; flex-shrink: 0; }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: $text-sm;
+
+    strong { font-weight: 600; color: $neutral-800; }
+  }
+}

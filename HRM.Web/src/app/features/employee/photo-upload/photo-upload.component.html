@@ -1,0 +1,31 @@
+<div class="photo-upload">
+  <div class="photo-upload__current">
+    <hrm-avatar
+      [name]="employee.fullName"
+      [photoUrl]="preview() || employee.photoUrl"
+      [size]="96"
+    ></hrm-avatar>
+  </div>
+
+  <label
+    class="photo-upload__drop"
+    [class.is-dragging]="isDragging()"
+    [class.is-uploading]="uploading()"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+  >
+    <input
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      [disabled]="uploading()"
+      (change)="onFileChange($event)"
+      hidden
+    />
+    <ng-icon name="heroCloudArrowUp" size="22" class="photo-upload__icon" />
+    <div class="photo-upload__text">
+      <strong>{{ uploading() ? 'Uploading…' : 'Click or drop a photo' }}</strong>
+      <span class="form-hint">Square photos work best. JPG, PNG, or WebP up to 1 MB.</span>
+    </div>
+  </label>
+</div>

@@ -1,0 +1,346 @@
+<hrm-page-header
+  [title]="isEdit() ? 'Edit Employee' : 'Add Employee'"
+  [subtitle]="isEdit() ? 'Update personal and employment details.' : 'Create a new employee record in three quick steps.'"
+>
+  <a routerLink="/employees" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back to list
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="card wizard">
+    <div class="wizard__header">
+      <div
+        class="wizard__step"
+        [class.is-active]="step() === 1"
+        [class.is-done]="step() > 1"
+      >
+        <div class="wizard__bullet">
+          <ng-icon *ngIf="step() > 1" name="heroCheck" size="14" />
+          <span *ngIf="step() <= 1">1</span>
+        </div>
+        <div class="wizard__step-label">
+          <strong>Personal</strong>
+          <span class="text-muted text-xs">Identity &amp; contact</span>
+        </div>
+      </div>
+
+      <div class="wizard__connector" [class.is-done]="step() > 1"></div>
+
+      <div
+        class="wizard__step"
+        [class.is-active]="step() === 2"
+        [class.is-done]="step() > 2"
+      >
+        <div class="wizard__bullet">
+          <ng-icon *ngIf="step() > 2" name="heroCheck" size="14" />
+          <span *ngIf="step() <= 2">2</span>
+        </div>
+        <div class="wizard__step-label">
+          <strong>Employment</strong>
+          <span class="text-muted text-xs">Org &amp; role</span>
+        </div>
+      </div>
+
+      <div class="wizard__connector" [class.is-done]="step() > 2"></div>
+
+      <div
+        class="wizard__step"
+        [class.is-active]="step() === 3"
+        [class.is-done]="step() > 3"
+      >
+        <div class="wizard__bullet">
+          <ng-icon *ngIf="step() > 3" name="heroCheck" size="14" />
+          <span *ngIf="step() <= 3">3</span>
+        </div>
+        <div class="wizard__step-label">
+          <strong>Review</strong>
+          <span class="text-muted text-xs">Submit</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────── Step 1 -->
+    <div class="wizard__body" *ngIf="step() === 1">
+      <form [formGroup]="personalForm" novalidate>
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label">Employee Code <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control text-mono"
+              formControlName="employeeCode"
+              placeholder="EMP-001"
+              [class.is-invalid]="hasPersonalError('employeeCode', 'required')"
+            />
+            <span class="form-error" *ngIf="hasPersonalError('employeeCode', 'required')">Required.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email <span class="required">*</span></label>
+            <input
+              type="email"
+              class="form-control"
+              formControlName="email"
+              placeholder="employee@company.com"
+              [class.is-invalid]="hasPersonalError('email', 'required') || hasPersonalError('email', 'email')"
+            />
+            <span class="form-error" *ngIf="hasPersonalError('email', 'required')">Required.</span>
+            <span class="form-error" *ngIf="hasPersonalError('email', 'email')">Invalid email.</span>
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label">First Name <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="firstName"
+              [class.is-invalid]="hasPersonalError('firstName', 'required')"
+            />
+            <span class="form-error" *ngIf="hasPersonalError('firstName', 'required')">Required.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name <span class="required">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="lastName"
+              [class.is-invalid]="hasPersonalError('lastName', 'required')"
+            />
+            <span class="form-error" *ngIf="hasPersonalError('lastName', 'required')">Required.</span>
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label">Phone <span class="required">*</span></label>
+            <input
+              type="tel"
+              class="form-control"
+              formControlName="phone"
+              [class.is-invalid]="hasPersonalError('phone', 'required')"
+            />
+            <span class="form-error" *ngIf="hasPersonalError('phone', 'required')">Required.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">National ID</label>
+            <input type="text" class="form-control" formControlName="nationalId" />
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--3">
+          <div class="form-group">
+            <label class="form-label">Date of Birth <span class="required">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="dateOfBirth"
+              [class.is-invalid]="hasPersonalError('dateOfBirth', 'required')"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender <span class="required">*</span></label>
+            <select class="form-control" formControlName="gender">
+              <option *ngFor="let g of genders" [value]="g">{{ g }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Marital Status <span class="required">*</span></label>
+            <select class="form-control" formControlName="maritalStatus">
+              <option *ngFor="let m of maritalStatuses" [value]="m">{{ m }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Address <span class="required">*</span></label>
+          <textarea
+            class="form-control"
+            formControlName="address"
+            rows="3"
+            [class.is-invalid]="hasPersonalError('address', 'required')"
+          ></textarea>
+          <span class="form-error" *ngIf="hasPersonalError('address', 'required')">Required.</span>
+        </div>
+      </form>
+    </div>
+
+    <!-- ─────────────────────── Step 2 -->
+    <div class="wizard__body" *ngIf="step() === 2">
+      <form [formGroup]="employmentForm" novalidate>
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label">Branch <span class="required">*</span></label>
+            <select
+              class="form-control"
+              formControlName="branchId"
+              (change)="onBranchChange($any($event.target).value)"
+              [class.is-invalid]="hasEmploymentError('branchId', 'min')"
+            >
+              <option [ngValue]="0" disabled>Select a branch</option>
+              <option *ngFor="let b of branchOptions()" [ngValue]="b.id">{{ b.name }}</option>
+            </select>
+            <span class="form-error" *ngIf="hasEmploymentError('branchId', 'min')">Required.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Department <span class="required">*</span></label>
+            <select
+              class="form-control"
+              formControlName="departmentId"
+              (change)="onDepartmentChange($any($event.target).value)"
+              [class.is-invalid]="hasEmploymentError('departmentId', 'min')"
+            >
+              <option [ngValue]="0" disabled>Select a department</option>
+              <option *ngFor="let d of filteredDepartments()" [ngValue]="d.id">{{ d.name }}</option>
+            </select>
+            <span class="form-error" *ngIf="hasEmploymentError('departmentId', 'min')">Required.</span>
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label">Designation <span class="required">*</span></label>
+            <select
+              class="form-control"
+              formControlName="designationId"
+              [class.is-invalid]="hasEmploymentError('designationId', 'min')"
+            >
+              <option [ngValue]="0" disabled>Select a designation</option>
+              <option *ngFor="let d of filteredDesignations()" [ngValue]="d.id">{{ d.title }}</option>
+            </select>
+            <span class="form-error" *ngIf="hasEmploymentError('designationId', 'min')">Required.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Employment Type <span class="required">*</span></label>
+            <select class="form-control" formControlName="employmentType">
+              <option *ngFor="let t of employmentTypes" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label">Joining Date <span class="required">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="joiningDate"
+              [class.is-invalid]="hasEmploymentError('joiningDate', 'required')"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmation Date</label>
+            <input type="date" class="form-control" formControlName="confirmationDate" />
+            <span class="form-hint">Optional — leave blank if probation hasn't completed.</span>
+          </div>
+        </div>
+
+        <div *ngIf="isEdit()" class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-control" formControlName="status">
+            <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </form>
+    </div>
+
+    <!-- ─────────────────────── Step 3 -->
+    <div class="wizard__body" *ngIf="step() === 3">
+      <h3 style="margin-top:0">Review &amp; Submit</h3>
+      <p class="text-muted">Confirm the details below. Use <strong>Back</strong> to make changes.</p>
+
+      <div class="wizard__review">
+        <section>
+          <h4 class="text-label">Personal</h4>
+          <dl>
+            <dt>Code</dt><dd class="text-mono">{{ personalForm.value.employeeCode }}</dd>
+            <dt>Name</dt><dd>{{ personalForm.value.firstName }} {{ personalForm.value.lastName }}</dd>
+            <dt>Email</dt><dd>{{ personalForm.value.email }}</dd>
+            <dt>Phone</dt><dd>{{ personalForm.value.phone }}</dd>
+            <dt>Date of Birth</dt><dd>{{ personalForm.value.dateOfBirth }}</dd>
+            <dt>Gender</dt><dd>{{ personalForm.value.gender }}</dd>
+            <dt>Marital Status</dt><dd>{{ personalForm.value.maritalStatus }}</dd>
+            <dt>National ID</dt><dd>{{ personalForm.value.nationalId || '—' }}</dd>
+            <dt>Address</dt><dd>{{ personalForm.value.address }}</dd>
+          </dl>
+        </section>
+
+        <section>
+          <h4 class="text-label">Employment</h4>
+          <dl>
+            <dt>Branch</dt><dd>{{ branchName(employmentForm.value.branchId) }}</dd>
+            <dt>Department</dt><dd>{{ departmentName(employmentForm.value.departmentId) }}</dd>
+            <dt>Designation</dt><dd>{{ designationTitle(employmentForm.value.designationId) }}</dd>
+            <dt>Type</dt><dd>{{ employmentForm.value.employmentType }}</dd>
+            <dt>Joining Date</dt><dd>{{ employmentForm.value.joiningDate }}</dd>
+            <dt>Confirmation Date</dt><dd>{{ employmentForm.value.confirmationDate || '—' }}</dd>
+          </dl>
+        </section>
+      </div>
+    </div>
+
+    <!-- ─────────────────────── Step 4 (success) -->
+    <div class="wizard__body wizard__success" *ngIf="step() === 4 && createdEmployee() as emp">
+      <div class="wizard__success-icon">
+        <ng-icon name="heroCheckCircle" size="44" />
+      </div>
+      <h3>Employee {{ isEdit() ? 'updated' : 'created' }} successfully</h3>
+      <p class="text-muted">{{ emp.fullName }} ({{ emp.employeeCode }})</p>
+
+      <div class="wizard__photo">
+        <h4 class="text-label">Upload a photo (optional)</h4>
+        <hrm-photo-upload
+          [employee]="emp"
+          (uploaded)="onPhotoUploaded($event)"
+        ></hrm-photo-upload>
+      </div>
+
+      <div class="wizard__success-actions">
+        <a routerLink="/employees" class="btn btn--secondary">Back to list</a>
+        <button type="button" class="btn btn--primary" (click)="finish()">
+          View Employee
+        </button>
+      </div>
+    </div>
+
+    <!-- ─────────────────────── Footer nav -->
+    <div *ngIf="step() < 4" class="wizard__footer">
+      <button
+        type="button"
+        class="btn btn--secondary"
+        [disabled]="step() === 1"
+        (click)="back()"
+      >
+        <ng-icon name="heroArrowLeft" size="14" />
+        Back
+      </button>
+
+      <div class="wizard__footer-spacer"></div>
+
+      <button
+        *ngIf="step() < 3"
+        type="button"
+        class="btn btn--primary"
+        (click)="next()"
+      >
+        Next
+        <ng-icon name="heroArrowRight" size="14" />
+      </button>
+
+      <button
+        *ngIf="step() === 3"
+        type="button"
+        class="btn btn--primary"
+        [disabled]="saving()"
+        (click)="submit()"
+      >
+        <ng-icon name="heroCheck" size="14" />
+        {{ saving() ? 'Saving…' : (isEdit() ? 'Save Changes' : 'Create Employee') }}
+      </button>
+    </div>
+  </div>
+</div>

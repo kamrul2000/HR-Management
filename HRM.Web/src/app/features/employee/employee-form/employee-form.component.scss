@@ -1,0 +1,152 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.wizard {
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-md $spacing-lg;
+    background: $neutral-50;
+    border-bottom: 1px solid $neutral-200;
+  }
+
+  &__step {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: $neutral-500;
+
+    &.is-active { color: $brand-primary; }
+    &.is-active .wizard__bullet {
+      background: $brand-primary;
+      color: #fff;
+      border-color: $brand-primary;
+    }
+    &.is-done .wizard__bullet {
+      background: $success;
+      color: #fff;
+      border-color: $success;
+    }
+    &.is-done { color: $success; }
+  }
+
+  &__bullet {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid $neutral-300;
+    background: #fff;
+    color: $neutral-500;
+    font-size: $text-sm;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all $transition-fast;
+  }
+
+  &__step-label {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+
+    strong { font-weight: 600; font-size: $text-sm; color: inherit; }
+    span { font-size: $text-xs; }
+  }
+
+  &__connector {
+    flex: 1;
+    height: 2px;
+    background: $neutral-200;
+    margin: 0 4px;
+    border-radius: 2px;
+    transition: background $transition-fast;
+
+    &.is-done { background: $success; }
+  }
+
+  &__body {
+    padding: $spacing-lg;
+
+    @include mobile { padding: $spacing-md; }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $neutral-200;
+    background: $neutral-50;
+  }
+
+  &__footer-spacer { flex: 1; }
+
+  // Review step ------------------------------------------------------
+  &__review {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-lg;
+
+    @include mobile { grid-template-columns: 1fr; }
+
+    section {
+      h4 {
+        margin: 0 0 $spacing-sm;
+        font-size: $text-xs;
+      }
+      dl {
+        margin: 0;
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        row-gap: 8px;
+        column-gap: $spacing-md;
+      }
+      dt {
+        color: $neutral-500;
+        font-size: $text-sm;
+      }
+      dd {
+        margin: 0;
+        color: $neutral-900;
+        font-size: $text-sm;
+      }
+    }
+  }
+
+  // Success step -----------------------------------------------------
+  &__success {
+    text-align: center;
+    padding: $spacing-2xl $spacing-lg;
+  }
+
+  &__success-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: $success-light;
+    color: $success;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $spacing-md;
+  }
+
+  &__photo {
+    margin-top: $spacing-lg;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+
+    h4 { margin-bottom: $spacing-sm; }
+  }
+
+  &__success-actions {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-sm;
+    margin-top: $spacing-xl;
+  }
+}

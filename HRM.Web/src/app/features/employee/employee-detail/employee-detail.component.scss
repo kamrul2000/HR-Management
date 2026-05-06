@@ -1,0 +1,107 @@
+@use 'styles/variables' as *;
+
+.detail-header {
+  &__body {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+  }
+
+  &__avatar {
+    position: relative;
+    cursor: pointer;
+  }
+
+  &__avatar-edit {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid $neutral-200;
+    color: $brand-primary;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: $shadow-xs;
+  }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+
+    h2 { margin: 0; font-size: $text-xl; font-weight: 600; }
+  }
+
+  &__meta {
+    margin-top: 4px;
+    font-size: $text-sm;
+    color: $neutral-500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  &__badges {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__type {
+    font-size: $text-xs;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: $neutral-100;
+    color: $neutral-700;
+  }
+
+  &__photo-panel {
+    border-top: 1px solid $neutral-200;
+    background: $neutral-50;
+    padding: $spacing-md $spacing-lg;
+  }
+
+  &__photo-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-sm;
+
+    h4 { margin: 0; font-size: $text-sm; font-weight: 600; }
+  }
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid $neutral-200;
+  padding: 0 $spacing-md;
+  gap: 4px;
+  overflow-x: auto;
+
+  &__tab {
+    background: transparent;
+    border: none;
+    padding: 14px $spacing-md;
+    font-size: $text-sm;
+    font-weight: 500;
+    color: $neutral-600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all $transition-fast;
+    white-space: nowrap;
+
+    &:hover { color: $neutral-900; }
+    &.is-active {
+      color: $brand-primary;
+      border-bottom-color: $brand-primary;
+      font-weight: 600;
+    }
+  }
+}

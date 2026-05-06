@@ -44,12 +44,12 @@
         />
       </div>
       <div class="form-group">
-        <label class="form-label">To {{ form.value.isCurrent ? '' : '*' }}</label>
+        <label class="form-label">To {{ !!form.value.isCurrent ? '' : '*' }}</label>
         <input
           type="date"
           class="form-control"
           formControlName="toDate"
-          [disabled]="form.value.isCurrent"
+          [attr.disabled]="form.value.isCurrent ? '' : null"
         />
         <span class="form-error" *ngIf="formError('toRequired') && !form.value.isCurrent">
           Required for past experience.
@@ -70,7 +70,7 @@
       ></textarea>
     </div>
 
-    <div class="form-group" *ngIf="!form.value.isCurrent">
+    <div class="form-group" *ngIf="!form.value.isCurrent ? true : false">
       <label class="form-label">Reason for Leaving</label>
       <input type="text" class="form-control" formControlName="reasonForLeaving" />
     </div>

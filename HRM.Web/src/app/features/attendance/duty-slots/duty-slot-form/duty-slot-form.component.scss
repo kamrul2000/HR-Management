@@ -1,0 +1,25 @@
+@use 'styles/variables' as *;
+
+.duty-preview {
+  margin-top: $spacing-md;
+  padding: 14px 16px;
+  background: $brand-primary-light;
+  border: 1px solid rgba($brand-primary, 0.15);
+  border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+
+  .text-label { display: block; margin-bottom: 2px; }
+  strong { color: $brand-primary; font-size: $text-lg; }
+
+  &__night {
+    background: #F5F3FF;
+    color: #7C3AED;
+    font-size: $text-xs;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 99px;
+  }
+}

@@ -29,6 +29,7 @@ public class AppDbContext : DbContext
     public DbSet<SalaryCalculation> SalaryCalculations => Set<SalaryCalculation>();
     public DbSet<SalaryCalculationDetail> SalaryCalculationDetails => Set<SalaryCalculationDetail>();
     public DbSet<BonusCalculation> BonusCalculations => Set<BonusCalculation>();
+    public DbSet<LoanApplication> LoanApplications => Set<LoanApplication>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -637,6 +638,36 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.EmployeeId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => new { e.DisbursementYear, e.DisbursementMonth });
+        });
+
+        modelBuilder.Entity<LoanApplication>(entity =>
+        {
+            entity.ToTable("LoanApplications");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.ApplicationNo).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.LoanType).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.RequestedAmount).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.RequestedTenureMonths).IsRequired();
+            entity.Property(e => e.Purpose).IsRequired().HasMaxLength(1000);
+            entity.Property(e => e.AttachmentPath).HasMaxLength(500);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.RecommendationRemarks).HasMaxLength(500);
+            entity.Property(e => e.RejectionRemarks).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => new { e.ApplicationNo, e.SubscriptionId }).IsUnique();
         });
     }
 }

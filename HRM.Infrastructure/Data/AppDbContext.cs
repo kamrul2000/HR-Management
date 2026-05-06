@@ -17,7 +17,8 @@ public class AppDbContext : DbContext
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<Attendance> Attendances => Set<Attendance>();
     public DbSet<LeaveApplication> LeaveApplications => Set<LeaveApplication>();
-    public DbSet<SalaryCreate> SalaryCreates => Set<SalaryCreate>();
+    public DbSet<SalaryStructure> SalaryStructures => Set<SalaryStructure>();
+    public DbSet<SalaryStructureItem> SalaryStructureItems => Set<SalaryStructureItem>();
     public DbSet<DutySlot> DutySlots => Set<DutySlot>();
     public DbSet<LeaveType> LeaveTypes => Set<LeaveType>();
     public DbSet<LeaveAllotment> LeaveAllotments => Set<LeaveAllotment>();
@@ -272,11 +273,17 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => new { e.ApplicationNo, e.SubscriptionId }).IsUnique();
         });
 
-        modelBuilder.Entity<SalaryCreate>(entity =>
+        modelBuilder.Entity<SalaryStructure>(entity =>
         {
-            entity.ToTable("SalaryCreates");
+            entity.ToTable("SalaryStructures");
             entity.HasKey(e => e.Id);
 
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.EffectiveFrom).HasColumnType("date").IsRequired();
+            entity.Property(e => e.EffectiveTo).HasColumnType("date");
+            entity.Property(e => e.BasicSalary).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.Remarks).HasMaxLength(500);
             entity.Property(e => e.SubscriptionId).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.UpdatedAt).IsRequired();
@@ -286,15 +293,37 @@ public class AppDbContext : DbContext
                 .HasForeignKey(e => e.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => new { e.EmployeeId, e.IsActive });
+        });
+
+        modelBuilder.Entity<SalaryStructureItem>(entity =>
+        {
+            entity.ToTable("SalaryStructureItems");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.SalaryStructureId).IsRequired();
+            entity.Property(e => e.SalaryHeadId).IsRequired();
+            entity.Property(e => e.FixedAmount).HasColumnType("decimal(12,2)");
+            entity.Property(e => e.OverridePercentage).HasColumnType("decimal(6,4)");
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.SalaryStructure)
+                .WithMany(s => s.Items)
+                .HasForeignKey(e => e.SalaryStructureId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasOne(e => e.SalaryHead)
                 .WithMany()
                 .HasForeignKey(e => e.SalaryHeadId)
-                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasIndex(e => e.SubscriptionId);
-            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.SalaryStructureId);
             entity.HasIndex(e => e.SalaryHeadId);
+            entity.HasIndex(e => new { e.SalaryStructureId, e.SalaryHeadId }).IsUnique();
         });
 
         modelBuilder.Entity<DutySlot>(entity =>

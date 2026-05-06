@@ -28,7 +28,7 @@ public class EmployeeService : IEmployeeService
     private readonly IRepository<Designation> _designationRepository;
     private readonly IRepository<Attendance> _attendanceRepository;
     private readonly IRepository<LeaveApplication> _leaveApplicationRepository;
-    private readonly IRepository<SalaryCreate> _salaryCreateRepository;
+    private readonly IRepository<SalaryStructure> _salaryStructureRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IWebHostEnvironment _env;
     private readonly IMapper _mapper;
@@ -40,7 +40,7 @@ public class EmployeeService : IEmployeeService
         IRepository<Designation> designationRepository,
         IRepository<Attendance> attendanceRepository,
         IRepository<LeaveApplication> leaveApplicationRepository,
-        IRepository<SalaryCreate> salaryCreateRepository,
+        IRepository<SalaryStructure> salaryStructureRepository,
         IHttpContextAccessor httpContextAccessor,
         IWebHostEnvironment env,
         IMapper mapper)
@@ -51,7 +51,7 @@ public class EmployeeService : IEmployeeService
         _designationRepository = designationRepository;
         _attendanceRepository = attendanceRepository;
         _leaveApplicationRepository = leaveApplicationRepository;
-        _salaryCreateRepository = salaryCreateRepository;
+        _salaryStructureRepository = salaryStructureRepository;
         _httpContextAccessor = httpContextAccessor;
         _env = env;
         _mapper = mapper;
@@ -324,7 +324,7 @@ public class EmployeeService : IEmployeeService
 
         var hasAttendance = await _attendanceRepository.Query().AnyAsync(a => a.EmployeeId == id);
         var hasLeave = await _leaveApplicationRepository.Query().AnyAsync(l => l.EmployeeId == id);
-        var hasSalary = await _salaryCreateRepository.Query().AnyAsync(s => s.EmployeeId == id);
+        var hasSalary = await _salaryStructureRepository.Query().AnyAsync(s => s.EmployeeId == id);
 
         if (hasAttendance || hasLeave || hasSalary)
         {

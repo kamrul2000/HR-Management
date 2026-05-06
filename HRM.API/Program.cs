@@ -125,6 +125,7 @@ builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<ILeaveApplicationService, LeaveApplicationService>();
 builder.Services.AddScoped<IOvertimeService, OvertimeService>();
 builder.Services.AddScoped<ISalaryHeadService, SalaryHeadService>();
+builder.Services.AddScoped<ISalaryCreateService, SalaryCreateService>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();

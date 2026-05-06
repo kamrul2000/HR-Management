@@ -19,18 +19,18 @@ public class SalaryHeadService : ISalaryHeadService
     };
 
     private readonly IRepository<SalaryHead> _salaryHeadRepository;
-    private readonly IRepository<SalaryCreate> _salaryCreateRepository;
+    private readonly IRepository<SalaryStructureItem> _salaryStructureItemRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMapper _mapper;
 
     public SalaryHeadService(
         IRepository<SalaryHead> salaryHeadRepository,
-        IRepository<SalaryCreate> salaryCreateRepository,
+        IRepository<SalaryStructureItem> salaryStructureItemRepository,
         IHttpContextAccessor httpContextAccessor,
         IMapper mapper)
     {
         _salaryHeadRepository = salaryHeadRepository;
-        _salaryCreateRepository = salaryCreateRepository;
+        _salaryStructureItemRepository = salaryStructureItemRepository;
         _httpContextAccessor = httpContextAccessor;
         _mapper = mapper;
     }
@@ -191,7 +191,7 @@ public class SalaryHeadService : ISalaryHeadService
                 "Cannot delete a salary head that is used as a base head for other heads. Update the dependent heads first.");
         }
 
-        var hasSalaryStructureRefs = await _salaryCreateRepository.Query()
+        var hasSalaryStructureRefs = await _salaryStructureItemRepository.Query()
             .AnyAsync(s => s.SalaryHeadId == id);
 
         if (hasSalaryStructureRefs)

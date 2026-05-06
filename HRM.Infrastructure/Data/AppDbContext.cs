@@ -523,5 +523,78 @@ public class AppDbContext : DbContext
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
         });
+
+        modelBuilder.Entity<SalaryCalculation>(entity =>
+        {
+            entity.ToTable("SalaryCalculations");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.SalaryStructureId).IsRequired();
+            entity.Property(e => e.Year).IsRequired();
+            entity.Property(e => e.Month).IsRequired();
+            entity.Property(e => e.TotalWorkingDays).IsRequired();
+            entity.Property(e => e.PresentDays).IsRequired();
+            entity.Property(e => e.AbsentDays).IsRequired();
+            entity.Property(e => e.HalfDays).IsRequired();
+            entity.Property(e => e.UnpaidLeaveDays).HasColumnType("decimal(6,2)").IsRequired();
+            entity.Property(e => e.LateDeductionDays).HasColumnType("decimal(6,2)").IsRequired();
+            entity.Property(e => e.OvertimeMinutes).IsRequired();
+            entity.Property(e => e.BasicSalary).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.GrossSalary).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.TotalEarnings).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.TotalDeductions).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.OvertimePay).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.BonusAmount).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.LoanDeduction).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.TaxDeduction).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.NetSalary).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Remarks).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.SalaryStructure)
+                .WithMany()
+                .HasForeignKey(e => e.SalaryStructureId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => new { e.EmployeeId, e.Year, e.Month, e.SubscriptionId, e.Status });
+        });
+
+        modelBuilder.Entity<SalaryCalculationDetail>(entity =>
+        {
+            entity.ToTable("SalaryCalculationDetails");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.SalaryCalculationId).IsRequired();
+            entity.Property(e => e.SalaryHeadId).IsRequired();
+            entity.Property(e => e.HeadName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.HeadCode).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.HeadType).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.CalculationMethod).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.BaseAmount).HasColumnType("decimal(12,2)");
+            entity.Property(e => e.AppliedPercentage).HasColumnType("decimal(6,4)");
+            entity.Property(e => e.ComputedAmount).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+
+            entity.HasOne(e => e.SalaryCalculation)
+                .WithMany(c => c.Details)
+                .HasForeignKey(e => e.SalaryCalculationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SalaryCalculationId);
+            entity.HasIndex(e => e.SalaryHeadId);
+        });
     }
 }

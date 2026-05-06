@@ -217,8 +217,14 @@ public class GratuityRuleService : IGratuityRuleService
         var subscriptionId = GetSubscriptionId();
         var rule = await LoadRuleAsync(id, subscriptionId);
 
-        // Module 29 (GratuityCalculation) reference check will be added when that module exists.
-        // For now there is no FK constraint preventing deletion.
+        var inUse = await _context.GratuityCalculations
+            .AnyAsync(c => c.GratuityRuleId == id);
+
+        if (inUse)
+        {
+            throw new InvalidOperationException(
+                "Cannot delete a gratuity rule that has been used in gratuity calculations.");
+        }
 
         await _ruleRepository.DeleteAsync(rule);
     }

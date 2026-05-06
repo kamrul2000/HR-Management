@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HRM.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ae6e732edbd93aedd81c1141f04c0e54b626ea55")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+300a7d3156385007706fe20f03781117ea9be6c1")]
 [assembly: System.Reflection.AssemblyProductAttribute("HRM.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HRM.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

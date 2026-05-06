@@ -42,6 +42,9 @@ public class AppDbContext : DbContext
     public DbSet<PfInterestRate> PfInterestRates => Set<PfInterestRate>();
     public DbSet<EmployeePfInterest> EmployeePfInterests => Set<EmployeePfInterest>();
     public DbSet<GratuityRule> GratuityRules => Set<GratuityRule>();
+    public DbSet<GratuityCalculation> GratuityCalculations => Set<GratuityCalculation>();
+    public DbSet<SeparationReason> SeparationReasons => Set<SeparationReason>();
+    public DbSet<EmployeeSeparation> EmployeeSeparations => Set<EmployeeSeparation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1023,6 +1026,107 @@ public class AppDbContext : DbContext
 
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => new { e.RuleName, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<GratuityCalculation>(entity =>
+        {
+            entity.ToTable("GratuityCalculations");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.GratuityRuleId).IsRequired();
+            entity.Property(e => e.SeparationDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.JoiningDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.TotalServiceDays).IsRequired();
+            entity.Property(e => e.TotalServiceYears).HasColumnType("decimal(8,4)").IsRequired();
+            entity.Property(e => e.EligibleYears).HasColumnType("decimal(8,4)").IsRequired();
+            entity.Property(e => e.CalculationBasis).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.MonthlySalaryUsed).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.DailySalary).HasColumnType("decimal(12,4)").IsRequired();
+            entity.Property(e => e.RatePerYear).HasColumnType("decimal(6,2)").IsRequired();
+            entity.Property(e => e.GratuityBeforeCap).HasColumnType("decimal(14,2)").IsRequired();
+            entity.Property(e => e.GratuityAmount).HasColumnType("decimal(14,2)").IsRequired();
+            entity.Property(e => e.IsCapApplied).IsRequired();
+            entity.Property(e => e.IsEligible).IsRequired();
+            entity.Property(e => e.IneligibilityReason).HasMaxLength(500);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.Remarks).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.GratuityRule)
+                .WithMany()
+                .HasForeignKey(e => e.GratuityRuleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.GratuityRuleId);
+            entity.HasIndex(e => e.Status);
+        });
+
+        modelBuilder.Entity<SeparationReason>(entity =>
+        {
+            entity.ToTable("SeparationReasons");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.ReasonName).IsRequired().HasMaxLength(150);
+            entity.Property(e => e.Category).HasMaxLength(20);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => new { e.ReasonName, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<EmployeeSeparation>(entity =>
+        {
+            entity.ToTable("EmployeeSeparations");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.SeparationReasonId).IsRequired();
+            entity.Property(e => e.SeparationType).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.ApplicationDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.LastWorkingDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.NoticePeriodDays).IsRequired();
+            entity.Property(e => e.ActualNoticeDays).IsRequired();
+            entity.Property(e => e.NoticePeriodShortfall).IsRequired();
+            entity.Property(e => e.NoticePeriodBuyout).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.GratuityAmount).HasColumnType("decimal(14,2)").IsRequired();
+            entity.Property(e => e.OtherSettlementAmount).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.TotalSettlementAmount).HasColumnType("decimal(14,2)").IsRequired();
+            entity.Property(e => e.Remarks).HasMaxLength(1000);
+            entity.Property(e => e.AttachmentPath).HasMaxLength(500);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.ApprovalRemarks).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Employee)
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.SeparationReason)
+                .WithMany()
+                .HasForeignKey(e => e.SeparationReasonId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.LastWorkingDate);
         });
     }
 }

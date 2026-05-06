@@ -1,0 +1,156 @@
+<hrm-page-header title="Bulk Attendance Entry" subtitle="Mark attendance for many employees at once.">
+  <a routerLink="../records" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="card">
+    <div class="card__body">
+      <div class="form-grid form-grid--3">
+        <div class="form-group">
+          <label class="form-label">Date <span class="required">*</span></label>
+          <input
+            type="date"
+            class="form-control"
+            [ngModel]="attendanceDate()"
+            (ngModelChange)="attendanceDate.set($event)"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Duty Slot <span class="required">*</span></label>
+          <select
+            class="form-control"
+            [ngModel]="dutySlotId()"
+            (ngModelChange)="dutySlotId.set($event ? +$event : null)"
+          >
+            <option [ngValue]="null">Select a duty slot…</option>
+            <option *ngFor="let s of slotOptions()" [ngValue]="s.id">
+              {{ s.slotName }} ({{ s.startTime.slice(0,5) }}–{{ s.endTime.slice(0,5) }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Branch</label>
+          <select
+            class="form-control"
+            [ngModel]="branchId()"
+            (ngModelChange)="branchId.set($event ? +$event : null)"
+          >
+            <option [ngValue]="null">All active employees</option>
+            <option *ngFor="let b of branchOptions()" [ngValue]="b.id">{{ b.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn--primary"
+        [disabled]="!canLoad()"
+        (click)="loadEmployees()"
+      >
+        <ng-icon name="heroPlay" size="14" />
+        Load Employees
+      </button>
+    </div>
+  </div>
+
+  <hrm-loading-skeleton *ngIf="loadingEmployees()" rows="5" class="mt-md"></hrm-loading-skeleton>
+
+  <div *ngIf="!loadingEmployees() && rows().length > 0" class="card mt-md">
+    <div class="card__header">
+      <h3>{{ rows().length }} employees</h3>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="applyDefaults()">
+        Reset to Present 9–6
+      </button>
+    </div>
+    <div class="card__body card__body--flush">
+      <table class="bulk-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Status</th>
+            <th>Punch In</th>
+            <th>Punch Out</th>
+            <th>Remarks</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rows()">
+            <td>
+              <div class="bulk-table__person">
+                <hrm-avatar [name]="row.employee.fullName" [size]="32"></hrm-avatar>
+                <div>
+                  <div class="text-strong">{{ row.employee.fullName }}</div>
+                  <div class="text-muted text-xs text-mono">{{ row.employee.employeeCode }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <select
+                class="form-control form-control--sm"
+                [ngModel]="row.status"
+                (ngModelChange)="setRowStatus(row.employeeId, $event)"
+              >
+                <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+              </select>
+            </td>
+            <td>
+              <input
+                type="time"
+                class="form-control form-control--sm"
+                [ngModel]="row.punchInTime ? row.punchInTime.slice(11, 16) : ''"
+                (ngModelChange)="setRowField(row.employeeId, 'punchInTime', $event ? attendanceDate() + 'T' + $event + ':00' : null)"
+                [disabled]="['Absent','Holiday','WeeklyOff','OnLeave'].includes(row.status)"
+              />
+            </td>
+            <td>
+              <input
+                type="time"
+                class="form-control form-control--sm"
+                [ngModel]="row.punchOutTime ? row.punchOutTime.slice(11, 16) : ''"
+                (ngModelChange)="setRowField(row.employeeId, 'punchOutTime', $event ? attendanceDate() + 'T' + $event + ':00' : null)"
+                [disabled]="['Absent','Holiday','WeeklyOff','OnLeave'].includes(row.status)"
+              />
+            </td>
+            <td>
+              <input
+                type="text"
+                class="form-control form-control--sm"
+                [ngModel]="row.remarks"
+                (ngModelChange)="setRowField(row.employeeId, 'remarks', $event)"
+                placeholder="Optional"
+              />
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn--icon btn--ghost-neutral"
+                (click)="removeRow(row.employeeId)"
+                aria-label="Remove row"
+              >
+                ×
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card__footer">
+      <span class="text-muted text-sm">{{ rows().length }} rows ready to submit</span>
+      <button
+        type="button"
+        class="btn btn--primary"
+        [disabled]="!canSubmit()"
+        (click)="submit()"
+      >
+        <ng-icon name="heroCheck" size="14" />
+        {{ submitting() ? 'Submitting…' : 'Submit Attendance' }}
+      </button>
+    </div>
+  </div>
+</div>

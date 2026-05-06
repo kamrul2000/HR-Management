@@ -1,0 +1,123 @@
+<hrm-page-header title="Attendance" subtitle="Daily attendance records across the organization.">
+  <a routerLink="../summary" class="btn btn--secondary">
+    <ng-icon name="heroChartBar" size="14" />
+    Monthly Summary
+  </a>
+  <a routerLink="../entry" class="btn btn--primary">
+    <ng-icon name="heroPlus" size="14" />
+    Bulk Entry
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field toolbar__field--grow">
+      <div class="attendance-list__search">
+        <ng-icon name="heroMagnifyingGlass" size="16" />
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Search by employee name or code…"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </div>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="branchFilter()"
+        (ngModelChange)="branchFilter.set($event ? +$event : null); onAnyFilterChange()"
+      >
+        <option [ngValue]="null">All branches</option>
+        <option *ngFor="let b of branchOptions()" [ngValue]="b.id">{{ b.name }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="departmentFilter()"
+        (ngModelChange)="departmentFilter.set($event ? +$event : null); onAnyFilterChange()"
+      >
+        <option [ngValue]="null">All departments</option>
+        <option *ngFor="let d of departmentOptions()" [ngValue]="d.id">{{ d.name }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event); onAnyFilterChange()"
+      >
+        <option value="">All statuses</option>
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <input
+        type="date"
+        class="form-control"
+        [ngModel]="fromDate()"
+        (ngModelChange)="fromDate.set($event); onAnyFilterChange()"
+        aria-label="From date"
+      />
+    </div>
+
+    <div class="toolbar__field">
+      <input
+        type="date"
+        class="form-control"
+        [ngModel]="toDate()"
+        (ngModelChange)="toDate.set($event); onAnyFilterChange()"
+        aria-label="To date"
+      />
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [page]="pageState()"
+    [showPagination]="true"
+    rowKey="id"
+    emptyTitle="No attendance records"
+    emptyMessage="Adjust the filters or run bulk entry to capture attendance."
+    (pageChange)="onPageChange($event)"
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div class="attendance-list__person">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #punchesCellTpl let-row>
+  <div class="attendance-list__punches">
+    <span>{{ row.punchInTimeFormatted || '—' }}</span>
+    <span class="text-muted">→</span>
+    <span>{{ row.punchOutTimeFormatted || '—' }}</span>
+  </div>
+</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge [variant]="row.status" [label]="row.statusLabel || row.status"></hrm-status-badge>
+</ng-template>
+
+<ng-template #lateCellTpl let-row>
+  <span *ngIf="row.isLate" class="attendance-list__late">{{ row.lateMinutes }}m</span>
+  <span *ngIf="!row.isLate" class="text-muted">—</span>
+</ng-template>
+
+<ng-template #hoursCellTpl let-row>
+  <span class="text-mono text-sm">{{ formatHours(row.actualWorkingMinutes) }}</span>
+</ng-template>

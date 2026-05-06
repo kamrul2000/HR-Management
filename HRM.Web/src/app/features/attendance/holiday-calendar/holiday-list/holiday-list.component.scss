@@ -1,0 +1,123 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.holiday-toolbar__month {
+  margin: 0 $spacing-md 0 4px;
+  font-size: $text-md;
+  font-weight: 600;
+  color: $neutral-900;
+}
+
+.holiday-toolbar__view {
+  display: inline-flex;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-md;
+  overflow: hidden;
+
+  button {
+    background: #fff;
+    border: none;
+    padding: 7px 14px;
+    font-size: $text-xs;
+    font-weight: 500;
+    color: $neutral-600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all $transition-fast;
+
+    & + button { border-left: 1px solid $neutral-200; }
+
+    &:hover { background: $neutral-100; }
+    &.is-active { background: $brand-primary; color: #fff; }
+  }
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+
+  &__head {
+    background: $neutral-50;
+    color: $neutral-500;
+    font-size: $text-xs;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 10px 12px;
+    border-bottom: 1px solid $neutral-200;
+    text-align: center;
+  }
+
+  &__cell {
+    border-right: 1px solid $neutral-100;
+    border-bottom: 1px solid $neutral-100;
+    min-height: 110px;
+    padding: 8px;
+    cursor: pointer;
+    transition: background $transition-fast;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &:hover:not(.is-out) { background: $neutral-50; }
+    &.is-out { background: $neutral-50; color: $neutral-300; cursor: default; }
+    &.is-today .cal-grid__day {
+      background: $brand-primary;
+      color: #fff;
+    }
+    &.has-holiday { background: rgba($brand-primary, 0.05); }
+
+    &:nth-child(7n) { border-right: none; }
+  }
+
+  &__day {
+    align-self: flex-start;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $text-xs;
+    font-weight: 600;
+  }
+
+  &__events {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    li {
+      font-size: $text-xs;
+      padding: 2px 6px;
+      background: $brand-primary;
+      color: #fff;
+      border-radius: $radius-sm;
+      cursor: pointer;
+      @include truncate;
+      transition: filter $transition-fast;
+
+      &:hover { filter: brightness(1.1); }
+    }
+  }
+}
+
+.holiday-type {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: $text-xs;
+  font-weight: 600;
+  background: $neutral-100;
+  color: $neutral-700;
+
+  &[data-type="Public"]         { background: $brand-primary-light; color: $brand-primary; }
+  &[data-type="Optional"]       { background: $warning-light; color: $warning; }
+  &[data-type="Organizational"] { background: #F5F3FF; color: #7C3AED; }
+}

@@ -1,0 +1,41 @@
+@use 'styles/variables' as *;
+
+.attendance-list {
+  &__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    ng-icon {
+      position: absolute;
+      left: 12px;
+      color: $neutral-400;
+      pointer-events: none;
+    }
+
+    .form-control { padding-left: 36px; }
+  }
+
+  &__person {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__punches {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: $font-mono;
+    font-size: $text-sm;
+  }
+
+  &__late {
+    font-size: $text-xs;
+    font-weight: 600;
+    background: #FFF7ED;
+    color: #C2410C;
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+}

@@ -1,0 +1,121 @@
+<hrm-page-header title="Holiday Calendar" subtitle="Public, optional, and organizational holidays.">
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    Add Holiday
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="prevMonth()" aria-label="Previous month">
+      <ng-icon name="heroChevronLeft" size="16" />
+    </button>
+    <button type="button" class="btn btn--secondary btn--sm" (click)="today()">Today</button>
+    <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="nextMonth()" aria-label="Next month">
+      <ng-icon name="heroChevronRight" size="16" />
+    </button>
+    <h3 class="holiday-toolbar__month">{{ monthLabel() }}</h3>
+
+    <div class="toolbar__actions">
+      <div class="holiday-toolbar__view">
+        <button
+          type="button"
+          [class.is-active]="view() === 'calendar'"
+          (click)="setView('calendar')"
+        >
+          <ng-icon name="heroCalendarDays" size="14" /> Calendar
+        </button>
+        <button
+          type="button"
+          [class.is-active]="view() === 'list'"
+          (click)="setView('list')"
+        >
+          <ng-icon name="heroQueueList" size="14" /> List
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <hrm-loading-skeleton *ngIf="loading()" rows="6"></hrm-loading-skeleton>
+
+  <ng-container *ngIf="!loading()">
+    <!-- Calendar -->
+    <div *ngIf="view() === 'calendar'" class="card">
+      <div class="card__body card__body--flush">
+        <div class="cal-grid">
+          <div class="cal-grid__head" *ngFor="let n of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']">{{ n }}</div>
+          <div
+            *ngFor="let cell of cells()"
+            class="cal-grid__cell"
+            [class.is-out]="!cell.inMonth"
+            [class.is-today]="cell.isToday"
+            [class.has-holiday]="cell.holidays.length > 0"
+            (click)="cell.inMonth ? openCreate(cell.date) : null"
+          >
+            <span class="cal-grid__day">{{ cell.day }}</span>
+            <ul class="cal-grid__events" *ngIf="cell.holidays.length > 0">
+              <li
+                *ngFor="let h of cell.holidays"
+                [attr.title]="h.holidayName"
+                (click)="$event.stopPropagation(); openEdit(h)"
+              >
+                {{ h.holidayName }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- List -->
+    <hrm-data-table
+      *ngIf="view() === 'list'"
+      [columns]="columns"
+      [rows]="filteredList()"
+      [loading]="false"
+      [showPagination]="false"
+      [actionsTemplate]="actionsTpl"
+      rowKey="id"
+      emptyTitle="No holidays this month"
+      emptyMessage="Add a holiday from the calendar view or use the button above."
+    ></hrm-data-table>
+  </ng-container>
+</div>
+
+<ng-template #typeCellTpl let-row>
+  <span class="holiday-type" [attr.data-type]="row.holidayType">{{ row.holidayType }}</span>
+</ng-template>
+
+<ng-template #scopeCellTpl let-row>
+  <ng-container *ngIf="row.branchName; else orgScope">
+    <span class="text-strong">{{ row.branchName }}</span>
+  </ng-container>
+  <ng-template #orgScope>
+    <span class="text-muted">All branches</span>
+  </ng-template>
+</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge
+    [variant]="row.isActive ? 'active' : 'inactive'"
+    [label]="row.isActive ? 'Active' : 'Inactive'"
+  ></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="openEdit(row)" aria-label="Edit">
+    <ng-icon name="heroPencilSquare" size="16" />
+  </button>
+  <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="delete(row)" aria-label="Delete">
+    <ng-icon name="heroTrash" size="16" />
+  </button>
+</ng-template>
+
+<ng-container *ngIf="drawerOpen()">
+  <hrm-holiday-form
+    [holiday]="editing()"
+    [defaultDate]="defaultDate()"
+    (saved)="onSaved()"
+    (dismiss)="closeDrawer()"
+  ></hrm-holiday-form>
+</ng-container>

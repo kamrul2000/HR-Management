@@ -1,0 +1,45 @@
+@use 'styles/variables' as *;
+
+.bulk-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $text-sm;
+
+  thead th {
+    padding: 10px 12px;
+    text-align: left;
+    background: $neutral-50;
+    border-bottom: 1px solid $neutral-200;
+    font-size: $text-xs;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: $neutral-500;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid $neutral-100;
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  &__person {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+// Compact variant of form-control used in bulk grid
+.form-control--sm {
+  padding: 6px 10px;
+  font-size: $text-sm;
+  height: 34px;
+}
+
+.card__footer {
+  justify-content: space-between;
+}

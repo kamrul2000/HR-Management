@@ -28,6 +28,7 @@ public class AppDbContext : DbContext
     public DbSet<SalaryHead> SalaryHeads => Set<SalaryHead>();
     public DbSet<SalaryCalculation> SalaryCalculations => Set<SalaryCalculation>();
     public DbSet<SalaryCalculationDetail> SalaryCalculationDetails => Set<SalaryCalculationDetail>();
+    public DbSet<BonusCalculation> BonusCalculations => Set<BonusCalculation>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

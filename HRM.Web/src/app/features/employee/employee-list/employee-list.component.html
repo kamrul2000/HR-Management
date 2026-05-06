@@ -1,0 +1,135 @@
+<hrm-page-header title="Employees" subtitle="All employees across branches and departments.">
+  <button
+    type="button"
+    class="btn btn--secondary"
+    (click)="exportCsv()"
+    title="Coming soon"
+    disabled
+  >
+    <ng-icon name="heroArrowDownTray" size="14" />
+    Export
+  </button>
+  <a routerLink="new" class="btn btn--primary">
+    <ng-icon name="heroPlus" size="14" />
+    Add Employee
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field toolbar__field--grow">
+      <div class="employee-list__search">
+        <ng-icon name="heroMagnifyingGlass" size="16" />
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Search by name, code, or email…"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </div>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="branchFilter()"
+        (ngModelChange)="onBranchChange($event)"
+        aria-label="Filter by branch"
+      >
+        <option [ngValue]="null">All branches</option>
+        <option *ngFor="let b of branchOptions()" [ngValue]="b.id">{{ b.name }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="departmentFilter()"
+        (ngModelChange)="onDepartmentChange($event)"
+        aria-label="Filter by department"
+      >
+        <option [ngValue]="null">All departments</option>
+        <option *ngFor="let d of departmentOptions()" [ngValue]="d.id">{{ d.name }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="onStatusChange($event)"
+        aria-label="Filter by status"
+      >
+        <option value="">All statuses</option>
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [page]="pageState()"
+    [showPagination]="true"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No employees found"
+    emptyMessage="Adjust your filters or add a new employee to get started."
+    (pageChange)="onPageChange($event)"
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div class="employee-list__person" (click)="view(row)" role="button" tabindex="0">
+    <hrm-avatar [name]="row.fullName" [photoUrl]="row.photoUrl" [size]="36"></hrm-avatar>
+    <div>
+      <div class="employee-list__person-name">{{ row.fullName }}</div>
+      <div class="employee-list__person-meta text-muted text-xs">
+        {{ row.employeeCode }}
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #orgCellTpl let-row>
+  <div>
+    <div>{{ row.branchName || '—' }}</div>
+    <div class="text-muted text-xs">{{ row.departmentName || '—' }}</div>
+  </div>
+</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge [variant]="row.status" [label]="row.statusLabel || row.status"></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <button
+    type="button"
+    class="btn btn--icon btn--ghost-neutral"
+    (click)="view(row)"
+    aria-label="View"
+    title="View"
+  >
+    <ng-icon name="heroEye" size="16" />
+  </button>
+  <button
+    type="button"
+    class="btn btn--icon btn--ghost-neutral"
+    (click)="edit(row)"
+    aria-label="Edit"
+    title="Edit"
+  >
+    <ng-icon name="heroPencilSquare" size="16" />
+  </button>
+  <button
+    type="button"
+    class="btn btn--icon btn--ghost-neutral"
+    (click)="delete(row)"
+    aria-label="Delete"
+    title="Delete"
+  >
+    <ng-icon name="heroTrash" size="16" />
+  </button>
+</ng-template>

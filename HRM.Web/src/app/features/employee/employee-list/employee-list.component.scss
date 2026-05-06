@@ -1,0 +1,41 @@
+@use 'styles/variables' as *;
+
+.employee-list {
+  &__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    ng-icon {
+      position: absolute;
+      left: 12px;
+      color: $neutral-400;
+      pointer-events: none;
+    }
+    .form-control { padding-left: 36px; }
+  }
+
+  &__person {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    border-radius: $radius-md;
+    padding: 2px;
+    margin: -2px;
+    transition: background $transition-fast;
+
+    &:hover { background: $neutral-100; }
+  }
+
+  &__person-name {
+    font-weight: 500;
+    color: $neutral-900;
+    line-height: 1.2;
+  }
+
+  &__person-meta {
+    font-family: $font-mono;
+    margin-top: 2px;
+  }
+}

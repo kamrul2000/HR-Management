@@ -30,6 +30,8 @@ public class AppDbContext : DbContext
     public DbSet<SalaryCalculationDetail> SalaryCalculationDetails => Set<SalaryCalculationDetail>();
     public DbSet<BonusCalculation> BonusCalculations => Set<BonusCalculation>();
     public DbSet<LoanApplication> LoanApplications => Set<LoanApplication>();
+    public DbSet<LoanRecommendation> LoanRecommendations => Set<LoanRecommendation>();
+    public DbSet<LoanApproval> LoanApprovals => Set<LoanApproval>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -668,6 +670,57 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.EmployeeId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => new { e.ApplicationNo, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<LoanRecommendation>(entity =>
+        {
+            entity.ToTable("LoanRecommendations");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.LoanApplicationId).IsRequired();
+            entity.Property(e => e.RecommendedById).IsRequired();
+            entity.Property(e => e.Decision).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.RecommendedAmount).HasColumnType("decimal(12,2)");
+            entity.Property(e => e.Remarks).IsRequired().HasMaxLength(1000);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.LoanApplication)
+                .WithMany()
+                .HasForeignKey(e => e.LoanApplicationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.LoanApplicationId);
+            entity.HasIndex(e => new { e.LoanApplicationId, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<LoanApproval>(entity =>
+        {
+            entity.ToTable("LoanApprovals");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.LoanApplicationId).IsRequired();
+            entity.Property(e => e.ApprovedById).IsRequired();
+            entity.Property(e => e.Decision).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.ApprovedAmount).HasColumnType("decimal(12,2)");
+            entity.Property(e => e.MonthlyInstallment).HasColumnType("decimal(12,2)");
+            entity.Property(e => e.InterestRate).HasColumnType("decimal(6,4)");
+            entity.Property(e => e.InterestType).HasMaxLength(20);
+            entity.Property(e => e.Remarks).IsRequired().HasMaxLength(1000);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.LoanApplication)
+                .WithMany()
+                .HasForeignKey(e => e.LoanApplicationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.LoanApplicationId);
+            entity.HasIndex(e => new { e.LoanApplicationId, e.SubscriptionId }).IsUnique();
         });
     }
 }

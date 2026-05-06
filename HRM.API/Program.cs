@@ -141,6 +141,10 @@ builder.Services.AddScoped<IGratuityRuleService, GratuityRuleService>();
 builder.Services.AddScoped<IGratuityCalculationService, GratuityCalculationService>();
 builder.Services.AddScoped<IEmployeeSeparationService, EmployeeSeparationService>();
 builder.Services.AddScoped<ISeparationReasonService, SeparationReasonService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IAdditionalInfoService, AdditionalInfoService>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();

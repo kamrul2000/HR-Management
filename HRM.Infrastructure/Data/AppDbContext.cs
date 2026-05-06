@@ -45,6 +45,12 @@ public class AppDbContext : DbContext
     public DbSet<GratuityCalculation> GratuityCalculations => Set<GratuityCalculation>();
     public DbSet<SeparationReason> SeparationReasons => Set<SeparationReason>();
     public DbSet<EmployeeSeparation> EmployeeSeparations => Set<EmployeeSeparation>();
+    public DbSet<Role> Roles => Set<Role>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
+    public DbSet<Permission> Permissions => Set<Permission>();
+    public DbSet<EmergencyContact> EmergencyContacts => Set<EmergencyContact>();
+    public DbSet<EmployeeEducation> EmployeeEducations => Set<EmployeeEducation>();
+    public DbSet<EmployeeExperience> EmployeeExperiences => Set<EmployeeExperience>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1128,6 +1134,156 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.EmployeeId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.LastWorkingDate);
+        });
+
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.ToTable("Roles");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.RoleName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => new { e.RoleName, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.ToTable("UserRoles");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.UserId).IsRequired();
+            entity.Property(e => e.RoleId).IsRequired();
+            entity.Property(e => e.AssignedAt).IsRequired();
+            entity.Property(e => e.AssignedById).IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(e => e.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.UserId);
+            entity.HasIndex(e => e.RoleId);
+            entity.HasIndex(e => new { e.UserId, e.RoleId, e.SubscriptionId, e.IsActive });
+        });
+
+        modelBuilder.Entity<Permission>(entity =>
+        {
+            entity.ToTable("Permissions");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.RoleId).IsRequired();
+            entity.Property(e => e.ModuleCode).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.CanView).IsRequired();
+            entity.Property(e => e.CanCreate).IsRequired();
+            entity.Property(e => e.CanEdit).IsRequired();
+            entity.Property(e => e.CanDelete).IsRequired();
+            entity.Property(e => e.CanApprove).IsRequired();
+            entity.Property(e => e.CanExport).IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.Role)
+                .WithMany(r => r.Permissions)
+                .HasForeignKey(e => e.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.RoleId);
+            entity.HasIndex(e => new { e.RoleId, e.ModuleCode, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<EmergencyContact>(entity =>
+        {
+            entity.ToTable("EmergencyContacts");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.ContactName).IsRequired().HasMaxLength(150);
+            entity.Property(e => e.Relationship).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Phone).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.AlternatePhone).HasMaxLength(20);
+            entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.IsPrimary).IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne<Employee>()
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+        });
+
+        modelBuilder.Entity<EmployeeEducation>(entity =>
+        {
+            entity.ToTable("EmployeeEducations");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.Degree).IsRequired().HasMaxLength(150);
+            entity.Property(e => e.Institution).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.PassingYear).IsRequired();
+            entity.Property(e => e.Result).HasMaxLength(50);
+            entity.Property(e => e.MajorSubject).HasMaxLength(100);
+            entity.Property(e => e.AttachmentPath).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne<Employee>()
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
+        });
+
+        modelBuilder.Entity<EmployeeExperience>(entity =>
+        {
+            entity.ToTable("EmployeeExperiences");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.EmployeeId).IsRequired();
+            entity.Property(e => e.OrganizationName).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Designation).IsRequired().HasMaxLength(150);
+            entity.Property(e => e.FromDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.ToDate).HasColumnType("date");
+            entity.Property(e => e.IsCurrent).IsRequired();
+            entity.Property(e => e.Responsibilities).HasMaxLength(1000);
+            entity.Property(e => e.ReasonForLeaving).HasMaxLength(500);
+            entity.Property(e => e.AttachmentPath).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne<Employee>()
+                .WithMany()
+                .HasForeignKey(e => e.EmployeeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.EmployeeId);
         });
     }
 }

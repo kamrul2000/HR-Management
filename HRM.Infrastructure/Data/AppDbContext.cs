@@ -24,6 +24,7 @@ public class AppDbContext : DbContext
     public DbSet<HolidayCalendar> HolidayCalendars => Set<HolidayCalendar>();
     public DbSet<OffDay> OffDays => Set<OffDay>();
     public DbSet<Overtime> Overtimes => Set<Overtime>();
+    public DbSet<SalaryHead> SalaryHeads => Set<SalaryHead>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -285,8 +286,15 @@ public class AppDbContext : DbContext
                 .HasForeignKey(e => e.EmployeeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            entity.HasOne(e => e.SalaryHead)
+                .WithMany()
+                .HasForeignKey(e => e.SalaryHeadId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasIndex(e => e.SubscriptionId);
             entity.HasIndex(e => e.EmployeeId);
+            entity.HasIndex(e => e.SalaryHeadId);
         });
 
         modelBuilder.Entity<DutySlot>(entity =>
@@ -451,6 +459,38 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.EmployeeId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => new { e.AttendanceId, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<SalaryHead>(entity =>
+        {
+            entity.ToTable("SalaryHeads");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.HeadName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.HeadCode).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.HeadType).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.CalculationMethod).IsRequired().HasMaxLength(30);
+            entity.Property(e => e.Percentage).HasColumnType("decimal(6,4)");
+            entity.Property(e => e.IsFixed).IsRequired();
+            entity.Property(e => e.IsTaxable).IsRequired();
+            entity.Property(e => e.IsProvidentFundApplicable).IsRequired();
+            entity.Property(e => e.DisplayOrder).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasIndex(e => new { e.HeadName, e.SubscriptionId }).IsUnique();
+            entity.HasIndex(e => new { e.HeadCode, e.SubscriptionId }).IsUnique();
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => e.HeadType);
+
+            entity.HasOne(e => e.BaseHead)
+                .WithMany(e => e.DependentHeads)
+                .HasForeignKey(e => e.BaseHeadId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

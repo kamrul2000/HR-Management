@@ -124,6 +124,7 @@ builder.Services.AddScoped<IWorkingDayCalculator, WorkingDayCalculator>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<ILeaveApplicationService, LeaveApplicationService>();
 builder.Services.AddScoped<IOvertimeService, OvertimeService>();
+builder.Services.AddScoped<ISalaryHeadService, SalaryHeadService>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();

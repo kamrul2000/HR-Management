@@ -1,0 +1,43 @@
+@use 'styles/variables' as *;
+
+.contacts-tab {
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-md;
+
+    h3 { margin: 0; font-size: $text-lg; }
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $text-sm;
+
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: $text-xs;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: $neutral-500;
+      background: $neutral-50;
+      border-bottom: 1px solid $neutral-200;
+    }
+
+    tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid $neutral-100;
+      color: $neutral-800;
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    .text-center { text-align: center; }
+    .text-right  { text-align: right; }
+    .text-strong { font-weight: 600; color: $neutral-900; }
+  }
+}

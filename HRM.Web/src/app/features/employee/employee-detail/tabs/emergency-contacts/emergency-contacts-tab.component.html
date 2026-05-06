@@ -1,0 +1,78 @@
+<div class="contacts-tab">
+  <div class="contacts-tab__head">
+    <h3>Emergency Contacts</h3>
+    <button type="button" class="btn btn--primary btn--sm" (click)="openCreate()">
+      <ng-icon name="heroPlus" size="14" />
+      Add Contact
+    </button>
+  </div>
+
+  <hrm-loading-skeleton *ngIf="loading()" rows="3"></hrm-loading-skeleton>
+
+  <ng-container *ngIf="!loading()">
+    <hrm-empty-state
+      *ngIf="contacts().length === 0; else listTpl"
+      icon="heroPhone"
+      title="No emergency contacts"
+      description="Add a contact so they can be reached in an emergency."
+      actionLabel="Add Contact"
+      (action)="openCreate()"
+    ></hrm-empty-state>
+
+    <ng-template #listTpl>
+      <table class="contacts-tab__table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Relationship</th>
+            <th>Phone</th>
+            <th>Alternate</th>
+            <th class="text-center">Primary</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of contacts()">
+            <td>
+              <div class="text-strong">{{ c.contactName }}</div>
+              <div class="text-muted text-xs" *ngIf="c.address">{{ c.address }}</div>
+            </td>
+            <td>{{ c.relationship }}</td>
+            <td class="text-mono">{{ c.phone }}</td>
+            <td class="text-mono">{{ c.alternatePhone || '—' }}</td>
+            <td class="text-center">
+              <button
+                type="button"
+                class="btn btn--icon"
+                [class.btn--ghost-neutral]="!c.isPrimary"
+                [class.btn--primary]="c.isPrimary"
+                (click)="setPrimary(c)"
+                [attr.aria-label]="c.isPrimary ? 'Primary contact' : 'Set as primary'"
+                [title]="c.isPrimary ? 'Primary contact' : 'Set as primary'"
+              >
+                <ng-icon name="heroStar" size="16" />
+              </button>
+            </td>
+            <td class="text-right">
+              <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="openEdit(c)" aria-label="Edit">
+                <ng-icon name="heroPencilSquare" size="16" />
+              </button>
+              <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="delete(c)" aria-label="Delete">
+                <ng-icon name="heroTrash" size="16" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-template>
+  </ng-container>
+</div>
+
+<ng-container *ngIf="drawerOpen()">
+  <hrm-emergency-contact-form
+    [employeeId]="employeeId"
+    [contact]="editingContact()"
+    (saved)="onSaved()"
+    (dismiss)="closeDrawer()"
+  ></hrm-emergency-contact-form>
+</ng-container>

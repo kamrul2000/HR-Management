@@ -1,0 +1,83 @@
+<div class="education-tab">
+  <div class="education-tab__head">
+    <h3>Education</h3>
+    <button type="button" class="btn btn--primary btn--sm" (click)="openCreate()">
+      <ng-icon name="heroPlus" size="14" />
+      Add Education
+    </button>
+  </div>
+
+  <hrm-loading-skeleton *ngIf="loading()" rows="3"></hrm-loading-skeleton>
+
+  <ng-container *ngIf="!loading()">
+    <hrm-empty-state
+      *ngIf="records().length === 0; else cards"
+      icon="heroAcademicCap"
+      title="No education records"
+      description="Track each qualification, year, and certificate scan."
+      actionLabel="Add Education"
+      (action)="openCreate()"
+    ></hrm-empty-state>
+
+    <ng-template #cards>
+      <div class="education-tab__grid">
+        <article *ngFor="let r of records()" class="edu-card">
+          <header>
+            <h4>{{ r.degree }}</h4>
+            <span class="edu-card__year">{{ r.passingYear }}</span>
+          </header>
+          <p class="edu-card__institution">{{ r.institution }}</p>
+          <dl class="edu-card__meta">
+            <ng-container *ngIf="r.majorSubject">
+              <dt>Major</dt><dd>{{ r.majorSubject }}</dd>
+            </ng-container>
+            <ng-container *ngIf="r.result">
+              <dt>Result</dt><dd>{{ r.result }}</dd>
+            </ng-container>
+          </dl>
+
+          <footer>
+            <a
+              *ngIf="r.attachmentUrl"
+              [href]="r.attachmentUrl"
+              target="_blank"
+              rel="noopener"
+              class="btn btn--ghost btn--sm"
+            >
+              <ng-icon name="heroDocumentArrowDown" size="14" />
+              Certificate
+            </a>
+            <label class="btn btn--ghost btn--sm" *ngIf="!r.attachmentUrl">
+              <ng-icon name="heroPaperClip" size="14" />
+              Upload
+              <input
+                type="file"
+                accept="application/pdf,image/png,image/jpeg"
+                hidden
+                (change)="onAttachmentChange(r, $event)"
+              />
+            </label>
+
+            <div class="edu-card__actions">
+              <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="openEdit(r)" aria-label="Edit">
+                <ng-icon name="heroPencilSquare" size="16" />
+              </button>
+              <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="delete(r)" aria-label="Delete">
+                <ng-icon name="heroTrash" size="16" />
+              </button>
+            </div>
+          </footer>
+        </article>
+      </div>
+    </ng-template>
+  </ng-container>
+</div>
+
+<ng-container *ngIf="drawerOpen()">
+  <hrm-education-form
+    [employeeId]="employeeId"
+    [record]="editingRecord()"
+    (saved)="onSaved()"
+    (dismiss)="closeDrawer()"
+  ></hrm-education-form>
+</ng-container>

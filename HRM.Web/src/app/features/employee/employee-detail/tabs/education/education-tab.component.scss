@@ -1,0 +1,78 @@
+@use 'styles/variables' as *;
+
+.education-tab {
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-md;
+
+    h3 { margin: 0; font-size: $text-lg; }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: $spacing-md;
+  }
+}
+
+.edu-card {
+  background: #fff;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: $spacing-sm;
+
+    h4 { margin: 0; font-size: $text-md; font-weight: 600; }
+  }
+
+  &__year {
+    font-size: $text-xs;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: $brand-primary-light;
+    color: $brand-primary;
+  }
+
+  &__institution {
+    margin: 0;
+    color: $neutral-600;
+    font-size: $text-sm;
+  }
+
+  &__meta {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 4px 12px;
+    margin: 0;
+    font-size: $text-xs;
+
+    dt { color: $neutral-500; }
+    dd { margin: 0; color: $neutral-800; }
+  }
+
+  footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: $spacing-sm;
+    border-top: 1px dashed $neutral-200;
+    gap: $spacing-sm;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 2px;
+  }
+}

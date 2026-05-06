@@ -1,0 +1,67 @@
+<hrm-drawer
+  [title]="isEdit ? 'Edit Contact' : 'Add Emergency Contact'"
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label class="form-label">Name <span class="required">*</span></label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="contactName"
+          [class.is-invalid]="hasError('contactName', 'required')"
+        />
+        <span class="form-error" *ngIf="hasError('contactName', 'required')">Required.</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Relationship <span class="required">*</span></label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="relationship"
+          placeholder="Spouse, Parent, Sibling…"
+          [class.is-invalid]="hasError('relationship', 'required')"
+        />
+        <span class="form-error" *ngIf="hasError('relationship', 'required')">Required.</span>
+      </div>
+    </div>
+
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label class="form-label">Phone <span class="required">*</span></label>
+        <input
+          type="tel"
+          class="form-control"
+          formControlName="phone"
+          [class.is-invalid]="hasError('phone', 'required')"
+        />
+        <span class="form-error" *ngIf="hasError('phone', 'required')">Required.</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Alternate Phone</label>
+        <input type="tel" class="form-control" formControlName="alternatePhone" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Address</label>
+      <textarea class="form-control" formControlName="address" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="company-form__toggle">
+        <input type="checkbox" formControlName="isPrimary" />
+        <span>Primary contact</span>
+      </label>
+    </div>
+  </form>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="dismiss.emit()">Cancel</button>
+    <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+      {{ saving() ? 'Saving…' : isEdit ? 'Save Changes' : 'Add Contact' }}
+    </button>
+  </ng-container>
+</hrm-drawer>

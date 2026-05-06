@@ -34,6 +34,8 @@ public class AppDbContext : DbContext
     public DbSet<LoanApproval> LoanApprovals => Set<LoanApproval>();
     public DbSet<EmployeeLoan> EmployeeLoans => Set<EmployeeLoan>();
     public DbSet<LoanInstallment> LoanInstallments => Set<LoanInstallment>();
+    public DbSet<TaxSlabConfig> TaxSlabConfigs => Set<TaxSlabConfig>();
+    public DbSet<TaxSlab> TaxSlabs => Set<TaxSlab>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -807,6 +809,47 @@ public class AppDbContext : DbContext
             entity.HasIndex(e => e.EmployeeId);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => new { e.EmployeeId, e.DueYear, e.DueMonth, e.Status });
+        });
+
+        modelBuilder.Entity<TaxSlabConfig>(entity =>
+        {
+            entity.ToTable("TaxSlabConfigs");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.FiscalYear).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.StartDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.EndDate).HasColumnType("date").IsRequired();
+            entity.Property(e => e.TaxFreeThreshold).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasIndex(e => e.SubscriptionId);
+            entity.HasIndex(e => new { e.FiscalYear, e.SubscriptionId }).IsUnique();
+        });
+
+        modelBuilder.Entity<TaxSlab>(entity =>
+        {
+            entity.ToTable("TaxSlabs");
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.TaxSlabConfigId).IsRequired();
+            entity.Property(e => e.SlabOrder).IsRequired();
+            entity.Property(e => e.MinAmount).HasColumnType("decimal(12,2)").IsRequired();
+            entity.Property(e => e.MaxAmount).HasColumnType("decimal(12,2)");
+            entity.Property(e => e.TaxRate).HasColumnType("decimal(6,4)").IsRequired();
+            entity.Property(e => e.SubscriptionId).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+
+            entity.HasOne(e => e.TaxSlabConfig)
+                .WithMany(c => c.Slabs)
+                .HasForeignKey(e => e.TaxSlabConfigId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.TaxSlabConfigId);
         });
     }
 }

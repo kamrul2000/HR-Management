@@ -133,6 +133,7 @@ builder.Services.AddScoped<ILoanRecommendationService, LoanRecommendationService
 builder.Services.AddScoped<ILoanApprovalService, LoanApprovalService>();
 builder.Services.AddScoped<IEmployeeLoanService, EmployeeLoanService>();
 builder.Services.AddScoped<ILoanInstallmentService, LoanInstallmentService>();
+builder.Services.AddScoped<ITaxSlabService, TaxSlabService>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();

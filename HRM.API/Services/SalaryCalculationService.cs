@@ -7,6 +7,7 @@ using HRM.Core.DTOs.Employee;
 using HRM.Core.DTOs.LeaveAllotment;
 using HRM.Core.DTOs.LoanInstallment;
 using HRM.Core.DTOs.SalaryCalculation;
+using HRM.Core.DTOs.TaxSlab;
 using HRM.Core.Entities;
 using HRM.Infrastructure.Data;
 using HRM.Infrastructure.Repositories;
@@ -28,6 +29,7 @@ public class SalaryCalculationService : ISalaryCalculationService
     private readonly IAttendanceService _attendanceService;
     private readonly IOvertimeService _overtimeService;
     private readonly ILoanInstallmentService _loanInstallmentService;
+    private readonly ITaxSlabService _taxSlabService;
     private readonly IWorkingDayCalculator _workingDayCalculator;
     private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -44,6 +46,7 @@ public class SalaryCalculationService : ISalaryCalculationService
         IAttendanceService attendanceService,
         IOvertimeService overtimeService,
         ILoanInstallmentService loanInstallmentService,
+        ITaxSlabService taxSlabService,
         IWorkingDayCalculator workingDayCalculator,
         IConfiguration configuration,
         IHttpContextAccessor httpContextAccessor,
@@ -59,6 +62,7 @@ public class SalaryCalculationService : ISalaryCalculationService
         _attendanceService = attendanceService;
         _overtimeService = overtimeService;
         _loanInstallmentService = loanInstallmentService;
+        _taxSlabService = taxSlabService;
         _workingDayCalculator = workingDayCalculator;
         _configuration = configuration;
         _httpContextAccessor = httpContextAccessor;
@@ -732,11 +736,21 @@ public class SalaryCalculationService : ISalaryCalculationService
         return pending?.InstallmentAmount ?? 0m;
     }
 
-    private Task<decimal> GetMonthlyTaxDeductionAsync(
+    private async Task<decimal> GetMonthlyTaxDeductionAsync(
         int employeeId, int year, int month, decimal taxableIncome, int subscriptionId)
     {
-        // TODO Module 24 integration — compute income tax using configured slabs.
-        return Task.FromResult(0m);
+        // TODO Module 25 integration — short-circuit when employee is tax-exempt:
+        //   if (await _excludeTaxService.IsExcludedAsync(employeeId, subscriptionId)) return 0m;
+
+        var config = await _taxSlabService.GetActiveConfigAsync(subscriptionId);
+        if (config is null)
+        {
+            return 0m;
+        }
+
+        decimal projectedAnnualIncome = taxableIncome * 12m;
+        var result = TaxSlabService.ComputeTax(projectedAnnualIncome, config);
+        return result.MonthlyTax;
     }
 
     private async Task<Employee> ResolveEmployeeAsync(int employeeId, int subscriptionId)

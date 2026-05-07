@@ -1,0 +1,83 @@
+<hrm-page-header
+  [title]="structure() ? structure()!.employeeFullName : 'Salary Structure'"
+  [subtitle]="structure() ? 'Effective from ' + (structure()!.effectiveFromFormatted || structure()!.effectiveFrom) : ''"
+>
+  <a routerLink="/salary/structures" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+  <a *ngIf="structure() as s" [routerLink]="['/salary/structures', s.id, 'edit']" class="btn btn--primary">
+    <ng-icon name="heroPencilSquare" size="14" />
+    Edit
+  </a>
+</hrm-page-header>
+
+<div class="page-content" *ngIf="loading()">
+  <div class="card"><div class="card__body"><hrm-loading-skeleton rows="6"></hrm-loading-skeleton></div></div>
+</div>
+
+<div *ngIf="!loading() && structure() as s" class="page-content">
+  <div class="card struct-detail__head">
+    <div class="card__body struct-detail__head-body">
+      <hrm-avatar [name]="s.employeeFullName || ''" [size]="56"></hrm-avatar>
+      <div>
+        <h2>{{ s.employeeFullName }} <span class="text-muted text-sm text-mono">{{ s.employeeCode }}</span></h2>
+        <p class="text-muted">Effective from {{ s.effectiveFromFormatted || s.effectiveFrom }}<span *ngIf="s.effectiveTo"> until {{ s.effectiveToFormatted || s.effectiveTo }}</span></p>
+      </div>
+      <div class="struct-detail__totals">
+        <div><span class="text-label">Basic</span><strong>{{ s.basicSalary | currencyBd }}</strong></div>
+        <div><span class="text-label">Est. Gross</span><strong>{{ s.estimatedGrossSalary | currencyBd }}</strong></div>
+        <div class="text-strong"><span class="text-label">Est. Net</span><strong class="text-primary">{{ s.estimatedNetSalary | currencyBd }}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="struct-detail__cols">
+    <div class="card">
+      <div class="card__header"><h3>Earnings <span class="text-muted text-sm">({{ earnings().length }})</span></h3></div>
+      <table class="struct-detail__table">
+        <thead>
+          <tr><th>Code</th><th>Name</th><th>Method</th><th class="text-right">Value</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let it of earnings()">
+            <td class="text-mono text-sm">{{ it.headCode }}</td>
+            <td>{{ it.headName }}</td>
+            <td class="text-sm">{{ it.calculationMethod }}</td>
+            <td class="text-right text-mono">
+              <ng-container *ngIf="it.calculationMethod === 'Fixed'">{{ it.fixedAmount | currencyBd }}</ng-container>
+              <ng-container *ngIf="it.calculationMethod !== 'Fixed'">{{ it.effectivePercentage }}%</ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card__header"><h3>Deductions <span class="text-muted text-sm">({{ deductions().length }})</span></h3></div>
+      <table class="struct-detail__table">
+        <thead>
+          <tr><th>Code</th><th>Name</th><th>Method</th><th class="text-right">Value</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let it of deductions()">
+            <td class="text-mono text-sm">{{ it.headCode }}</td>
+            <td>{{ it.headName }}</td>
+            <td class="text-sm">{{ it.calculationMethod }}</td>
+            <td class="text-right text-mono">
+              <ng-container *ngIf="it.calculationMethod === 'Fixed'">{{ it.fixedAmount | currencyBd }}</ng-container>
+              <ng-container *ngIf="it.calculationMethod !== 'Fixed'">{{ it.effectivePercentage }}%</ng-container>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div *ngIf="s.remarks" class="card mt-md">
+    <div class="card__body">
+      <h4 class="text-label">Remarks</h4>
+      <p>{{ s.remarks }}</p>
+    </div>
+  </div>
+</div>

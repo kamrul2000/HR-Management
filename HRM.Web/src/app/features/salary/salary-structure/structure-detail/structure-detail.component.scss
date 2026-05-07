@@ -1,0 +1,64 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.struct-detail {
+  &__head .card__body { padding: $spacing-lg; }
+
+  &__head-body {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+
+    h2 { margin: 0; font-size: $text-xl; font-weight: 600; }
+    p { margin: 4px 0 0; font-size: $text-sm; }
+  }
+
+  &__totals {
+    margin-left: auto;
+    display: flex;
+    gap: $spacing-xl;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .text-label { display: block; margin-bottom: 2px; font-size: $text-xs; }
+    strong { font-size: $text-md; color: $neutral-900; }
+    .text-primary { color: $brand-primary; font-size: $text-lg; }
+  }
+
+  &__cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-md;
+    margin-top: $spacing-md;
+
+    @include mobile { grid-template-columns: 1fr; }
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $text-sm;
+
+    thead th {
+      text-align: left;
+      padding: 10px 14px;
+      background: $neutral-50;
+      font-size: $text-xs;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: $neutral-500;
+      border-bottom: 1px solid $neutral-200;
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid $neutral-100;
+    }
+
+    .text-right { text-align: right; }
+  }
+}

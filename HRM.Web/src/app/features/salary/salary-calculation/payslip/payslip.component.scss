@@ -1,0 +1,136 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.payslip {
+  display: flex;
+  justify-content: center;
+}
+
+.payslip__sheet {
+  background: #fff;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-lg;
+  padding: $spacing-2xl;
+  max-width: 880px;
+  width: 100%;
+  box-shadow: $shadow-xs;
+}
+
+.payslip__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid $neutral-900;
+  padding-bottom: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  h1 {
+    margin: 0;
+    font-size: $text-2xl;
+    color: $brand-primary;
+  }
+  p { margin: 4px 0 0; }
+}
+
+.payslip__employee {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  > div { display: flex; flex-direction: column; }
+
+  .text-label { font-size: $text-xs; }
+  strong { font-size: $text-sm; color: $neutral-900; margin-top: 2px; }
+
+  @include mobile { grid-template-columns: repeat(2, 1fr); }
+}
+
+.payslip__attendance {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: $spacing-sm;
+  background: $neutral-50;
+  padding: $spacing-md;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-lg;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .text-label { font-size: $text-xs; }
+  strong { font-size: $text-md; color: $neutral-900; }
+
+  @include mobile { grid-template-columns: repeat(3, 1fr); }
+}
+
+.payslip__cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.payslip__table {
+  h3 {
+    margin: 0 0 $spacing-sm;
+    font-size: $text-sm;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: $brand-primary;
+    border-bottom: 1px solid $neutral-200;
+    padding-bottom: $spacing-sm;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $text-sm;
+
+    td { padding: 8px 0; }
+    .text-right { text-align: right; }
+    tfoot td {
+      border-top: 1px solid $neutral-200;
+      padding-top: $spacing-sm;
+      font-weight: 600;
+      color: $neutral-900;
+    }
+  }
+}
+
+.payslip__net {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: $brand-primary;
+  color: #fff;
+  padding: $spacing-md $spacing-lg;
+  border-radius: $radius-md;
+
+  .text-label { font-size: $text-sm; color: rgba(255,255,255,.85); letter-spacing: 0.5px; }
+  strong {
+    font-size: $text-3xl;
+    color: #fff;
+  }
+}
+
+.payslip__remarks {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 1px solid $neutral-200;
+
+  p { margin: 4px 0 0; color: $neutral-700; font-size: $text-sm; line-height: 1.5; }
+}
+
+@media print {
+  .payslip__sheet {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+}

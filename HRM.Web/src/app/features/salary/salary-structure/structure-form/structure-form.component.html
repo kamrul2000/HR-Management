@@ -1,0 +1,154 @@
+<hrm-page-header
+  [title]="isEdit() ? 'Edit Salary Structure' : 'New Salary Structure'"
+  [subtitle]="isEdit() ? 'Update the structure for this employee.' : 'Define basic + earnings + deductions for an employee.'"
+>
+  <a routerLink="/salary/structures" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+</hrm-page-header>
+
+<hrm-loading-skeleton *ngIf="loading()" rows="6" class="page-content"></hrm-loading-skeleton>
+
+<div *ngIf="!loading()" class="page-content struct-builder">
+  <!-- Left: meta form -->
+  <aside class="card struct-builder__meta">
+    <div class="card__header"><h3>Details</h3></div>
+    <div class="card__body">
+      <form [formGroup]="form" novalidate>
+        <div class="form-group" style="position: relative;">
+          <label class="form-label">Employee <span class="required">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [ngModel]="form.value.employeeLabel"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onEmployeeSearch($event)"
+            placeholder="Search by name or code…"
+            [readonly]="isEdit()"
+            [class.is-invalid]="hasError('employeeId', 'min')"
+          />
+          <ul *ngIf="searchResults().length > 0" class="emp-autocomplete">
+            <li *ngFor="let emp of searchResults()" (click)="pickEmployee(emp)">
+              <strong>{{ emp.fullName }}</strong>
+              <span class="text-muted text-mono"> · {{ emp.employeeCode }}</span>
+            </li>
+          </ul>
+          <span class="form-error" *ngIf="hasError('employeeId', 'min')">Pick an employee.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Effective From <span class="required">*</span></label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="effectiveFrom"
+            [readonly]="isEdit()"
+            [class.is-invalid]="hasError('effectiveFrom', 'required')"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Basic Salary <span class="required">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            formControlName="basicSalary"
+            min="0.01"
+            step="0.01"
+            [class.is-invalid]="hasError('basicSalary', 'min')"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Remarks</label>
+          <textarea class="form-control" formControlName="remarks" rows="2"></textarea>
+        </div>
+      </form>
+    </div>
+  </aside>
+
+  <!-- Right: head builder -->
+  <section class="card struct-builder__heads">
+    <div class="card__header">
+      <h3>Salary Heads</h3>
+      <span class="text-muted text-sm">Pick which heads apply to this structure.</span>
+    </div>
+
+    <div class="card__body card__body--flush">
+      <div class="struct-section">
+        <header>Earnings <span class="text-muted text-sm">({{ earnings().length }})</span></header>
+        <div *ngFor="let it of earnings()" class="struct-row">
+          <label class="struct-row__check">
+            <input type="checkbox" [checked]="it.selected" (change)="toggleItem(it.head.id)" />
+            <span>
+              <strong>{{ it.head.headName }}</strong>
+              <span class="text-muted text-xs"> · {{ it.head.headCode }} · {{ it.head.calculationMethod }}</span>
+            </span>
+          </label>
+          <input
+            *ngIf="it.selected && it.head.calculationMethod === 'Fixed'"
+            type="number"
+            class="form-control form-control--sm"
+            placeholder="Amount"
+            [ngModel]="it.fixedAmount"
+            (ngModelChange)="setItemAmount(it.head.id, +$event)"
+          />
+          <input
+            *ngIf="it.selected && it.head.calculationMethod !== 'Fixed'"
+            type="number"
+            class="form-control form-control--sm"
+            placeholder="% override"
+            [ngModel]="it.overridePercentage"
+            (ngModelChange)="setItemPercent(it.head.id, +$event)"
+          />
+        </div>
+      </div>
+
+      <div class="struct-section">
+        <header>Deductions <span class="text-muted text-sm">({{ deductions().length }})</span></header>
+        <div *ngFor="let it of deductions()" class="struct-row">
+          <label class="struct-row__check">
+            <input type="checkbox" [checked]="it.selected" (change)="toggleItem(it.head.id)" />
+            <span>
+              <strong>{{ it.head.headName }}</strong>
+              <span class="text-muted text-xs"> · {{ it.head.headCode }} · {{ it.head.calculationMethod }}</span>
+            </span>
+          </label>
+          <input
+            *ngIf="it.selected && it.head.calculationMethod === 'Fixed'"
+            type="number"
+            class="form-control form-control--sm"
+            placeholder="Amount"
+            [ngModel]="it.fixedAmount"
+            (ngModelChange)="setItemAmount(it.head.id, +$event)"
+          />
+          <input
+            *ngIf="it.selected && it.head.calculationMethod !== 'Fixed'"
+            type="number"
+            class="form-control form-control--sm"
+            placeholder="% override"
+            [ngModel]="it.overridePercentage"
+            (ngModelChange)="setItemPercent(it.head.id, +$event)"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sticky footer -->
+  <footer class="struct-builder__footer">
+    <div class="struct-totals">
+      <div><span class="text-label">Est. Gross</span><strong>{{ preview().gross | currencyBd }}</strong></div>
+      <div><span class="text-label">Deductions</span><strong>{{ preview().deductions | currencyBd }}</strong></div>
+      <div class="struct-totals__net"><span class="text-label">Est. Net</span><strong>{{ preview().net | currencyBd }}</strong></div>
+    </div>
+    <div class="struct-builder__actions">
+      <a routerLink="/salary/structures" class="btn btn--secondary">Cancel</a>
+      <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+        <ng-icon name="heroCheck" size="14" />
+        {{ saving() ? 'Saving…' : isEdit() ? 'Save Changes' : 'Create Structure' }}
+      </button>
+    </div>
+  </footer>
+</div>

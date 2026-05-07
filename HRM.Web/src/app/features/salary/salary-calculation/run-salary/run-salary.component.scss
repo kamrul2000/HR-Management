@@ -1,0 +1,94 @@
+@use 'styles/variables' as *;
+
+.run-card {
+  max-width: 880px;
+  margin: 0 auto;
+
+  .card__footer { justify-content: space-between; }
+}
+
+.run-scope {
+  display: inline-flex;
+  background: $neutral-100;
+  border-radius: $radius-md;
+  padding: 4px;
+  gap: 4px;
+
+  button {
+    background: transparent;
+    border: none;
+    padding: 8px 14px;
+    border-radius: $radius-sm;
+    font-size: $text-xs;
+    font-weight: 500;
+    color: $neutral-600;
+    cursor: pointer;
+
+    &:hover { color: $neutral-900; }
+
+    &.is-active {
+      background: #fff;
+      color: $brand-primary;
+      box-shadow: $shadow-xs;
+    }
+  }
+}
+
+.run-result {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+
+  &__icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: $success-light;
+    color: $success;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: $spacing-md;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-sm;
+    margin-top: $spacing-xl;
+  }
+}
+
+.run-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+  max-width: 600px;
+  margin: $spacing-lg auto 0;
+}
+
+.run-stat {
+  background: #fff;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-md;
+  padding: 14px;
+  border-left: 4px solid $neutral-300;
+  text-align: left;
+
+  .text-label { display: block; }
+  strong { font-size: $text-2xl; font-weight: 700; }
+
+  &[data-tone="success"] { border-left-color: $success; strong { color: $success; } }
+  &[data-tone="warn"]    { border-left-color: $warning; strong { color: $warning; } }
+  &[data-tone="danger"]  { border-left-color: $danger;  strong { color: $danger; } }
+}
+
+.run-reasons {
+  text-align: left;
+  max-width: 600px;
+  margin: $spacing-lg auto 0;
+
+  h4 { margin: 0 0 $spacing-sm; }
+  ul { margin: 0; padding-left: $spacing-lg; font-size: $text-sm; color: $neutral-700; }
+  li { margin-bottom: 4px; }
+}

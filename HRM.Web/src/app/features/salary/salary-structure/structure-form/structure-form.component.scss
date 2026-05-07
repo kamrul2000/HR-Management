@@ -1,0 +1,121 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.struct-builder {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: $spacing-md;
+  padding-bottom: 100px;
+
+  @include mobile { grid-template-columns: 1fr; }
+
+  &__meta { align-self: start; position: sticky; top: $topbar-height + $spacing-md; }
+
+  &__footer {
+    grid-column: 1 / -1;
+    position: fixed;
+    bottom: 0;
+    left: $sidebar-width;
+    right: 0;
+    background: #fff;
+    border-top: 1px solid $neutral-200;
+    padding: 14px $spacing-xl;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: $shadow-sm;
+    z-index: 10;
+
+    @include mobile { left: 0; }
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
+}
+
+.emp-autocomplete {
+  position: absolute;
+  z-index: 5;
+  background: #fff;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  margin-top: 4px;
+  width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 4px;
+
+  li {
+    padding: 8px 10px;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    font-size: $text-sm;
+
+    &:hover { background: $neutral-100; }
+  }
+}
+
+.struct-section {
+  > header {
+    padding: 10px 16px;
+    background: $neutral-50;
+    border-top: 1px solid $neutral-200;
+    border-bottom: 1px solid $neutral-200;
+    font-size: $text-xs;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: $neutral-600;
+  }
+}
+
+.struct-row {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: 10px 16px;
+  border-bottom: 1px solid $neutral-100;
+
+  &:last-child { border-bottom: none; }
+
+  &__check {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: $text-sm;
+
+    input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: $brand-primary;
+      cursor: pointer;
+    }
+  }
+
+  .form-control--sm {
+    max-width: 140px;
+    padding: 6px 10px;
+    font-size: $text-sm;
+  }
+}
+
+.struct-totals {
+  display: flex;
+  gap: $spacing-xl;
+  align-items: center;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .text-label { font-size: $text-xs; }
+  strong { font-size: $text-md; color: $neutral-900; }
+
+  &__net strong { color: $brand-primary; font-size: $text-lg; }
+}

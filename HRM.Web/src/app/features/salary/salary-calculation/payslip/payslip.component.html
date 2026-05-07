@@ -1,0 +1,153 @@
+<hrm-page-header
+  [title]="calc() ? calc()!.employeeFullName + ' — Payslip' : 'Payslip'"
+  [subtitle]="calc() ? calc()!.monthLabel : ''"
+>
+  <a routerLink="/salary/calculations" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+  <button type="button" class="btn btn--secondary" (click)="print()" *ngIf="calc()">
+    <ng-icon name="heroPrinter" size="14" />
+    Print
+  </button>
+  <button
+    type="button"
+    class="btn btn--primary"
+    *ngIf="isDraft()"
+    [disabled]="busy()"
+    (click)="finalize()"
+  >
+    <ng-icon name="heroCheck" size="14" />
+    Finalize
+  </button>
+  <button
+    type="button"
+    class="btn btn--danger"
+    *ngIf="!loading() && calc() && calc()!.status !== 'Cancelled'"
+    [disabled]="busy()"
+    (click)="cancel()"
+  >
+    <ng-icon name="heroXMark" size="14" />
+    Cancel
+  </button>
+</hrm-page-header>
+
+<div class="page-content" *ngIf="loading()">
+  <div class="card"><div class="card__body"><hrm-loading-skeleton rows="6"></hrm-loading-skeleton></div></div>
+</div>
+
+<div *ngIf="!loading() && calc() as c" class="page-content payslip">
+  <div class="payslip__sheet">
+    <header class="payslip__head">
+      <div>
+        <h1>HRM Platform</h1>
+        <p class="text-muted">Payslip · {{ c.monthLabel }}</p>
+      </div>
+      <div class="payslip__head-status">
+        <hrm-status-badge [variant]="c.status" [label]="c.statusLabel || c.status"></hrm-status-badge>
+      </div>
+    </header>
+
+    <section class="payslip__employee">
+      <div>
+        <span class="text-label">Employee</span>
+        <strong>{{ c.employeeFullName }}</strong>
+        <div class="text-muted text-sm text-mono">{{ c.employeeCode }}</div>
+      </div>
+      <div>
+        <span class="text-label">Designation</span>
+        <strong>{{ c.designationTitle || '—' }}</strong>
+      </div>
+      <div>
+        <span class="text-label">Branch</span>
+        <strong>{{ c.branchName || '—' }}</strong>
+      </div>
+      <div>
+        <span class="text-label">Period</span>
+        <strong>{{ c.monthLabel }}</strong>
+      </div>
+    </section>
+
+    <section class="payslip__attendance">
+      <div><span class="text-label">Working</span><strong>{{ c.totalWorkingDays }}</strong></div>
+      <div><span class="text-label">Present</span><strong>{{ c.presentDays }}</strong></div>
+      <div><span class="text-label">Absent</span><strong>{{ c.absentDays }}</strong></div>
+      <div><span class="text-label">Half Day</span><strong>{{ c.halfDays }}</strong></div>
+      <div><span class="text-label">Unpaid</span><strong>{{ c.unpaidLeaveDays }}</strong></div>
+      <div><span class="text-label">Late Days</span><strong>{{ c.lateDeductionDays }}</strong></div>
+      <div *ngIf="c.overtimeMinutes > 0"><span class="text-label">Overtime</span><strong>{{ c.overtimeFormatted || (c.overtimeMinutes + 'm') }}</strong></div>
+    </section>
+
+    <section class="payslip__cols">
+      <div class="payslip__table">
+        <h3>Earnings</h3>
+        <table>
+          <tbody>
+            <tr>
+              <td>Basic Salary</td>
+              <td class="text-right text-mono">{{ c.basicSalary | currencyBd }}</td>
+            </tr>
+            <tr *ngFor="let d of c.earningDetails">
+              <td>{{ d.headName }}</td>
+              <td class="text-right text-mono">{{ d.computedAmount | currencyBd }}</td>
+            </tr>
+            <tr *ngIf="c.overtimePay > 0">
+              <td>Overtime Pay</td>
+              <td class="text-right text-mono">{{ c.overtimePay | currencyBd }}</td>
+            </tr>
+            <tr *ngIf="c.bonusAmount > 0">
+              <td>Bonus</td>
+              <td class="text-right text-mono">{{ c.bonusAmount | currencyBd }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Gross Earnings</td>
+              <td class="text-right text-mono"><strong>{{ c.totalEarnings | currencyBd }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="payslip__table">
+        <h3>Deductions</h3>
+        <table>
+          <tbody>
+            <tr *ngIf="c.attendanceDeduction > 0">
+              <td>Attendance Deduction</td>
+              <td class="text-right text-mono">{{ c.attendanceDeduction | currencyBd }}</td>
+            </tr>
+            <tr *ngFor="let d of c.deductionDetails">
+              <td>{{ d.headName }}</td>
+              <td class="text-right text-mono">{{ d.computedAmount | currencyBd }}</td>
+            </tr>
+            <tr *ngIf="c.taxDeduction > 0">
+              <td>Tax</td>
+              <td class="text-right text-mono">{{ c.taxDeduction | currencyBd }}</td>
+            </tr>
+            <tr *ngIf="c.loanDeduction > 0">
+              <td>Loan Installment</td>
+              <td class="text-right text-mono">{{ c.loanDeduction | currencyBd }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Total Deductions</td>
+              <td class="text-right text-mono"><strong>{{ c.totalDeductions | currencyBd }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <section class="payslip__net">
+      <span class="text-label">Net Salary</span>
+      <strong>{{ c.netSalary | currencyBd }}</strong>
+    </section>
+
+    <footer *ngIf="c.remarks" class="payslip__remarks">
+      <span class="text-label">Remarks</span>
+      <p>{{ c.remarks }}</p>
+    </footer>
+  </div>
+</div>

@@ -1,0 +1,112 @@
+<hrm-page-header title="Run Payroll" subtitle="Calculate monthly salaries for the selected scope.">
+  <a routerLink="/salary/calculations" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <ng-container *ngIf="!result(); else resultTpl">
+    <div class="card run-card">
+      <div class="card__header"><h3>Configuration</h3></div>
+      <div class="card__body">
+        <div class="form-grid form-grid--3">
+          <div class="form-group">
+            <label class="form-label">Year <span class="required">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              min="2000"
+              max="2100"
+              [ngModel]="year()"
+              (ngModelChange)="year.set(+$event)"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Month <span class="required">*</span></label>
+            <select class="form-control" [ngModel]="month()" (ngModelChange)="month.set(+$event)">
+              <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Scope <span class="required">*</span></label>
+            <div class="run-scope">
+              <button type="button" [class.is-active]="scope() === 'all'" (click)="setScope('all')">All employees</button>
+              <button type="button" [class.is-active]="scope() === 'branch'" (click)="setScope('branch')">By branch</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="scope() === 'branch'" class="form-group" style="max-width: 360px;">
+          <label class="form-label">Branch <span class="required">*</span></label>
+          <select
+            class="form-control"
+            [ngModel]="branchId()"
+            (ngModelChange)="branchId.set($event ? +$event : null)"
+          >
+            <option [ngValue]="null">Select a branch</option>
+            <option *ngFor="let b of branchOptions()" [ngValue]="b.id">{{ b.name }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Remarks</label>
+          <textarea
+            class="form-control"
+            rows="2"
+            placeholder="Optional notes attached to every calculation"
+            [ngModel]="remarks()"
+            (ngModelChange)="remarks.set($event)"
+          ></textarea>
+        </div>
+      </div>
+      <div class="card__footer">
+        <span class="text-muted text-sm">
+          Each employee with an active salary structure will be processed for the selected month.
+        </span>
+        <button type="button" class="btn btn--primary" [disabled]="!canSubmit()" (click)="run()">
+          <ng-icon name="heroPlay" size="14" />
+          {{ running() ? 'Running…' : 'Start Payroll Run' }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #resultTpl>
+    <div *ngIf="result() as r" class="card run-result">
+      <div class="card__body">
+        <div class="run-result__icon"><ng-icon name="heroCheckCircle" size="44" /></div>
+        <h3>Payroll run completed</h3>
+
+        <div class="run-stats">
+          <div class="run-stat" data-tone="success">
+            <span class="text-label">Calculated</span>
+            <strong>{{ r.successCount }}</strong>
+          </div>
+          <div class="run-stat" data-tone="warn">
+            <span class="text-label">Skipped</span>
+            <strong>{{ r.skippedCount }}</strong>
+          </div>
+          <div class="run-stat" data-tone="danger">
+            <span class="text-label">Failed</span>
+            <strong>{{ r.failedCount }}</strong>
+          </div>
+        </div>
+
+        <div *ngIf="r.skippedReasons?.length" class="run-reasons">
+          <h4 class="text-label">Skipped</h4>
+          <ul><li *ngFor="let m of r.skippedReasons">{{ m }}</li></ul>
+        </div>
+        <div *ngIf="r.failedReasons?.length" class="run-reasons">
+          <h4 class="text-label">Failed</h4>
+          <ul><li *ngFor="let m of r.failedReasons">{{ m }}</li></ul>
+        </div>
+
+        <div class="run-result__actions">
+          <button type="button" class="btn btn--secondary" (click)="startOver()">Run another</button>
+          <button type="button" class="btn btn--primary" (click)="goToList()">View Calculations</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

@@ -37,6 +37,10 @@ export const routes: Routes = [
         path: 'leave',
         loadChildren: () => import('./features/leave/leave.routes'),
       },
+      {
+        path: 'overtime',
+        loadChildren: () => import('./features/overtime/overtime.routes'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

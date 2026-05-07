@@ -1,0 +1,100 @@
+@use 'styles/variables' as *;
+
+.ot-summary {
+  &__month {
+    margin: 0 $spacing-md;
+    font-size: $text-md;
+    font-weight: 600;
+    color: $neutral-900;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: $spacing-md;
+  }
+
+  &__card {
+    background: #fff;
+    border: 1px solid $neutral-200;
+    border-radius: $radius-lg;
+    padding: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    box-shadow: $shadow-xs;
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+  }
+
+  &__totals {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-sm;
+    background: $neutral-50;
+    border-radius: $radius-md;
+    padding: $spacing-sm $spacing-md;
+  }
+
+  &__total {
+    .text-label { display: block; margin-bottom: 2px; }
+    strong { font-size: $text-lg; font-weight: 700; color: $neutral-900; }
+  }
+
+  &__bars {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__bar-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px;
+    align-items: center;
+    gap: 10px;
+    font-size: $text-xs;
+  }
+
+  &__bar-label { color: $neutral-500; font-weight: 500; }
+  &__bar-value { color: $neutral-700; text-align: right; font-family: $font-mono; }
+
+  &__bar {
+    height: 8px;
+    background: $neutral-100;
+    border-radius: 99px;
+    overflow: hidden;
+
+    span {
+      display: block;
+      height: 100%;
+      transition: width $transition-base;
+      background: $brand-primary;
+
+      &[data-tone="purple"] { background: #7C3AED; }
+      &[data-tone="cyan"]   { background: #0891B2; }
+    }
+  }
+
+  &__count {
+    font-size: $text-xs;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    background: $neutral-100;
+    color: $neutral-600;
+
+    &[data-tone="warn"]    { background: $warning-light; color: $warning; }
+    &[data-tone="success"] { background: $success-light; color: $success; }
+    &[data-tone="danger"]  { background: $danger-light;  color: $danger; }
+  }
+
+  &__card footer {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+}

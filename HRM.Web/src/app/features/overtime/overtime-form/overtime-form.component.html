@@ -1,0 +1,108 @@
+<hrm-page-header title="New Overtime Request" subtitle="Capture overtime against an attendance record.">
+  <a routerLink="/overtime" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="card ot-form">
+    <div class="card__body">
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-group" style="position: relative;">
+          <label class="form-label">Employee <span class="required">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [ngModel]="form.value.employeeLabel"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onEmployeeSearch($event)"
+            placeholder="Search by name or code…"
+            [class.is-invalid]="hasError('employeeId', 'min')"
+          />
+          <ul *ngIf="searchResults().length > 0" class="emp-autocomplete">
+            <li *ngFor="let emp of searchResults()" (click)="pickEmployee(emp)">
+              <strong>{{ emp.fullName }}</strong>
+              <span class="text-muted text-mono"> · {{ emp.employeeCode }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label">Date <span class="required">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="overtimeDate"
+              [class.is-invalid]="hasError('overtimeDate', 'required')"
+            />
+            <span class="form-hint">Must match an existing attendance record.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Type <span class="required">*</span></label>
+            <select class="form-control" formControlName="overtimeType">
+              <option *ngFor="let t of typeOptions" [value]="t">{{ t }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Attendance probe panel -->
+        <div *ngIf="attendanceLoading()" class="ot-attendance ot-attendance--loading">
+          Looking up attendance…
+        </div>
+
+        <div *ngIf="!attendanceLoading() && attendanceError()" class="ot-attendance ot-attendance--error">
+          <ng-icon name="heroExclamationTriangle" size="16" />
+          {{ attendanceError() }}
+        </div>
+
+        <div *ngIf="!attendanceLoading() && attendanceRecord() as att" class="ot-attendance ot-attendance--ok">
+          <div>
+            <span class="text-label">Attendance found</span>
+            <strong>
+              {{ att.punchInTimeFormatted || '—' }} → {{ att.punchOutTimeFormatted || '—' }}
+              · {{ att.dutySlotName || 'No slot' }}
+            </strong>
+          </div>
+          <div *ngIf="att.overtimeMinutes > 0" class="ot-attendance__hint">
+            Captured overtime: <strong>{{ formatMinutes(att.overtimeMinutes) }}</strong>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Requested Minutes <span class="required">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            formControlName="requestedMinutes"
+            min="1"
+            max="720"
+            [class.is-invalid]="hasError('requestedMinutes', 'min') || hasError('requestedMinutes', 'max')"
+          />
+          <span class="form-hint">Maximum 12 hours (720 minutes).</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason <span class="required">*</span></label>
+          <textarea
+            class="form-control"
+            formControlName="reason"
+            rows="3"
+            placeholder="Why was the overtime needed?"
+            [class.is-invalid]="hasError('reason', 'required')"
+          ></textarea>
+          <span class="form-error" *ngIf="hasError('reason', 'required')">Required.</span>
+        </div>
+      </form>
+    </div>
+    <div class="card__footer">
+      <a routerLink="/overtime" class="btn btn--secondary">Cancel</a>
+      <button type="button" class="btn btn--primary" [disabled]="!canSubmit()" (click)="submit()">
+        <ng-icon name="heroCheck" size="14" />
+        {{ saving() ? 'Submitting…' : 'Submit Request' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,205 @@
+<hrm-page-header title="Overtime" subtitle="Overtime requests and approvals.">
+  <a routerLink="../overtime/summary" class="btn btn--secondary">
+    <ng-icon name="heroChartBar" size="14" />
+    Monthly Summary
+  </a>
+  <a routerLink="../overtime/new" class="btn btn--primary">
+    <ng-icon name="heroPlus" size="14" />
+    New Request
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field toolbar__field--grow">
+      <div class="ot-search">
+        <ng-icon name="heroMagnifyingGlass" size="16" />
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Search by employee…"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </div>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="branchFilter()"
+        (ngModelChange)="branchFilter.set($event ? +$event : null); onAnyFilterChange()"
+      >
+        <option [ngValue]="null">All branches</option>
+        <option *ngFor="let b of branchOptions()" [ngValue]="b.id">{{ b.name }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event); onAnyFilterChange()"
+      >
+        <option value="">All statuses</option>
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="typeFilter()"
+        (ngModelChange)="typeFilter.set($event); onAnyFilterChange()"
+      >
+        <option value="">All types</option>
+        <option *ngFor="let t of typeOptions" [value]="t">{{ t }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="month()"
+        (ngModelChange)="month.set(+$event); onAnyFilterChange()"
+      >
+        <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <input
+        type="number"
+        class="form-control"
+        min="2000"
+        max="2100"
+        [ngModel]="year()"
+        (ngModelChange)="year.set(+$event); onAnyFilterChange()"
+        aria-label="Year"
+      />
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [page]="pageState()"
+    [showPagination]="true"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No overtime requests"
+    emptyMessage="When employees submit overtime requests they appear here."
+    (pageChange)="onPageChange($event)"
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div class="ot-person">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #typeCellTpl let-row>
+  <span class="ot-type-pill" [attr.data-type]="row.overtimeType">{{ row.overtimeType }}</span>
+</ng-template>
+
+<ng-template #minutesCellTpl let-row>
+  <span class="text-mono text-sm">{{ formatMinutes(row.requestedMinutes) }}</span>
+</ng-template>
+
+<ng-template #approvedCellTpl let-row>
+  <span class="text-mono text-sm" [class.text-muted]="row.status !== 'Approved'">
+    {{ row.status === 'Approved' ? formatMinutes(row.approvedMinutes) : '—' }}
+  </span>
+</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge [variant]="row.status" [label]="row.statusLabel || row.status"></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <ng-container *ngIf="row.status === 'Pending'; else viewOnly">
+    <button
+      type="button"
+      class="btn btn--ghost btn--sm"
+      style="color: var(--success, #16A34A)"
+      (click)="openApprove(row)"
+    >
+      <ng-icon name="heroCheck" size="14" />
+      Approve
+    </button>
+    <button
+      type="button"
+      class="btn btn--ghost-neutral btn--sm"
+      (click)="openReject(row)"
+    >
+      <ng-icon name="heroXMark" size="14" />
+      Reject
+    </button>
+  </ng-container>
+  <ng-template #viewOnly>
+    <span class="text-muted text-xs">—</span>
+  </ng-template>
+</ng-template>
+
+<ng-container *ngIf="drawerOpen() && drawerRow() as row">
+  <hrm-drawer
+    [title]="drawerKind() === 'approve' ? 'Approve Overtime' : 'Reject Overtime'"
+    [subtitle]="row.employeeFullName + ' · ' + row.overtimeType + ' · ' + formatMinutes(row.requestedMinutes) + ' requested'"
+    [locked]="busy()"
+    (dismiss)="closeDrawer()"
+  >
+    <div *ngIf="drawerKind() === 'approve'" class="form-group">
+      <label class="form-label">Approved Minutes <span class="required">*</span></label>
+      <input
+        type="number"
+        class="form-control"
+        min="0"
+        [max]="row.requestedMinutes"
+        [ngModel]="approvedMinutes()"
+        (ngModelChange)="approvedMinutes.set(+$event)"
+      />
+      <span class="form-hint">Capped at the requested {{ formatMinutes(row.requestedMinutes) }}.</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        {{ drawerKind() === 'approve' ? 'Remarks (optional)' : 'Reason for rejection' }}
+        <span *ngIf="drawerKind() === 'reject'" class="required">*</span>
+      </label>
+      <textarea
+        class="form-control"
+        rows="3"
+        [ngModel]="remarks()"
+        (ngModelChange)="remarks.set($event)"
+      ></textarea>
+    </div>
+
+    <ng-container drawer-footer>
+      <button type="button" class="btn btn--secondary" [disabled]="busy()" (click)="closeDrawer()">Cancel</button>
+      <button
+        *ngIf="drawerKind() === 'approve'"
+        type="button"
+        class="btn btn--primary"
+        [disabled]="busy()"
+        (click)="confirmApprove()"
+      >
+        {{ busy() ? 'Approving…' : 'Approve' }}
+      </button>
+      <button
+        *ngIf="drawerKind() === 'reject'"
+        type="button"
+        class="btn btn--danger"
+        [disabled]="busy()"
+        (click)="confirmReject()"
+      >
+        {{ busy() ? 'Rejecting…' : 'Reject' }}
+      </button>
+    </ng-container>
+  </hrm-drawer>
+</ng-container>

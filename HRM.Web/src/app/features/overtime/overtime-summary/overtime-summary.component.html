@@ -1,0 +1,89 @@
+<hrm-page-header title="Overtime Summary" subtitle="Per-employee overtime totals for the month.">
+  <a routerLink="/overtime" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="prevMonth()" aria-label="Previous month">
+      <ng-icon name="heroChevronLeft" size="16" />
+    </button>
+    <strong class="ot-summary__month">{{ monthLabel() }}</strong>
+    <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="nextMonth()" aria-label="Next month">
+      <ng-icon name="heroChevronRight" size="16" />
+    </button>
+
+    <div class="toolbar__actions">
+      <select
+        class="form-control"
+        [ngModel]="branchFilter()"
+        (ngModelChange)="onBranchChange($event ? +$event : null)"
+        aria-label="Filter by branch"
+      >
+        <option [ngValue]="null">All branches</option>
+        <option *ngFor="let b of branchOptions()" [ngValue]="b.id">{{ b.name }}</option>
+      </select>
+    </div>
+  </div>
+
+  <hrm-loading-skeleton *ngIf="loading()" rows="4"></hrm-loading-skeleton>
+
+  <ng-container *ngIf="!loading()">
+    <hrm-empty-state
+      *ngIf="summaries().length === 0; else gridTpl"
+      title="No overtime this month"
+      description="Once requests are approved they will be summarized here."
+    ></hrm-empty-state>
+
+    <ng-template #gridTpl>
+      <div class="ot-summary__grid">
+        <article *ngFor="let s of summaries()" class="ot-summary__card">
+          <header>
+            <hrm-avatar [name]="s.employeeFullName || ''" [size]="36"></hrm-avatar>
+            <div>
+              <div class="text-strong">{{ s.employeeFullName || '—' }}</div>
+              <div class="text-muted text-xs text-mono">{{ s.employeeCode }}</div>
+            </div>
+          </header>
+
+          <div class="ot-summary__totals">
+            <div class="ot-summary__total">
+              <span class="text-label">Requested</span>
+              <strong>{{ formatMinutes(s.totalRequestedMinutes) }}</strong>
+            </div>
+            <div class="ot-summary__total">
+              <span class="text-label">Approved</span>
+              <strong class="text-success">{{ formatMinutes(s.totalApprovedMinutes) }}</strong>
+            </div>
+          </div>
+
+          <div class="ot-summary__bars">
+            <div class="ot-summary__bar-row">
+              <span class="ot-summary__bar-label">Regular</span>
+              <div class="ot-summary__bar"><span [style.width.%]="pct(s.regularMinutes)" data-tone="primary"></span></div>
+              <span class="ot-summary__bar-value">{{ formatMinutes(s.regularMinutes) }}</span>
+            </div>
+            <div class="ot-summary__bar-row">
+              <span class="ot-summary__bar-label">Holiday</span>
+              <div class="ot-summary__bar"><span [style.width.%]="pct(s.holidayMinutes)" data-tone="purple"></span></div>
+              <span class="ot-summary__bar-value">{{ formatMinutes(s.holidayMinutes) }}</span>
+            </div>
+            <div class="ot-summary__bar-row">
+              <span class="ot-summary__bar-label">Weekly Off</span>
+              <div class="ot-summary__bar"><span [style.width.%]="pct(s.weeklyOffMinutes)" data-tone="cyan"></span></div>
+              <span class="ot-summary__bar-value">{{ formatMinutes(s.weeklyOffMinutes) }}</span>
+            </div>
+          </div>
+
+          <footer>
+            <span class="ot-summary__count" data-tone="warn">Pending {{ s.pendingCount }}</span>
+            <span class="ot-summary__count" data-tone="success">Approved {{ s.approvedCount }}</span>
+            <span class="ot-summary__count" data-tone="danger">Rejected {{ s.rejectedCount }}</span>
+          </footer>
+        </article>
+      </div>
+    </ng-template>
+  </ng-container>
+</div>

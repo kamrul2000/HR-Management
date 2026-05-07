@@ -1,0 +1,35 @@
+@use 'styles/variables' as *;
+
+.ot-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  ng-icon {
+    position: absolute;
+    left: 12px;
+    color: $neutral-400;
+    pointer-events: none;
+  }
+  .form-control { padding-left: 36px; }
+}
+
+.ot-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ot-type-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: $text-xs;
+  font-weight: 600;
+  background: $neutral-100;
+  color: $neutral-700;
+
+  &[data-type="Regular"]   { background: $brand-primary-light; color: $brand-primary; }
+  &[data-type="Holiday"]   { background: #F5F3FF; color: #7C3AED; }
+  &[data-type="WeeklyOff"] { background: #ECFEFF; color: #0891B2; }
+}

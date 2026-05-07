@@ -33,6 +33,10 @@ export const routes: Routes = [
         path: 'attendance',
         loadChildren: () => import('./features/attendance/attendance.routes'),
       },
+      {
+        path: 'leave',
+        loadChildren: () => import('./features/leave/leave.routes'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

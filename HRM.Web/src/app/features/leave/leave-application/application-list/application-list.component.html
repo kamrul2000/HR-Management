@@ -1,0 +1,111 @@
+<hrm-page-header title="Leave Applications" subtitle="All leave requests across the organization.">
+  <a routerLink="../applications/new" class="btn btn--primary">
+    <ng-icon name="heroPlus" size="14" />
+    New Application
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field toolbar__field--grow">
+      <div class="app-search">
+        <ng-icon name="heroMagnifyingGlass" size="16" />
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Search by app number or employee…"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </div>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event); onAnyFilterChange()"
+      >
+        <option value="">All statuses</option>
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="leaveTypeFilter()"
+        (ngModelChange)="leaveTypeFilter.set($event ? +$event : null); onAnyFilterChange()"
+      >
+        <option [ngValue]="null">All leave types</option>
+        <option *ngFor="let t of leaveTypeOptions()" [ngValue]="t.id">{{ t.name }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <input
+        type="date"
+        class="form-control"
+        [ngModel]="fromDate()"
+        (ngModelChange)="fromDate.set($event); onAnyFilterChange()"
+        aria-label="From date"
+      />
+    </div>
+
+    <div class="toolbar__field">
+      <input
+        type="date"
+        class="form-control"
+        [ngModel]="toDate()"
+        (ngModelChange)="toDate.set($event); onAnyFilterChange()"
+        aria-label="To date"
+      />
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [page]="pageState()"
+    [showPagination]="true"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No leave applications"
+    emptyMessage="When employees apply for leave, requests show up here."
+    (pageChange)="onPageChange($event)"
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div class="app-person">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #periodCellTpl let-row>
+  <span class="text-mono text-sm">
+    {{ row.fromDateFormatted || row.fromDate }} → {{ row.toDateFormatted || row.toDate }}
+  </span>
+</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge [variant]="row.status" [label]="row.statusLabel || row.status"></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="view(row)" aria-label="View">
+    <ng-icon name="heroEye" size="16" />
+  </button>
+</ng-template>
+
+<hrm-application-detail
+  *ngIf="selected() as sel"
+  [application]="sel"
+  (updated)="onUpdated($event)"
+  (dismiss)="closeDetail()"
+></hrm-application-detail>

@@ -1,0 +1,22 @@
+@use 'styles/variables' as *;
+
+.app-detail {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    p { margin: 0; line-height: 1.5; color: $neutral-800; font-size: $text-sm; }
+  }
+
+  &__action-row {
+    display: flex;
+    gap: 8px;
+    margin-top: $spacing-sm;
+    justify-content: flex-end;
+  }
+}

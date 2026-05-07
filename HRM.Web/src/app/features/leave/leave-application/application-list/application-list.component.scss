@@ -1,0 +1,21 @@
+@use 'styles/variables' as *;
+
+.app-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  ng-icon {
+    position: absolute;
+    left: 12px;
+    color: $neutral-400;
+    pointer-events: none;
+  }
+  .form-control { padding-left: 36px; }
+}
+
+.app-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}

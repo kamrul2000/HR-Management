@@ -1,0 +1,113 @@
+<hrm-drawer
+  [title]="application.applicationNo"
+  [subtitle]="(application.employeeFullName || '—') + ' · ' + (application.leaveTypeName || '—')"
+  size="lg"
+  [locked]="busy()"
+  (dismiss)="dismiss.emit()"
+>
+  <div class="app-detail">
+    <div class="app-detail__row">
+      <span class="text-label">Status</span>
+      <hrm-status-badge [variant]="application.status" [label]="application.statusLabel || application.status"></hrm-status-badge>
+    </div>
+
+    <div class="app-detail__row">
+      <span class="text-label">Period</span>
+      <span class="text-mono">
+        {{ application.fromDateFormatted || application.fromDate }} →
+        {{ application.toDateFormatted || application.toDate }}
+        <strong>· {{ application.totalDays }} day(s)</strong>
+      </span>
+    </div>
+
+    <div class="app-detail__row">
+      <span class="text-label">Reason</span>
+      <p>{{ application.reason }}</p>
+    </div>
+
+    <ng-container *ngIf="application.approvalRemarks">
+      <div class="app-detail__row">
+        <span class="text-label">Approval Remarks</span>
+        <p>{{ application.approvalRemarks }}</p>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="application.cancellationReason">
+      <div class="app-detail__row">
+        <span class="text-label">Cancellation</span>
+        <p>{{ application.cancellationReason }}</p>
+      </div>
+    </ng-container>
+
+    <div class="divider"></div>
+
+    <h4 class="text-label">Attachment</h4>
+    <a
+      *ngIf="application.attachmentUrl; else uploadTpl"
+      [href]="application.attachmentUrl"
+      target="_blank"
+      rel="noopener"
+      class="btn btn--secondary btn--sm"
+    >
+      <ng-icon name="heroDocumentArrowDown" size="14" />
+      Download
+    </a>
+
+    <ng-template #uploadTpl>
+      <label *ngIf="isPending" class="btn btn--secondary btn--sm">
+        <ng-icon name="heroPaperClip" size="14" />
+        Upload supporting document
+        <input
+          type="file"
+          accept="application/pdf,image/png,image/jpeg"
+          hidden
+          [disabled]="busy()"
+          (change)="onAttachmentChange($event)"
+        />
+      </label>
+      <p *ngIf="!isPending" class="text-muted text-sm">No attachment uploaded.</p>
+    </ng-template>
+
+    <ng-container *ngIf="isPending">
+      <div class="divider"></div>
+
+      <h4 class="text-label">HR Action</h4>
+      <textarea
+        class="form-control"
+        rows="2"
+        placeholder="Approval / rejection remarks (required for reject)"
+        [ngModel]="approvalRemarks()"
+        (ngModelChange)="approvalRemarks.set($event)"
+      ></textarea>
+
+      <div class="app-detail__action-row">
+        <button type="button" class="btn btn--secondary" (click)="reject()" [disabled]="busy()">
+          <ng-icon name="heroXMark" size="14" />
+          Reject
+        </button>
+        <button type="button" class="btn btn--primary" (click)="approve()" [disabled]="busy()">
+          <ng-icon name="heroCheck" size="14" />
+          Approve
+        </button>
+      </div>
+
+      <div class="divider"></div>
+
+      <h4 class="text-label">Cancel Application</h4>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Cancellation reason"
+        [ngModel]="cancellationReason()"
+        (ngModelChange)="cancellationReason.set($event)"
+      />
+      <button type="button" class="btn btn--danger btn--sm mt-sm" (click)="cancelApplication()" [disabled]="busy()">
+        Cancel This Application
+      </button>
+    </ng-container>
+  </div>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--secondary" (click)="dismiss.emit()" [disabled]="busy()">Close</button>
+  </ng-container>
+</hrm-drawer>

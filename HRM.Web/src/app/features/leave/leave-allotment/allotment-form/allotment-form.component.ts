@@ -11,7 +11,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { ToastService } from '../../../../core/services/toast.service';
@@ -30,7 +30,7 @@ import { LeaveTypeService } from '../../services/leave-type.service';
 @Component({
   selector: 'hrm-allotment-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DrawerComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, DrawerComponent],
   templateUrl: './allotment-form.component.html',
   styles: [
     `

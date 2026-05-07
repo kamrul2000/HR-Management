@@ -6,6 +6,7 @@ import { environment } from '../../../../environments/environment';
 import {
   ApiResponse,
   PagedResult,
+  toPagedResponse,
 } from '../../../core/models/api-response.model';
 import {
   AttendanceRow,
@@ -38,8 +39,9 @@ export class DashboardService {
   getEmployeeCount(): Observable<number> {
     const params = new HttpParams().set('pageNumber', '1').set('pageSize', '1');
     return this.http
-      .get<ApiResponse<PagedResult<EmployeeListRow>>>(`${this.base}/employees`, { params })
+      .get<ApiResponse<EmployeeListRow[] | PagedResult<EmployeeListRow>>>(`${this.base}/employees`, { params })
       .pipe(
+        map((res) => toPagedResponse<EmployeeListRow>(res)),
         map((res) => (res.success && res.data ? res.data.totalCount : 0)),
         catchError(() => of(0)),
       );
@@ -55,8 +57,9 @@ export class DashboardService {
       .set('pageSize', '500');
 
     return this.http
-      .get<ApiResponse<PagedResult<AttendanceRow>>>(`${this.base}/attendance`, { params })
+      .get<ApiResponse<AttendanceRow[] | PagedResult<AttendanceRow>>>(`${this.base}/attendance`, { params })
       .pipe(
+        map((res) => toPagedResponse<AttendanceRow>(res)),
         map((res) => buildAttendanceSummary(res.success && res.data ? res.data.items : [])),
         catchError(() => of(emptyAttendanceSummary())),
       );
@@ -70,11 +73,12 @@ export class DashboardService {
       .set('pageSize', String(pageSize));
 
     return this.http
-      .get<ApiResponse<PagedResult<LeaveApplicationRow>>>(
+      .get<ApiResponse<LeaveApplicationRow[] | PagedResult<LeaveApplicationRow>>>(
         `${this.base}/leave-applications`,
         { params },
       )
       .pipe(
+        map((res) => toPagedResponse<LeaveApplicationRow>(res)),
         map((res) =>
           res.success && res.data
             ? res.data.items.map(toRecentLeaveRow)
@@ -92,11 +96,12 @@ export class DashboardService {
       .set('pageSize', '1');
 
     return this.http
-      .get<ApiResponse<PagedResult<LeaveApplicationRow>>>(
+      .get<ApiResponse<LeaveApplicationRow[] | PagedResult<LeaveApplicationRow>>>(
         `${this.base}/leave-applications`,
         { params },
       )
       .pipe(
+        map((res) => toPagedResponse<LeaveApplicationRow>(res)),
         map((res) => (res.success && res.data ? res.data.totalCount : 0)),
         catchError(() => of(0)),
       );
@@ -110,11 +115,12 @@ export class DashboardService {
       .set('pageSize', '1');
 
     return this.http
-      .get<ApiResponse<PagedResult<unknown>>>(
+      .get<ApiResponse<unknown[] | PagedResult<unknown>>>(
         `${this.base}/loan-applications`,
         { params },
       )
       .pipe(
+        map((res) => toPagedResponse<unknown>(res)),
         map((res) => (res.success && res.data ? res.data.totalCount : 0)),
         catchError(() => of(0)),
       );
@@ -127,11 +133,12 @@ export class DashboardService {
       .set('pageSize', String(pageSize));
 
     return this.http
-      .get<ApiResponse<PagedResult<SalaryCalculationRow>>>(
+      .get<ApiResponse<SalaryCalculationRow[] | PagedResult<SalaryCalculationRow>>>(
         `${this.base}/salary-calculations`,
         { params },
       )
       .pipe(
+        map((res) => toPagedResponse<SalaryCalculationRow>(res)),
         map((res) =>
           res.success && res.data
             ? res.data.items.map(toRecentSalaryRow)
@@ -156,8 +163,9 @@ export class DashboardService {
       .set('isActive', 'true');
 
     return this.http
-      .get<ApiResponse<PagedResult<EmployeeListRow>>>(`${this.base}/employees`, { params })
+      .get<ApiResponse<EmployeeListRow[] | PagedResult<EmployeeListRow>>>(`${this.base}/employees`, { params })
       .pipe(
+        map((res) => toPagedResponse<EmployeeListRow>(res)),
         map((res) =>
           res.success && res.data ? groupByDepartment(res.data.items) : [],
         ),

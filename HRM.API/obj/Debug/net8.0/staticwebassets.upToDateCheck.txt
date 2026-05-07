@@ -1,5 +1,0 @@
-wwwroot\.gitkeep
-wwwroot\uploads\company-logos\.gitkeep
-wwwroot\uploads\employee-photos\.gitkeep
-wwwroot\uploads\leave-attachments\.gitkeep
-wwwroot\uploads\loan-attachments\.gitkeep

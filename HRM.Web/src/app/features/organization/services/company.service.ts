@@ -1,11 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import {
   ApiResponse,
   PagedResult,
+  toPagedResponse,
 } from '../../../core/models/api-response.model';
 import {
   CompanyResponse,
@@ -25,7 +26,9 @@ export class CompanyService {
     if (opts.pageSize)   params = params.set('pageSize',   String(opts.pageSize));
     if (typeof opts.isActive === 'boolean')
       params = params.set('isActive', String(opts.isActive));
-    return this.http.get<ApiResponse<PagedResult<CompanyResponse>>>(this.base, { params });
+    return this.http
+      .get<ApiResponse<CompanyResponse[] | PagedResult<CompanyResponse>>>(this.base, { params })
+      .pipe(map((res) => toPagedResponse<CompanyResponse>(res)));
   }
 
   getById(id: number): Observable<ApiResponse<CompanyResponse>> {

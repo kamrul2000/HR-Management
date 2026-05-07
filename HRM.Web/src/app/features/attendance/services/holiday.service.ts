@@ -1,11 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import {
   ApiResponse,
   PagedResult,
+  toPagedResponse,
 } from '../../../core/models/api-response.model';
 import {
   CreateHolidayDto,
@@ -29,7 +30,9 @@ export class HolidayService {
       params = params.set('isActive', String(filter.isActive));
     }
     params = params.set('pageSize', '300');
-    return this.http.get<ApiResponse<PagedResult<HolidayResponse>>>(this.base, { params });
+    return this.http
+      .get<ApiResponse<HolidayResponse[] | PagedResult<HolidayResponse>>>(this.base, { params })
+      .pipe(map((res) => toPagedResponse<HolidayResponse>(res)));
   }
 
   getById(id: number): Observable<ApiResponse<HolidayResponse>> {

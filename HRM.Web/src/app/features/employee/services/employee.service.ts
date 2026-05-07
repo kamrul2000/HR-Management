@@ -1,11 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import {
   ApiResponse,
   PagedResult,
+  toPagedResponse,
 } from '../../../core/models/api-response.model';
 import {
   CreateEmployeeDto,
@@ -31,7 +32,9 @@ export class EmployeeService {
       params = params.set('isActive', String(filter.isActive));
     if (filter.pageNumber) params = params.set('pageNumber', String(filter.pageNumber));
     if (filter.pageSize)   params = params.set('pageSize',   String(filter.pageSize));
-    return this.http.get<ApiResponse<PagedResult<EmployeeResponse>>>(this.base, { params });
+    return this.http
+      .get<ApiResponse<EmployeeResponse[] | PagedResult<EmployeeResponse>>>(this.base, { params })
+      .pipe(map((res) => toPagedResponse<EmployeeResponse>(res)));
   }
 
   getById(id: number): Observable<ApiResponse<EmployeeResponse>> {

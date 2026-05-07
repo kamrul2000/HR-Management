@@ -1,11 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import {
   ApiResponse,
   PagedResult,
+  toPagedResponse,
 } from '../../../core/models/api-response.model';
 import {
   CreateDutySlotDto,
@@ -24,7 +25,9 @@ export class DutySlotService {
     if (typeof opts.isActive === 'boolean') params = params.set('isActive', String(opts.isActive));
     if (opts.pageNumber) params = params.set('pageNumber', String(opts.pageNumber));
     if (opts.pageSize)   params = params.set('pageSize',   String(opts.pageSize));
-    return this.http.get<ApiResponse<PagedResult<DutySlotResponse>>>(this.base, { params });
+    return this.http
+      .get<ApiResponse<DutySlotResponse[] | PagedResult<DutySlotResponse>>>(this.base, { params })
+      .pipe(map((res) => toPagedResponse<DutySlotResponse>(res)));
   }
 
   getById(id: number): Observable<ApiResponse<DutySlotResponse>> {

@@ -1,0 +1,49 @@
+<hrm-drawer
+  title="Disburse Loan"
+  [subtitle]="application.applicationNo + ' · ' + application.employeeFullName"
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <div *ngIf="approval" class="ref-grid" style="margin-bottom: 16px;">
+    <div class="ref-card">
+      <div class="ref-card__label">Approved Amount</div>
+      <div class="ref-card__value">{{ approval.approvedAmount | currencyBd }}</div>
+    </div>
+    <div class="ref-card">
+      <div class="ref-card__label">EMI / Tenure</div>
+      <div class="ref-card__value">{{ approval.monthlyInstallment | currencyBd }} · {{ approval.approvedTenureMonths }} mo</div>
+    </div>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="form-group">
+      <label class="form-label">Disbursement Date <span class="required">*</span></label>
+      <input type="date" class="form-control" formControlName="disbursementDate" />
+    </div>
+
+    <div class="ref-grid">
+      <div class="form-group">
+        <label class="form-label">First Installment Month <span class="required">*</span></label>
+        <select class="form-control" formControlName="firstInstallmentMonth">
+          <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">First Installment Year <span class="required">*</span></label>
+        <input type="number" class="form-control" min="2000" max="2100" formControlName="firstInstallmentYear" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Remarks (optional)</label>
+      <textarea class="form-control" rows="2" formControlName="remarks"></textarea>
+    </div>
+  </form>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="dismiss.emit()">Cancel</button>
+    <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+      {{ saving() ? 'Disbursing…' : 'Disburse Loan' }}
+    </button>
+  </ng-container>
+</hrm-drawer>

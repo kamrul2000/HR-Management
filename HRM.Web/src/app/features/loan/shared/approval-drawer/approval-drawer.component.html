@@ -1,0 +1,130 @@
+<hrm-drawer
+  title="Loan Approval"
+  [subtitle]="application.applicationNo + ' · ' + application.employeeFullName"
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <div class="ref-grid" style="margin-bottom: 16px;">
+    <div class="ref-card">
+      <div class="ref-card__label">Requested</div>
+      <div class="ref-card__value">{{ application.requestedAmount | currencyBd }} · {{ application.requestedTenureMonths }} mo</div>
+    </div>
+    <div class="ref-card">
+      <div class="ref-card__label">Recommended</div>
+      <div class="ref-card__value">
+        <ng-container *ngIf="recommendation; else noRec">
+          {{ recommendation.recommendedAmount | currencyBd }} · {{ recommendation.recommendedTenureMonths }} mo
+        </ng-container>
+        <ng-template #noRec><span class="text-muted">—</span></ng-template>
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="form">
+    <div class="form-group">
+      <label class="form-label">Decision <span class="required">*</span></label>
+      <div style="display: flex; gap: 8px;">
+        <button
+          type="button"
+          class="btn"
+          [class.btn--primary]="isApprove()"
+          [class.btn--secondary]="!isApprove()"
+          (click)="setDecision('Approve')"
+        >Approve</button>
+        <button
+          type="button"
+          class="btn"
+          [class.btn--danger]="!isApprove()"
+          [class.btn--secondary]="isApprove()"
+          (click)="setDecision('Reject')"
+        >Reject</button>
+      </div>
+    </div>
+
+    <div *ngIf="isApprove()">
+      <div class="ref-grid">
+        <div class="form-group">
+          <label class="form-label">Approved Amount <span class="required">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            min="0"
+            step="0.01"
+            formControlName="approvedAmount"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tenure (months) <span class="required">*</span></label>
+          <input
+            type="number"
+            class="form-control"
+            min="1"
+            max="120"
+            formControlName="approvedTenureMonths"
+          />
+        </div>
+      </div>
+
+      <div class="ref-grid">
+        <div class="form-group">
+          <label class="form-label">Interest Rate (%)</label>
+          <input
+            type="number"
+            class="form-control"
+            min="0"
+            max="100"
+            step="0.01"
+            formControlName="interestRate"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Interest Type <span class="required">*</span></label>
+          <select class="form-control" formControlName="interestType">
+            <option value="Flat">Flat</option>
+            <option value="Reducing">Reducing balance</option>
+            <option value="None">No interest</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="preview">
+        <div>
+          <div class="preview__label">Monthly Installment</div>
+          <div class="preview__value">{{ preview().emi | currencyBd }}</div>
+        </div>
+        <div>
+          <div class="preview__label">Total Repayable</div>
+          <div class="preview__value">{{ preview().total | currencyBd }}</div>
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <div class="preview__label">Total Interest</div>
+          <div class="preview__value">{{ preview().interest | currencyBd }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top: 12px;">
+      <label class="form-label">Remarks <span class="required">*</span></label>
+      <textarea
+        class="form-control"
+        rows="3"
+        formControlName="remarks"
+        placeholder="Notes on this decision."
+      ></textarea>
+    </div>
+  </form>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="dismiss.emit()">Cancel</button>
+    <button
+      type="button"
+      class="btn"
+      [class.btn--primary]="isApprove()"
+      [class.btn--danger]="!isApprove()"
+      [disabled]="saving()"
+      (click)="submit()"
+    >
+      {{ saving() ? 'Saving…' : (isApprove() ? 'Approve' : 'Reject') }}
+    </button>
+  </ng-container>
+</hrm-drawer>

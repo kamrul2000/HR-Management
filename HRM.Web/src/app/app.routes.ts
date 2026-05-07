@@ -45,6 +45,10 @@ export const routes: Routes = [
         path: 'salary',
         loadChildren: () => import('./features/salary/salary.routes'),
       },
+      {
+        path: 'loans',
+        loadChildren: () => import('./features/loan/loan.routes'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

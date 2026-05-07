@@ -1,0 +1,83 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.loan-summary {
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+    padding: $spacing-lg;
+
+    h2 { margin: 0; font-size: $text-xl; font-weight: 600; }
+    p { margin: 4px 0 0; font-size: $text-sm; }
+  }
+
+  &__head-info { flex: 1; }
+  &__status { margin-left: auto; }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: $spacing-md;
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $neutral-100;
+
+    > div { display: flex; flex-direction: column; }
+    .text-label { font-size: $text-xs; }
+    strong { font-size: $text-md; color: $neutral-900; margin-top: 2px; }
+    .text-primary { color: $brand-primary; }
+
+    @include mobile { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  &__progress {
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $neutral-100;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    .progress-bar {
+      flex: 1;
+      background: $neutral-200;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-bar__fill {
+      background: $brand-primary;
+      height: 100%;
+      transition: width 200ms ease;
+    }
+  }
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $text-sm;
+
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    background: $neutral-50;
+    font-size: $text-xs;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: $neutral-500;
+    border-bottom: 1px solid $neutral-200;
+  }
+
+  tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid $neutral-100;
+  }
+
+  tbody tr.is-overdue {
+    background: rgba(220, 38, 38, 0.04);
+  }
+
+  .text-right  { text-align: right; }
+  .text-center { text-align: center; }
+}

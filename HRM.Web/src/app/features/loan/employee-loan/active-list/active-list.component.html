@@ -1,0 +1,62 @@
+<hrm-page-header title="Active Loans" subtitle="Disbursed loans currently being repaid.">
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event); onFilterChange()"
+      >
+        <option value="">All loans</option>
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [page]="pageState()"
+    [showPagination]="true"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No loans"
+    emptyMessage="Once an application is disbursed it will appear here."
+    (pageChange)="onPageChange($event)"
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div style="display: inline-flex; align-items: center; gap: 10px;">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #principalTpl  let-row><span class="text-mono">{{ row.principalAmount | currencyBd }}</span></ng-template>
+<ng-template #emiTpl        let-row><span class="text-mono">{{ row.monthlyInstallment | currencyBd }}</span></ng-template>
+<ng-template #outstandingTpl let-row><strong class="text-mono">{{ row.outstandingBalance | currencyBd }}</strong></ng-template>
+
+<ng-template #progressTpl let-row>
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <div class="progress-bar"><div class="progress-bar__fill" [style.width.%]="row.completionPercentage"></div></div>
+    <span class="text-xs text-muted">{{ row.paidInstallments }}/{{ row.tenureMonths }}</span>
+  </div>
+</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge [variant]="row.status" [label]="row.statusLabel || row.status"></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <a class="btn btn--ghost btn--sm" [routerLink]="['/loans/active', row.id]">
+    <ng-icon name="heroEye" size="14" />
+    View
+  </a>
+</ng-template>

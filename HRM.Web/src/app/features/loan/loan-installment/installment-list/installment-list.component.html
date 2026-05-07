@@ -1,0 +1,73 @@
+<hrm-page-header title="Loan Installments" subtitle="All scheduled installments across active loans.">
+  <button type="button" class="btn btn--secondary" [disabled]="busy()" (click)="markOverdue()">
+    <ng-icon name="heroExclamationTriangle" size="14" />
+    Mark Period Overdue
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field">
+      <select class="form-control" [ngModel]="month()" (ngModelChange)="month.set(+$event); onAnyFilterChange()">
+        <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+      </select>
+    </div>
+    <div class="toolbar__field">
+      <input
+        type="number"
+        class="form-control"
+        min="2000"
+        max="2100"
+        [ngModel]="year()"
+        (ngModelChange)="year.set(+$event); onAnyFilterChange()"
+      />
+    </div>
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event); onAnyFilterChange()"
+      >
+        <option value="">All statuses</option>
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [page]="pageState()"
+    [showPagination]="true"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No installments"
+    emptyMessage="Adjust filters to see installments."
+    (pageChange)="onPageChange($event)"
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div style="display: inline-flex; align-items: center; gap: 10px;">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #amountCellTpl let-row><span class="text-mono">{{ row.installmentAmount | currencyBd }}</span></ng-template>
+<ng-template #paidCellTpl   let-row><span class="text-mono">{{ row.paidAmount | currencyBd }}</span></ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge [variant]="row.status" [label]="row.statusLabel || row.status"></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <a class="btn btn--ghost btn--sm" [routerLink]="['/loans/active', row.employeeLoanId]">
+    <ng-icon name="heroEye" size="14" />
+    Loan
+  </a>
+</ng-template>

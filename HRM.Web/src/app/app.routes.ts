@@ -41,6 +41,10 @@ export const routes: Routes = [
         path: 'overtime',
         loadChildren: () => import('./features/overtime/overtime.routes'),
       },
+      {
+        path: 'salary',
+        loadChildren: () => import('./features/salary/salary.routes'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

@@ -1,0 +1,157 @@
+<hrm-page-header title="Bonus" subtitle="Bonus calculations and approvals.">
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    Add Bonus
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field">
+      <select class="form-control" [ngModel]="month()" (ngModelChange)="month.set(+$event); onAnyFilterChange()">
+        <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+      </select>
+    </div>
+    <div class="toolbar__field">
+      <input
+        type="number"
+        class="form-control"
+        min="2000"
+        max="2100"
+        [ngModel]="year()"
+        (ngModelChange)="year.set(+$event); onAnyFilterChange()"
+      />
+    </div>
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event); onAnyFilterChange()"
+      >
+        <option value="">All statuses</option>
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [page]="pageState()"
+    [showPagination]="true"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No bonuses"
+    emptyMessage="Create a bonus to start the approval workflow."
+    (pageChange)="onPageChange($event)"
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div style="display: inline-flex; align-items: center; gap: 10px;">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #amountCellTpl let-row>{{ row.computedAmount | currencyBd }}</ng-template>
+<ng-template #finalCellTpl let-row><strong>{{ row.finalAmount | currencyBd }}</strong></ng-template>
+
+<ng-template #periodCellTpl let-row>{{ periodLabel(row) }}</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge [variant]="row.status" [label]="row.statusLabel || row.status"></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <ng-container *ngIf="row.status === 'Pending'; else viewOnly">
+    <button type="button" class="btn btn--ghost btn--sm" style="color: #16A34A" (click)="openApprove(row)">
+      <ng-icon name="heroCheck" size="14" />
+      Approve
+    </button>
+    <button type="button" class="btn btn--ghost-neutral btn--sm" (click)="openReject(row)">
+      <ng-icon name="heroXMark" size="14" />
+      Reject
+    </button>
+  </ng-container>
+  <ng-template #viewOnly>
+    <button
+      *ngIf="row.status === 'Approved'"
+      type="button"
+      class="btn btn--ghost-neutral btn--sm"
+      (click)="cancel(row)"
+    >
+      Cancel
+    </button>
+    <span *ngIf="row.status !== 'Approved'" class="text-muted text-xs">—</span>
+  </ng-template>
+</ng-template>
+
+<!-- Create drawer -->
+<hrm-bonus-form
+  *ngIf="drawerOpen()"
+  (saved)="onCreated()"
+  (dismiss)="closeCreate()"
+></hrm-bonus-form>
+
+<!-- Approve / reject drawer -->
+<ng-container *ngIf="approvalOpen() && approvalRow() as row">
+  <hrm-drawer
+    [title]="approvalKind() === 'approve' ? 'Approve Bonus' : 'Reject Bonus'"
+    [subtitle]="row.employeeFullName + ' · ' + row.bonusTitle"
+    [locked]="busy()"
+    (dismiss)="closeApproval()"
+  >
+    <div *ngIf="approvalKind() === 'approve'" class="form-group">
+      <label class="form-label">Final Amount <span class="required">*</span></label>
+      <input
+        type="number"
+        class="form-control"
+        min="0"
+        step="0.01"
+        [ngModel]="finalAmount()"
+        (ngModelChange)="finalAmount.set(+$event)"
+      />
+      <span class="form-hint">Computed: {{ row.computedAmount | currencyBd }} — adjust if needed before approval.</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">
+        {{ approvalKind() === 'approve' ? 'Remarks (optional)' : 'Reason for rejection' }}
+        <span *ngIf="approvalKind() === 'reject'" class="required">*</span>
+      </label>
+      <textarea
+        class="form-control"
+        rows="3"
+        [ngModel]="remarks()"
+        (ngModelChange)="remarks.set($event)"
+      ></textarea>
+    </div>
+
+    <ng-container drawer-footer>
+      <button type="button" class="btn btn--secondary" [disabled]="busy()" (click)="closeApproval()">Cancel</button>
+      <button
+        *ngIf="approvalKind() === 'approve'"
+        type="button"
+        class="btn btn--primary"
+        [disabled]="busy()"
+        (click)="confirmApprove()"
+      >
+        {{ busy() ? 'Approving…' : 'Approve' }}
+      </button>
+      <button
+        *ngIf="approvalKind() === 'reject'"
+        type="button"
+        class="btn btn--danger"
+        [disabled]="busy()"
+        (click)="confirmReject()"
+      >
+        {{ busy() ? 'Rejecting…' : 'Reject' }}
+      </button>
+    </ng-container>
+  </hrm-drawer>
+</ng-container>

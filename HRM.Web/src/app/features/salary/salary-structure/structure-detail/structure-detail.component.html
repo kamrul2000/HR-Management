@@ -1,5 +1,5 @@
 <hrm-page-header
-  [title]="structure() ? structure()!.employeeFullName : 'Salary Structure'"
+  [title]="(structure()?.employeeFullName) || 'Salary Structure'"
   [subtitle]="structure() ? 'Effective from ' + (structure()!.effectiveFromFormatted || structure()!.effectiveFrom) : ''"
 >
   <a routerLink="/salary/structures" class="btn btn--secondary">

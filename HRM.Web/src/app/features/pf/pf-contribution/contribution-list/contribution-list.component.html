@@ -1,0 +1,78 @@
+<hrm-page-header title="PF Contributions" subtitle="Monthly Provident Fund contributions for all employees.">
+  <button type="button" class="btn btn--secondary" (click)="openRules()">
+    <ng-icon name="heroBookOpen" size="14" />
+    PF Rules
+  </button>
+  <button type="button" class="btn btn--primary" [disabled]="busy()" (click)="bulkCompute()">
+    <ng-icon name="heroPlay" size="14" />
+    {{ busy() ? 'Computing…' : 'Compute Period' }}
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field">
+      <select class="form-control" [ngModel]="month()" (ngModelChange)="month.set(+$event); onAnyFilterChange()">
+        <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+      </select>
+    </div>
+    <div class="toolbar__field">
+      <input
+        type="number"
+        class="form-control"
+        min="2000"
+        max="2100"
+        [ngModel]="year()"
+        (ngModelChange)="year.set(+$event); onAnyFilterChange()"
+      />
+    </div>
+  </div>
+
+  <div *ngIf="report() as r" class="stat-strip">
+    <div class="stat-card">
+      <div class="stat-card__label">Employees</div>
+      <div class="stat-card__value">{{ r.totalEmployees }}</div>
+    </div>
+    <div class="stat-card stat-card--employee">
+      <div class="stat-card__label">Employee Share</div>
+      <div class="stat-card__value">{{ r.totalEmployeeContribution | currencyBd }}</div>
+    </div>
+    <div class="stat-card stat-card--employer">
+      <div class="stat-card__label">Employer Share</div>
+      <div class="stat-card__value">{{ r.totalEmployerContribution | currencyBd }}</div>
+    </div>
+    <div class="stat-card stat-card--total">
+      <div class="stat-card__label">Total Contribution</div>
+      <div class="stat-card__value">{{ r.totalContribution | currencyBd }}</div>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [page]="pageState()"
+    [showPagination]="true"
+    rowKey="id"
+    emptyTitle="No contributions"
+    emptyMessage="Run a period computation to populate this list."
+    (pageChange)="onPageChange($event)"
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div style="display: inline-flex; align-items: center; gap: 10px;">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #baseCellTpl  let-row><span class="text-mono">{{ row.pfBase | currencyBd }}</span></ng-template>
+<ng-template #empCellTpl   let-row><span class="text-mono">{{ row.employeeContribution | currencyBd }}</span></ng-template>
+<ng-template #emprCellTpl  let-row><span class="text-mono">{{ row.employerContribution | currencyBd }}</span></ng-template>
+<ng-template #totalCellTpl let-row><strong class="text-mono">{{ row.totalContribution | currencyBd }}</strong></ng-template>
+
+<hrm-pf-rule-list *ngIf="rulesOpen()" (dismiss)="closeRules()"></hrm-pf-rule-list>

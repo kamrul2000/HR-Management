@@ -1,0 +1,45 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.slab-form {
+  &__row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-md;
+
+    @include mobile { grid-template-columns: 1fr; }
+  }
+
+  &__hint {
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $neutral-100;
+    font-size: $text-sm;
+    color: $neutral-700;
+  }
+}
+
+.slab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $text-sm;
+
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    background: $neutral-50;
+    font-size: $text-xs;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: $neutral-500;
+    border-bottom: 1px solid $neutral-200;
+  }
+
+  tbody td {
+    padding: 8px 14px;
+    border-bottom: 1px solid $neutral-100;
+    vertical-align: middle;
+  }
+
+  .text-center { text-align: center; }
+}

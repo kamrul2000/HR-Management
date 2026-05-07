@@ -1,0 +1,52 @@
+<hrm-page-header title="Tax Slab Configurations" subtitle="Fiscal-year tax slabs and thresholds.">
+  <button type="button" class="btn btn--secondary" (click)="openCompute()">
+    <ng-icon name="heroCalculator" size="14" />
+    Tax Calculator
+  </button>
+  <a routerLink="/tax/slabs/new" class="btn btn--primary">
+    <ng-icon name="heroPlus" size="14" />
+    New Configuration
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [showPagination]="false"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No tax configurations"
+    emptyMessage="Create a fiscal-year tax slab configuration to begin processing tax."
+  ></hrm-data-table>
+</div>
+
+<ng-template #thresholdTpl let-row>
+  <span class="text-mono">{{ row.taxFreeThreshold | currencyBd }}</span>
+</ng-template>
+
+<ng-template #slabsTpl let-row>
+  <strong>{{ row.slabCount }}</strong>
+</ng-template>
+
+<ng-template #activeTpl let-row>
+  <hrm-status-badge [variant]="row.isActive ? 'active' : 'inactive'" [label]="row.isActive ? 'Active' : 'Inactive'"></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <a class="btn btn--ghost btn--sm" [routerLink]="['/tax/slabs', row.id]">
+    <ng-icon name="heroEye" size="14" />
+    View
+  </a>
+  <a class="btn btn--ghost btn--sm" [routerLink]="['/tax/slabs', row.id, 'edit']">
+    <ng-icon name="heroPencilSquare" size="14" />
+    Edit
+  </a>
+  <button type="button" class="btn btn--ghost-neutral btn--sm" (click)="delete(row)">
+    <ng-icon name="heroTrash" size="14" />
+    Delete
+  </button>
+</ng-template>
+
+<hrm-tax-compute-drawer *ngIf="computeOpen()" (dismiss)="closeCompute()"></hrm-tax-compute-drawer>

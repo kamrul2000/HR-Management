@@ -1,0 +1,75 @@
+<hrm-drawer
+  title="Tax Calculator"
+  subtitle="Compute annual & monthly tax for an income amount."
+  [locked]="computing()"
+  (dismiss)="dismiss.emit()"
+>
+  <form [formGroup]="form" (ngSubmit)="compute()" autocomplete="off">
+    <div class="form-group">
+      <label class="form-label">Annual Income <span class="required">*</span></label>
+      <input type="number" class="form-control" min="0" step="0.01" formControlName="annualIncome" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Fiscal Year (optional)</label>
+      <input type="text" class="form-control" placeholder="2024-2025 — defaults to active" formControlName="fiscalYear" maxlength="10" />
+    </div>
+    <button type="submit" class="btn btn--primary" [disabled]="computing()" style="margin-bottom: 16px;">
+      {{ computing() ? 'Calculating…' : 'Calculate' }}
+    </button>
+  </form>
+
+  <div *ngIf="result() as r">
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-card__label">Annual Income</div>
+        <div class="summary-card__value">{{ r.annualIncome | currencyBd }}</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-card__label">Taxable Income</div>
+        <div class="summary-card__value">{{ r.taxableIncome | currencyBd }}</div>
+      </div>
+      <div class="summary-card summary-card--primary">
+        <div class="summary-card__label">Annual Tax</div>
+        <div class="summary-card__value">{{ r.annualTax | currencyBd }}</div>
+      </div>
+      <div class="summary-card summary-card--primary">
+        <div class="summary-card__label">Monthly Tax</div>
+        <div class="summary-card__value">{{ r.monthlyTax | currencyBd }}</div>
+      </div>
+      <div class="summary-card" style="grid-column: 1 / -1;">
+        <div class="summary-card__label">Effective Rate · Fiscal Year</div>
+        <div class="summary-card__value">{{ r.effectiveTaxRateLabel || (r.effectiveTaxRate + '%') }} <span class="text-muted text-sm">· {{ r.fiscalYear }}</span></div>
+      </div>
+    </div>
+
+    <h4 class="text-label" style="margin: 16px 0 8px;">Slab Breakdown</h4>
+    <table class="breakdown">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Range</th>
+          <th class="text-right">In Band</th>
+          <th class="text-right">Rate</th>
+          <th class="text-right">Tax</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of r.slabBreakdown">
+          <td>{{ row.slabOrder }}</td>
+          <td>{{ row.rangeLabel }}</td>
+          <td class="text-right">{{ row.amountInBand | currencyBd }}</td>
+          <td class="text-right">{{ row.taxRate }}%</td>
+          <td class="text-right"><strong>{{ row.taxAmount | currencyBd }}</strong></td>
+        </tr>
+        <tr *ngIf="r.slabBreakdown.length === 0">
+          <td colspan="5" class="text-center text-muted">No taxable income in any slab.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--ghost-neutral" (click)="reset()" [disabled]="computing()">Reset</button>
+    <button type="button" class="btn btn--secondary" (click)="dismiss.emit()" [disabled]="computing()">Close</button>
+  </ng-container>
+</hrm-drawer>

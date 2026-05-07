@@ -1,0 +1,134 @@
+<hrm-page-header title="PF Interest" subtitle="Annual interest credited on PF balances by fiscal year.">
+  <button type="button" class="btn btn--secondary" (click)="openRates()">
+    <ng-icon name="heroDocumentMagnifyingGlass" size="14" />
+    Interest Rates
+  </button>
+  <button type="button" class="btn btn--primary" [disabled]="busy()" (click)="bulkCompute()">
+    <ng-icon name="heroPlay" size="14" />
+    {{ busy() ? 'Computing…' : 'Compute Year' }}
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field">
+      <label class="form-label">Fiscal Year</label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="2024-2025"
+        maxlength="10"
+        [ngModel]="fiscalYear()"
+        (ngModelChange)="fiscalYear.set($event)"
+        (blur)="onFiscalYearChange()"
+      />
+    </div>
+  </div>
+
+  <div *ngIf="report() as r" class="stat-strip">
+    <div class="stat-card">
+      <div class="stat-card__label">Employees</div>
+      <div class="stat-card__value">{{ r.totalEmployees }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__label">Opening Balance</div>
+      <div class="stat-card__value">{{ r.totalOpeningBalance | currencyBd }}</div>
+    </div>
+    <div class="stat-card stat-card--interest">
+      <div class="stat-card__label">Interest Credited @ {{ r.interestRateLabel || (r.interestRate + '%') }}</div>
+      <div class="stat-card__value">{{ r.totalInterestCredited | currencyBd }}</div>
+    </div>
+    <div class="stat-card stat-card--closing">
+      <div class="stat-card__label">Closing Balance</div>
+      <div class="stat-card__value">{{ r.totalClosingBalance | currencyBd }}</div>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="report()?.details || []"
+    [loading]="loading()"
+    [showPagination]="false"
+    rowKey="id"
+    emptyTitle="No interest computed"
+    emptyMessage="Run Compute Year to generate per-employee interest records."
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div style="display: inline-flex; align-items: center; gap: 10px;">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #openingTpl  let-row><span class="text-mono">{{ row.openingBalance | currencyBd }}</span></ng-template>
+<ng-template #contribTpl  let-row><span class="text-mono">{{ row.totalContributionsForYear | currencyBd }}</span></ng-template>
+<ng-template #interestTpl let-row><strong class="text-mono" style="color: #16A34A;">{{ row.interestAmount | currencyBd }}</strong></ng-template>
+<ng-template #closingTpl  let-row><strong class="text-mono">{{ row.closingBalance | currencyBd }}</strong></ng-template>
+
+<!-- Interest Rates drawer -->
+<ng-container *ngIf="ratesOpen()">
+  <hrm-drawer
+    title="PF Interest Rates"
+    subtitle="Annual interest rate per fiscal year."
+    [locked]="savingRate()"
+    (dismiss)="closeRates()"
+  >
+    <ng-container *ngIf="!addingRate()">
+      <div *ngIf="rates().length === 0" class="text-center text-muted" style="padding: 24px;">
+        No rates defined yet.
+      </div>
+      <div *ngFor="let rate of rates()" class="rate-card">
+        <div class="rate-card__year">{{ rate.fiscalYear }}</div>
+        <div class="rate-card__rate">{{ rate.interestRate }}%</div>
+        <div class="rate-card__meta">
+          From {{ rate.effectiveFromFormatted || (rate.effectiveFrom | date: 'mediumDate') }}
+          <span *ngIf="rate.description"> · {{ rate.description }}</span>
+        </div>
+        <hrm-status-badge
+          [variant]="rate.isActive ? 'active' : 'inactive'"
+          [label]="rate.isActive ? 'Active' : 'Inactive'"
+        ></hrm-status-badge>
+      </div>
+    </ng-container>
+
+    <form *ngIf="addingRate()" [formGroup]="rateForm" (ngSubmit)="saveRate()">
+      <div class="form-group">
+        <label class="form-label">Fiscal Year <span class="required">*</span></label>
+        <input type="text" class="form-control" formControlName="fiscalYear" maxlength="10" placeholder="2024-2025" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Interest Rate (%) <span class="required">*</span></label>
+        <input type="number" class="form-control" min="0.01" max="30" step="0.01" formControlName="interestRate" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Effective From <span class="required">*</span></label>
+        <input type="date" class="form-control" formControlName="effectiveFrom" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" rows="2" formControlName="description"></textarea>
+      </div>
+    </form>
+
+    <ng-container drawer-footer>
+      <ng-container *ngIf="!addingRate()">
+        <button type="button" class="btn btn--secondary" (click)="closeRates()">Close</button>
+        <button type="button" class="btn btn--primary" (click)="startAddRate()">
+          <ng-icon name="heroPlus" size="14" />
+          Add Rate
+        </button>
+      </ng-container>
+      <ng-container *ngIf="addingRate()">
+        <button type="button" class="btn btn--secondary" [disabled]="savingRate()" (click)="cancelAddRate()">Back</button>
+        <button type="button" class="btn btn--primary" [disabled]="savingRate()" (click)="saveRate()">
+          {{ savingRate() ? 'Saving…' : 'Save Rate' }}
+        </button>
+      </ng-container>
+    </ng-container>
+  </hrm-drawer>
+</ng-container>

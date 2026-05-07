@@ -1,0 +1,140 @@
+<hrm-drawer
+  [title]="title()"
+  [subtitle]="mode() === 'list' ? 'PF rate, base, and eligibility rules.' : 'Configure how PF contributions are computed.'"
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <ng-container *ngIf="mode() === 'list'">
+    <div *ngIf="loading()"><hrm-loading-skeleton rows="4"></hrm-loading-skeleton></div>
+
+    <div *ngIf="!loading()">
+      <div *ngFor="let rule of rules()" class="rule-card">
+        <div class="rule-card__head">
+          <h4>{{ rule.ruleName }}</h4>
+          <hrm-status-badge
+            [variant]="rule.isActive ? 'active' : 'inactive'"
+            [label]="rule.isActive ? 'Active' : 'Inactive'"
+          ></hrm-status-badge>
+        </div>
+        <div class="rule-card__grid">
+          <div>
+            <div class="rule-card__label">Employee</div>
+            <strong>{{ rule.employeeContributionRate }}%</strong>
+          </div>
+          <div>
+            <div class="rule-card__label">Employer</div>
+            <strong>{{ rule.employerContributionRate }}%</strong>
+          </div>
+          <div>
+            <div class="rule-card__label">Base</div>
+            <strong>{{ rule.pfBaseLabel || rule.pfBase }}</strong>
+          </div>
+          <div>
+            <div class="rule-card__label">Effective</div>
+            <strong>{{ rule.effectiveFromFormatted || (rule.effectiveFrom | date: 'mediumDate') }}</strong>
+          </div>
+          <div *ngIf="rule.minEligibleSalary">
+            <div class="rule-card__label">Min Eligible Salary</div>
+            <strong>{{ rule.minEligibleSalary | currencyBd }}</strong>
+          </div>
+          <div *ngIf="rule.maxContributionAmount">
+            <div class="rule-card__label">Max Contribution</div>
+            <strong>{{ rule.maxContributionAmount | currencyBd }}</strong>
+          </div>
+        </div>
+        <div style="text-align: right; margin-top: 8px;">
+          <button type="button" class="btn btn--ghost btn--sm" (click)="openEdit(rule)">
+            <ng-icon name="heroPencilSquare" size="14" />
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="rules().length === 0" class="text-center text-muted" style="padding: 24px;">
+        No PF rules defined yet. Click <strong>Add Rule</strong> to begin.
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="mode() === 'form'">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-group">
+        <label class="form-label">Rule Name <span class="required">*</span></label>
+        <input type="text" class="form-control" formControlName="ruleName" maxlength="100" />
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label class="form-label">Employee Rate (%) <span class="required">*</span></label>
+          <input type="number" class="form-control" min="0.01" max="100" step="0.01" formControlName="employeeContributionRate" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Employer Rate (%) <span class="required">*</span></label>
+          <input type="number" class="form-control" min="0" max="100" step="0.01" formControlName="employerContributionRate" />
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label class="form-label">PF Base <span class="required">*</span></label>
+          <select class="form-control" formControlName="pfBase">
+            <option value="Basic">Basic Salary</option>
+            <option value="Gross">Gross Salary</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Effective From <span class="required">*</span></label>
+          <input type="date" class="form-control" formControlName="effectiveFrom" />
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="form-group">
+          <label class="form-label">Min Eligible Salary</label>
+          <input type="number" class="form-control" min="0" step="0.01" formControlName="minEligibleSalary" placeholder="No minimum" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Contribution</label>
+          <input type="number" class="form-control" min="0.01" step="0.01" formControlName="maxContributionAmount" placeholder="No cap" />
+        </div>
+      </div>
+
+      <div *ngIf="isEdit()" class="form-group">
+        <label class="form-label">Effective To</label>
+        <input type="date" class="form-control" formControlName="effectiveTo" />
+      </div>
+
+      <div *ngIf="isEdit()" class="form-group">
+        <label class="form-check">
+          <input type="checkbox" formControlName="isActive" />
+          <span>Active</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" rows="2" formControlName="description"></textarea>
+      </div>
+    </form>
+  </ng-container>
+
+  <ng-container drawer-footer>
+    <ng-container *ngIf="mode() === 'list'">
+      <button type="button" class="btn btn--secondary" (click)="dismiss.emit()">Close</button>
+      <button type="button" class="btn btn--primary" (click)="openCreate()">
+        <ng-icon name="heroPlus" size="14" />
+        Add Rule
+      </button>
+    </ng-container>
+    <ng-container *ngIf="mode() === 'form'">
+      <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="backToList()">
+        <ng-icon name="heroArrowLeft" size="14" />
+        Back
+      </button>
+      <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+        <ng-icon name="heroCheck" size="14" />
+        {{ saving() ? 'Saving…' : (isEdit() ? 'Save Changes' : 'Create Rule') }}
+      </button>
+    </ng-container>
+  </ng-container>
+</hrm-drawer>

@@ -1,0 +1,105 @@
+<hrm-page-header
+  [title]="editId() ? 'Edit Tax Configuration' : 'New Tax Configuration'"
+  [subtitle]="editId() ? 'Update slabs and threshold for this fiscal year.' : 'Define tax slabs and tax-free threshold.'"
+>
+  <a routerLink="/tax/slabs" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+  <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="save()">
+    <ng-icon name="heroCheck" size="14" />
+    {{ saving() ? 'Saving…' : (editId() ? 'Save Changes' : 'Create Configuration') }}
+  </button>
+</hrm-page-header>
+
+<div class="page-content" *ngIf="loading()">
+  <div class="card"><div class="card__body"><hrm-loading-skeleton rows="6"></hrm-loading-skeleton></div></div>
+</div>
+
+<form *ngIf="!loading()" [formGroup]="form" class="page-content slab-form" (ngSubmit)="save()">
+  <div class="card">
+    <div class="card__header"><h3>Configuration</h3></div>
+    <div class="card__body slab-form__row">
+      <div class="form-group">
+        <label class="form-label">Fiscal Year <span class="required">*</span></label>
+        <input type="text" class="form-control" formControlName="fiscalYear" placeholder="2024-2025" maxlength="10" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Start Date <span class="required">*</span></label>
+        <input type="date" class="form-control" formControlName="startDate" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">End Date <span class="required">*</span></label>
+        <input type="date" class="form-control" formControlName="endDate" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tax-Free Threshold <span class="required">*</span></label>
+        <input type="number" class="form-control" min="0" step="0.01" formControlName="taxFreeThreshold" />
+        <span class="form-hint">Income up to this amount is tax-free.</span>
+      </div>
+      <div *ngIf="editId()" class="form-group">
+        <label class="form-label">Status</label>
+        <label class="form-check">
+          <input type="checkbox" formControlName="isActive" />
+          <span>Active</span>
+        </label>
+      </div>
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" rows="2" formControlName="description"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-md">
+    <div class="card__header">
+      <h3>Tax Slabs <span class="text-muted text-sm">({{ summary().count }})</span></h3>
+      <button type="button" class="btn btn--ghost btn--sm" (click)="addSlab()">
+        <ng-icon name="heroPlus" size="14" />
+        Add Slab
+      </button>
+    </div>
+    <table class="slab-table">
+      <thead>
+        <tr>
+          <th style="width: 60px;">#</th>
+          <th>Min Amount</th>
+          <th>Max Amount <span class="text-muted text-xs">(blank = no upper limit)</span></th>
+          <th>Tax Rate (%)</th>
+          <th style="width: 60px;"></th>
+        </tr>
+      </thead>
+      <tbody formArrayName="slabs">
+        <tr *ngFor="let slab of slabs.controls; let i = index" [formGroupName]="i">
+          <td><strong>{{ i + 1 }}</strong></td>
+          <td>
+            <input type="number" class="form-control" min="0" step="0.01" formControlName="minAmount" />
+          </td>
+          <td>
+            <input type="number" class="form-control" min="0" step="0.01" formControlName="maxAmount" placeholder="No limit" />
+          </td>
+          <td>
+            <input type="number" class="form-control" min="0" max="100" step="0.01" formControlName="taxRate" />
+          </td>
+          <td class="text-center">
+            <button
+              type="button"
+              class="btn btn--ghost-neutral btn--sm"
+              (click)="removeSlab(i)"
+              [disabled]="slabs.length === 1"
+              title="Remove slab"
+            >
+              <ng-icon name="heroTrash" size="14" />
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="slabs.length === 0">
+          <td colspan="5" class="text-center text-muted">No slabs defined. Click <strong>Add Slab</strong>.</td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="summary().count > 0" class="slab-form__hint">
+      <strong>Tip:</strong> the topmost slab should have <em>Max Amount</em> blank to act as the catch-all.
+    </div>
+  </div>
+</form>

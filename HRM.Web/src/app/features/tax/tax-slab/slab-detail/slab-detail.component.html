@@ -1,0 +1,77 @@
+<hrm-page-header
+  [title]="config() ? 'Tax Slabs · ' + config()!.fiscalYear : 'Tax Configuration'"
+  [subtitle]="config() ? (config()!.startDateFormatted || (config()!.startDate | date:'mediumDate')) + ' – ' + (config()!.endDateFormatted || (config()!.endDate | date:'mediumDate')) : ''"
+>
+  <a routerLink="/tax/slabs" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+  <button type="button" class="btn btn--secondary" (click)="openCompute()">
+    <ng-icon name="heroCalculator" size="14" />
+    Compute
+  </button>
+  <a *ngIf="config() as c" [routerLink]="['/tax/slabs', c.id, 'edit']" class="btn btn--primary">
+    <ng-icon name="heroPencilSquare" size="14" />
+    Edit
+  </a>
+</hrm-page-header>
+
+<div class="page-content" *ngIf="loading()">
+  <div class="card"><div class="card__body"><hrm-loading-skeleton rows="6"></hrm-loading-skeleton></div></div>
+</div>
+
+<div *ngIf="!loading() && config() as c" class="page-content">
+  <div class="card">
+    <div class="card__body" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+      <div>
+        <span class="text-label">Fiscal Year</span>
+        <strong>{{ c.fiscalYear }}</strong>
+      </div>
+      <div>
+        <span class="text-label">Tax-Free Threshold</span>
+        <strong>{{ c.taxFreeThreshold | currencyBd }}</strong>
+      </div>
+      <div>
+        <span class="text-label">Slabs</span>
+        <strong>{{ c.slabCount }}</strong>
+      </div>
+      <div>
+        <span class="text-label">Status</span>
+        <hrm-status-badge [variant]="c.isActive ? 'active' : 'inactive'" [label]="c.isActive ? 'Active' : 'Inactive'"></hrm-status-badge>
+      </div>
+      <div *ngIf="c.description" style="grid-column: 1 / -1;">
+        <span class="text-label">Description</span>
+        <p>{{ c.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-md">
+    <div class="card__header"><h3>Slabs</h3></div>
+    <table class="slab-table">
+      <thead>
+        <tr>
+          <th style="width: 60px;">#</th>
+          <th>Range</th>
+          <th class="text-right">Min</th>
+          <th class="text-right">Max</th>
+          <th class="text-right">Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of c.slabs">
+          <td><strong>{{ s.slabOrder }}</strong></td>
+          <td>{{ s.rangeLabel || '—' }}</td>
+          <td class="text-right text-mono">{{ s.minAmount | currencyBd }}</td>
+          <td class="text-right text-mono">
+            <ng-container *ngIf="s.maxAmount; else noMax">{{ s.maxAmount | currencyBd }}</ng-container>
+            <ng-template #noMax><span class="text-muted">No limit</span></ng-template>
+          </td>
+          <td class="text-right text-mono">{{ s.taxRate }}%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<hrm-tax-compute-drawer *ngIf="computeOpen()" (dismiss)="closeCompute()"></hrm-tax-compute-drawer>

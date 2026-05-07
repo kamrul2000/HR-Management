@@ -49,6 +49,14 @@ export const routes: Routes = [
         path: 'loans',
         loadChildren: () => import('./features/loan/loan.routes'),
       },
+      {
+        path: 'tax',
+        loadChildren: () => import('./features/tax/tax.routes'),
+      },
+      {
+        path: 'pf',
+        loadChildren: () => import('./features/pf/pf.routes'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

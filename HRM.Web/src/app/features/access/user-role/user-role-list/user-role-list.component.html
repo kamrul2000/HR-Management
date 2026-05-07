@@ -1,0 +1,91 @@
+<hrm-page-header title="User Roles" subtitle="Map users to roles. Active assignments are listed below.">
+  <button type="button" class="btn btn--primary" (click)="openAssign()">
+    <ng-icon name="heroPlus" size="14" />
+    Assign Role
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [showPagination]="false"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No active assignments"
+    emptyMessage="Assign roles so users can access the system."
+  ></hrm-data-table>
+</div>
+
+<ng-template #userCellTpl let-row>
+  <div style="display: inline-flex; align-items: center; gap: 10px;">
+    <hrm-avatar [name]="row.userName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.userName }}</div>
+      <div class="text-muted text-xs">{{ row.userEmail }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #roleCellTpl let-row>
+  <hrm-status-badge variant="active" [label]="row.roleName"></hrm-status-badge>
+</ng-template>
+
+<ng-template #whenTpl let-row>
+  <span class="text-sm">{{ row.assignedAtFormatted || (row.assignedAt | date: 'medium') }}</span>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <button type="button" class="btn btn--ghost-neutral btn--sm" (click)="revoke(row)">
+    <ng-icon name="heroXMark" size="14" />
+    Revoke
+  </button>
+</ng-template>
+
+<ng-container *ngIf="drawerOpen()">
+  <hrm-drawer
+    title="Assign Role"
+    subtitle="Pick a known user or enter a user ID, then choose a role."
+    [locked]="saving()"
+    (dismiss)="closeDrawer()"
+  >
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-group">
+        <label class="form-label">User</label>
+        <select
+          class="form-control"
+          [ngModel]="form.value.userId"
+          (ngModelChange)="pickKnownUser(+$event)"
+          [ngModelOptions]="{ standalone: true }"
+        >
+          <option [ngValue]="0">— Select a known user or enter ID below —</option>
+          <option *ngFor="let u of knownUsers()" [ngValue]="u.id">
+            {{ u.name }} · {{ u.email }} (#{{ u.id }})
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">User ID <span class="required">*</span></label>
+        <input type="number" class="form-control" min="1" formControlName="userId" />
+        <span class="form-hint">Enter the user ID directly if the user isn't in the dropdown.</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Role <span class="required">*</span></label>
+        <select class="form-control" formControlName="roleId">
+          <option [ngValue]="0">— Select role —</option>
+          <option *ngFor="let r of availableRoles()" [ngValue]="r.id">{{ r.roleName }}</option>
+        </select>
+      </div>
+    </form>
+
+    <ng-container drawer-footer>
+      <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="closeDrawer()">Cancel</button>
+      <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+        {{ saving() ? 'Assigning…' : 'Assign Role' }}
+      </button>
+    </ng-container>
+  </hrm-drawer>
+</ng-container>

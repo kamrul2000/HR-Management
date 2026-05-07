@@ -1,0 +1,76 @@
+<hrm-page-header title="Permissions" subtitle="Toggle which actions each role can perform per module.">
+  <button type="button" class="btn btn--ghost-neutral" [disabled]="!dirty() || saving()" (click)="reset()">
+    <ng-icon name="heroArrowPath" size="14" />
+    Reset
+  </button>
+  <button type="button" class="btn btn--primary" [disabled]="!dirty() || saving()" (click)="save()">
+    <ng-icon name="heroCheck" size="14" />
+    {{ saving() ? 'Saving…' : 'Save Changes' }}
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="card">
+    <div class="card__body perm-toolbar">
+      <div class="form-group" style="margin: 0; flex: 1; max-width: 320px;">
+        <label class="form-label">Role</label>
+        <select class="form-control" [ngModel]="selectedRoleId()" (ngModelChange)="selectRole(+$event)">
+          <option [ngValue]="0" disabled>— Select a role —</option>
+          <option *ngFor="let r of roles()" [ngValue]="r.id">{{ r.roleName }}</option>
+        </select>
+      </div>
+      <div *ngIf="selectedRole() as r" class="text-muted text-sm">
+        Editing permissions for <strong>{{ r.roleName }}</strong>. Changes take effect immediately on save.
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="card mt-md"><div class="card__body"><hrm-loading-skeleton rows="6"></hrm-loading-skeleton></div></div>
+
+  <div *ngIf="!loading() && matrix().length > 0" class="card mt-md perm-matrix">
+    <table class="perm-table">
+      <thead>
+        <tr>
+          <th class="perm-table__module">Module</th>
+          <th *ngFor="let a of actions" class="text-center">
+            <div>{{ actionLabels[a] }}</div>
+            <div class="perm-table__select-all">
+              <button type="button" class="btn btn--ghost btn--sm" (click)="toggleAllForAction(a, true)">All</button>
+              <button type="button" class="btn btn--ghost-neutral btn--sm" (click)="toggleAllForAction(a, false)">None</button>
+            </div>
+          </th>
+          <th class="text-center" style="width: 100px;">Bulk</th>
+        </tr>
+      </thead>
+      <ng-container *ngFor="let g of grouped()">
+        <tbody>
+          <tr class="perm-table__group">
+            <td [attr.colspan]="actions.length + 2">{{ g.group }}</td>
+          </tr>
+          <tr *ngFor="let row of g.rows">
+            <td class="perm-table__module">
+              <div class="text-strong">{{ row.label }}</div>
+              <div class="text-muted text-xs text-mono">{{ row.code }}</div>
+            </td>
+            <td *ngFor="let a of actions" class="text-center">
+              <label class="perm-checkbox">
+                <input type="checkbox" [checked]="row[a]" (change)="toggle(row, a)" />
+                <span></span>
+              </label>
+            </td>
+            <td class="text-center">
+              <button type="button" class="btn btn--ghost btn--sm" (click)="toggleAllForRow(row, true)" title="Grant all">All</button>
+              <button type="button" class="btn btn--ghost-neutral btn--sm" (click)="toggleAllForRow(row, false)" title="Revoke all">None</button>
+            </td>
+          </tr>
+        </tbody>
+      </ng-container>
+    </table>
+  </div>
+
+  <div *ngIf="!loading() && roles().length === 0" class="card mt-md">
+    <div class="card__body text-center text-muted" style="padding: 32px;">
+      No active roles. Create a role first.
+    </div>
+  </div>
+</div>

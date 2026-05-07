@@ -1,0 +1,81 @@
+<hrm-page-header title="Roles" subtitle="Roles bundle the permissions assigned to users.">
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    New Role
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [showPagination]="false"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No roles defined"
+    emptyMessage="Create a role to start configuring permissions."
+  ></hrm-data-table>
+</div>
+
+<ng-template #countsTpl let-row>
+  <span class="text-mono text-sm">{{ row.userCount }} users</span>
+  <span class="text-muted text-xs"> · </span>
+  <span class="text-mono text-sm">{{ row.permissionCount }} perms</span>
+</ng-template>
+
+<ng-template #activeTpl let-row>
+  <hrm-status-badge
+    [variant]="row.isActive ? 'active' : 'inactive'"
+    [label]="row.isActive ? 'Active' : 'Inactive'"
+  ></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <a class="btn btn--ghost btn--sm" [routerLink]="['/access/permissions']" [queryParams]="{ roleId: row.id }">
+    <ng-icon name="heroLockClosed" size="14" />
+    Permissions
+  </a>
+  <button type="button" class="btn btn--ghost btn--sm" (click)="openEdit(row)">
+    <ng-icon name="heroPencilSquare" size="14" />
+    Edit
+  </button>
+  <button type="button" class="btn btn--ghost-neutral btn--sm" (click)="delete(row)">
+    <ng-icon name="heroTrash" size="14" />
+    Delete
+  </button>
+</ng-template>
+
+<ng-container *ngIf="drawerOpen()">
+  <hrm-drawer
+    [title]="isEdit() ? 'Edit Role' : 'New Role'"
+    [locked]="saving()"
+    (dismiss)="closeDrawer()"
+  >
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-group">
+        <label class="form-label">Role Name <span class="required">*</span></label>
+        <input type="text" class="form-control" formControlName="roleName" maxlength="100" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" rows="3" formControlName="description"></textarea>
+      </div>
+
+      <div *ngIf="isEdit()" class="form-group">
+        <label class="form-check">
+          <input type="checkbox" formControlName="isActive" />
+          <span>Active</span>
+        </label>
+      </div>
+    </form>
+
+    <ng-container drawer-footer>
+      <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="closeDrawer()">Cancel</button>
+      <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+        {{ saving() ? 'Saving…' : (isEdit() ? 'Save Changes' : 'Create Role') }}
+      </button>
+    </ng-container>
+  </hrm-drawer>
+</ng-container>

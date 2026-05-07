@@ -65,6 +65,10 @@ export const routes: Routes = [
         path: 'separation',
         loadChildren: () => import('./features/separation/separation.routes'),
       },
+      {
+        path: 'access',
+        loadChildren: () => import('./features/access/access.routes'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

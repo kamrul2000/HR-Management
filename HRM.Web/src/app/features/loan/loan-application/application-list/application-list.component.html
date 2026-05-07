@@ -1,0 +1,125 @@
+<hrm-page-header title="Loan Applications" subtitle="Submitted by employees, awaiting recommendation and approval.">
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    New Application
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event); onAnyFilterChange()"
+      >
+        <option value="">All statuses</option>
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="loanTypeFilter()"
+        (ngModelChange)="loanTypeFilter.set($event); onAnyFilterChange()"
+      >
+        <option value="">All loan types</option>
+        <option *ngFor="let t of loanTypes" [value]="t">{{ t }}</option>
+      </select>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [page]="pageState()"
+    [showPagination]="true"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No applications"
+    emptyMessage="Loan applications submitted by employees will appear here."
+    (pageChange)="onPageChange($event)"
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div style="display: inline-flex; align-items: center; gap: 10px;">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #typeCellTpl let-row>
+  <span class="text-sm">{{ row.loanTypeLabel || row.loanType }}</span>
+</ng-template>
+
+<ng-template #amountCellTpl let-row>
+  <span class="text-mono">{{ row.requestedAmount | currencyBd }}</span>
+</ng-template>
+
+<ng-template #emiCellTpl let-row>
+  <span class="text-mono">{{ row.estimatedMonthlyInstallment | currencyBd }}</span>
+</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge [variant]="row.status" [label]="row.statusLabel || row.status"></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <a
+    class="btn btn--ghost btn--sm"
+    [routerLink]="['/loans/applications', row.id]"
+    title="View"
+  >
+    <ng-icon name="heroEye" size="14" />
+    View
+  </a>
+  <button
+    *ngIf="row.status === 'Pending'"
+    type="button"
+    class="btn btn--ghost-neutral btn--sm"
+    (click)="openCancel(row)"
+  >
+    <ng-icon name="heroXMark" size="14" />
+    Cancel
+  </button>
+</ng-template>
+
+<!-- Create application drawer -->
+<hrm-loan-application-form
+  *ngIf="drawerOpen()"
+  (saved)="onCreated()"
+  (dismiss)="closeCreate()"
+></hrm-loan-application-form>
+
+<!-- Cancel reason drawer -->
+<ng-container *ngIf="cancelOpen() as row">
+  <hrm-drawer
+    title="Cancel Application"
+    [subtitle]="row.applicationNo + ' · ' + row.employeeFullName"
+    [locked]="busy()"
+    (dismiss)="closeCancel()"
+  >
+    <div class="form-group">
+      <label class="form-label">Reason <span class="required">*</span></label>
+      <textarea
+        class="form-control"
+        rows="3"
+        [ngModel]="cancelReason()"
+        (ngModelChange)="cancelReason.set($event)"
+        placeholder="Why is this application being cancelled?"
+      ></textarea>
+    </div>
+
+    <ng-container drawer-footer>
+      <button type="button" class="btn btn--secondary" [disabled]="busy()" (click)="closeCancel()">Back</button>
+      <button type="button" class="btn btn--danger" [disabled]="busy()" (click)="confirmCancel()">
+        {{ busy() ? 'Cancelling…' : 'Cancel Application' }}
+      </button>
+    </ng-container>
+  </hrm-drawer>
+</ng-container>

@@ -1,0 +1,98 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+.loan-detail {
+  &__cols {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: $spacing-md;
+
+    @include mobile { grid-template-columns: 1fr; }
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+
+    h2 { margin: 0; font-size: $text-xl; font-weight: 600; }
+    p { margin: 4px 0 0; font-size: $text-sm; }
+  }
+
+  &__head-info { flex: 1; }
+
+  &__status { margin-left: auto; }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-md;
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid $neutral-100;
+    border-bottom: 1px solid $neutral-100;
+
+    > div { display: flex; flex-direction: column; }
+    .text-label { font-size: $text-xs; }
+    strong { font-size: $text-md; color: $neutral-900; }
+
+    @include mobile { grid-template-columns: 1fr; }
+  }
+
+  &__purpose {
+    padding: $spacing-md $spacing-lg;
+
+    p { margin: 4px 0 0; color: $neutral-700; line-height: 1.5; }
+  }
+
+  &__attachment {
+    padding: 0 $spacing-lg $spacing-md;
+  }
+}
+
+.loan-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: $neutral-200;
+  }
+
+  &__item {
+    position: relative;
+    padding: 0 0 $spacing-md $spacing-xl;
+
+    &:last-child { padding-bottom: 0; }
+  }
+
+  &__dot {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: $neutral-300;
+    box-shadow: 0 0 0 3px #fff;
+  }
+
+  &__item--done .loan-timeline__dot { background: $brand-primary; }
+  &__item--current .loan-timeline__dot { background: #F59E0B; animation: pulse 1.6s ease-in-out infinite; }
+  &__item--rejected .loan-timeline__dot { background: #DC2626; }
+
+  &__title { font-weight: 600; color: $neutral-900; font-size: $text-sm; }
+  &__date  { color: $neutral-500; font-size: $text-xs; margin-top: 2px; }
+  &__desc  { color: $neutral-700; font-size: $text-sm; margin-top: 4px; line-height: 1.45; }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 3px #fff, 0 0 0 6px rgba(245, 158, 11, 0.25); }
+  50%      { box-shadow: 0 0 0 3px #fff, 0 0 0 10px rgba(245, 158, 11, 0); }
+}

@@ -1,0 +1,113 @@
+<hrm-page-header
+  [title]="application() ? 'Application ' + application()!.applicationNo : 'Loan Application'"
+  [subtitle]="application()?.employeeFullName || ''"
+>
+  <a routerLink="/loans/applications" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+  <button *ngIf="canRecommend()" type="button" class="btn btn--primary" (click)="openRecommend()">
+    <ng-icon name="heroDocumentText" size="14" />
+    Recommend
+  </button>
+  <button *ngIf="canApprove()" type="button" class="btn btn--primary" (click)="openApprove()">
+    <ng-icon name="heroCheck" size="14" />
+    Approve / Reject
+  </button>
+  <button *ngIf="canDisburse()" type="button" class="btn btn--primary" (click)="openDisburse()">
+    <ng-icon name="heroPaperAirplane" size="14" />
+    Disburse
+  </button>
+</hrm-page-header>
+
+<div class="page-content" *ngIf="loading()">
+  <div class="card"><div class="card__body"><hrm-loading-skeleton rows="6"></hrm-loading-skeleton></div></div>
+</div>
+
+<div *ngIf="!loading() && application() as app" class="page-content">
+  <div class="loan-detail__cols">
+    <div class="card">
+      <div class="card__body loan-detail__head">
+        <hrm-avatar [name]="app.employeeFullName" [size]="56"></hrm-avatar>
+        <div class="loan-detail__head-info">
+          <h2>{{ app.employeeFullName }} <span class="text-muted text-sm text-mono">{{ app.employeeCode }}</span></h2>
+          <p class="text-muted">{{ app.loanTypeLabel || app.loanType }} · Submitted {{ app.createdAt | date: 'mediumDate' }}</p>
+        </div>
+        <hrm-status-badge [variant]="app.status" [label]="app.statusLabel || app.status" class="loan-detail__status"></hrm-status-badge>
+      </div>
+
+      <div class="loan-detail__grid">
+        <div>
+          <span class="text-label">Requested Amount</span>
+          <strong>{{ app.requestedAmount | currencyBd }}</strong>
+        </div>
+        <div>
+          <span class="text-label">Tenure</span>
+          <strong>{{ app.requestedTenureMonths }} months</strong>
+        </div>
+        <div>
+          <span class="text-label">Estimated EMI</span>
+          <strong>{{ app.estimatedMonthlyInstallment | currencyBd }}</strong>
+        </div>
+      </div>
+
+      <div class="loan-detail__purpose">
+        <h4 class="text-label">Purpose</h4>
+        <p>{{ app.purpose }}</p>
+      </div>
+
+      <div *ngIf="app.attachmentUrl" class="loan-detail__attachment">
+        <a [href]="app.attachmentUrl" target="_blank" rel="noopener" class="btn btn--ghost btn--sm">
+          <ng-icon name="heroDocumentText" size="14" />
+          View attachment
+        </a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__header"><h3>Workflow</h3></div>
+      <div class="card__body">
+        <ol class="loan-timeline">
+          <li *ngFor="let ev of timeline()" [class]="'loan-timeline__item loan-timeline__item--' + ev.state">
+            <span class="loan-timeline__dot"></span>
+            <div class="loan-timeline__body">
+              <div class="loan-timeline__title">{{ ev.title }}</div>
+              <div *ngIf="ev.date" class="loan-timeline__date">{{ ev.date | date: 'medium' }}</div>
+              <div *ngIf="ev.description" class="loan-timeline__desc">{{ ev.description }}</div>
+            </div>
+          </li>
+        </ol>
+
+        <div *ngIf="disbursedLoanId() as lid" style="margin-top: 16px;">
+          <button type="button" class="btn btn--primary btn--sm" (click)="goToLoan()">
+            <ng-icon name="heroBanknotes" size="14" />
+            View active loan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hrm-loan-recommendation-drawer
+  *ngIf="recommendOpen() && application() as app"
+  [application]="app"
+  (saved)="onRecommended()"
+  (dismiss)="closeRecommend()"
+></hrm-loan-recommendation-drawer>
+
+<hrm-loan-approval-drawer
+  *ngIf="approveOpen() && application() as app"
+  [application]="app"
+  [recommendation]="recommendation()"
+  (saved)="onApproved()"
+  (dismiss)="closeApprove()"
+></hrm-loan-approval-drawer>
+
+<hrm-loan-disburse-drawer
+  *ngIf="disburseOpen() && application() as app"
+  [application]="app"
+  [approval]="approval()"
+  (saved)="onDisbursed($event)"
+  (dismiss)="closeDisburse()"
+></hrm-loan-disburse-drawer>

@@ -1,0 +1,87 @@
+<hrm-page-header title="Gratuity Setup" subtitle="Define how gratuity is calculated for separated employees.">
+  <button type="button" class="btn btn--secondary" (click)="openPreview()">
+    <ng-icon name="heroCalculator" size="14" />
+    Preview Calculation
+  </button>
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    New Rule
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div *ngIf="loading()" class="card"><div class="card__body"><hrm-loading-skeleton rows="4"></hrm-loading-skeleton></div></div>
+
+  <div *ngIf="!loading()" class="rule-grid">
+    <div *ngFor="let rule of rules()" class="rule-card">
+      <div class="rule-card__head">
+        <div>
+          <h3>{{ rule.ruleName }}</h3>
+          <p class="text-muted text-sm">Effective from {{ rule.effectiveFromFormatted || (rule.effectiveFrom | date: 'mediumDate') }}</p>
+        </div>
+        <hrm-status-badge
+          [variant]="rule.isActive ? 'active' : 'inactive'"
+          [label]="rule.isActive ? 'Active' : 'Inactive'"
+        ></hrm-status-badge>
+      </div>
+
+      <div class="rule-card__grid">
+        <div>
+          <span class="text-label">Min Service</span>
+          <strong>{{ rule.minServiceYearsLabel || (rule.minServiceYears + ' yrs') }}</strong>
+        </div>
+        <div>
+          <span class="text-label">Calculation Basis</span>
+          <strong>{{ rule.calculationBasisLabel || rule.calculationBasis }}</strong>
+        </div>
+        <div>
+          <span class="text-label">Rate per Year</span>
+          <strong>{{ rule.ratePerYearLabel || (rule.ratePerYear + ' days') }}</strong>
+        </div>
+        <div>
+          <span class="text-label">Pro-Rata</span>
+          <strong>{{ rule.proRataLabel || (rule.proRataEnabled ? 'Enabled' : 'Disabled') }}</strong>
+        </div>
+        <div *ngIf="rule.maxGratuityAmount">
+          <span class="text-label">Max Gratuity</span>
+          <strong>{{ rule.maxGratuityAmount | currencyBd }}</strong>
+        </div>
+        <div *ngIf="rule.maxServiceYearsCapped">
+          <span class="text-label">Service Cap</span>
+          <strong>{{ rule.maxServiceYearsCappedLabel || (rule.maxServiceYearsCapped + ' yrs') }}</strong>
+        </div>
+      </div>
+
+      <p *ngIf="rule.description" class="rule-card__desc">{{ rule.description }}</p>
+
+      <div class="rule-card__actions">
+        <button type="button" class="btn btn--ghost btn--sm" (click)="openEdit(rule)">
+          <ng-icon name="heroPencilSquare" size="14" />
+          Edit
+        </button>
+        <button type="button" class="btn btn--ghost-neutral btn--sm" (click)="delete(rule)">
+          <ng-icon name="heroTrash" size="14" />
+          Delete
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="rules().length === 0" class="card">
+      <div class="card__body text-center text-muted" style="padding: 32px;">
+        No gratuity rules defined. Click <strong>New Rule</strong> to create one.
+      </div>
+    </div>
+  </div>
+</div>
+
+<hrm-gratuity-rule-form
+  *ngIf="drawerOpen()"
+  [editing]="editing()"
+  (saved)="onSaved()"
+  (dismiss)="closeDrawer()"
+></hrm-gratuity-rule-form>
+
+<hrm-gratuity-preview-drawer
+  *ngIf="previewOpen()"
+  (dismiss)="closePreview()"
+></hrm-gratuity-preview-drawer>

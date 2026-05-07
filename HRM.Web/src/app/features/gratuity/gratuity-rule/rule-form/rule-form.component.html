@@ -1,0 +1,76 @@
+<hrm-drawer
+  [title]="isEdit() ? 'Edit Gratuity Rule' : 'New Gratuity Rule'"
+  subtitle="Eligibility threshold and per-year calculation."
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-group">
+      <label class="form-label">Rule Name <span class="required">*</span></label>
+      <input type="text" class="form-control" formControlName="ruleName" maxlength="100" />
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="form-group">
+        <label class="form-label">Min Service (Years) <span class="required">*</span></label>
+        <input type="number" class="form-control" min="0.5" max="10" step="0.5" formControlName="minServiceYears" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Calculation Basis <span class="required">*</span></label>
+        <select class="form-control" formControlName="calculationBasis">
+          <option value="Basic">Basic Salary</option>
+          <option value="Gross">Gross Salary</option>
+          <option value="LastDrawn">Last Drawn</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Days per Service Year <span class="required">*</span></label>
+      <input type="number" class="form-control" min="0.01" max="60" step="0.5" formControlName="ratePerYear" />
+      <span class="form-hint">e.g. 30 means one month's salary per year of service.</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="form-group">
+        <label class="form-label">Max Gratuity Amount</label>
+        <input type="number" class="form-control" min="1" step="0.01" formControlName="maxGratuityAmount" placeholder="No cap" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Max Service Years Capped</label>
+        <input type="number" class="form-control" min="1" max="40" formControlName="maxServiceYearsCapped" placeholder="No cap" />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-check">
+        <input type="checkbox" formControlName="proRataEnabled" />
+        <span>Enable pro-rata for partial years of service</span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Effective From <span class="required">*</span></label>
+      <input type="date" class="form-control" formControlName="effectiveFrom" />
+    </div>
+
+    <div *ngIf="isEdit()" class="form-group">
+      <label class="form-check">
+        <input type="checkbox" formControlName="isActive" />
+        <span>Active</span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-control" rows="2" formControlName="description"></textarea>
+    </div>
+  </form>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="dismiss.emit()">Cancel</button>
+    <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+      {{ saving() ? 'Saving…' : (isEdit() ? 'Save Changes' : 'Create Rule') }}
+    </button>
+  </ng-container>
+</hrm-drawer>

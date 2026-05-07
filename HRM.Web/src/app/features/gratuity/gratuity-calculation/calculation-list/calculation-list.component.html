@@ -1,0 +1,97 @@
+<hrm-page-header title="Gratuity Calculations" subtitle="Saved calculations awaiting finalization or settlement.">
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    Compute Gratuity
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div *ngIf="report() as r" class="stat-strip">
+    <div class="stat-card stat-card--total">
+      <div class="stat-card__label">Total Records</div>
+      <div class="stat-card__value">{{ r.totalRecords }}</div>
+    </div>
+    <div class="stat-card stat-card--eligible">
+      <div class="stat-card__label">Eligible</div>
+      <div class="stat-card__value">{{ r.eligibleCount }}</div>
+    </div>
+    <div class="stat-card stat-card--ineligible">
+      <div class="stat-card__label">Ineligible</div>
+      <div class="stat-card__value">{{ r.ineligibleCount }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__label">Total Gratuity Amount</div>
+      <div class="stat-card__value">{{ r.totalGratuityAmount | currencyBd }}</div>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [showPagination]="false"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No gratuity calculations"
+    emptyMessage="Click Compute Gratuity to start a new calculation."
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div style="display: inline-flex; align-items: center; gap: 10px;">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #serviceTpl let-row>
+  <span class="text-sm">{{ row.servicePeriodLabel || (row.totalServiceYears + ' yrs') }}</span>
+</ng-template>
+
+<ng-template #amountTpl let-row>
+  <strong class="text-mono">{{ row.gratuityAmount | currencyBd }}</strong>
+  <span *ngIf="row.isCapApplied" class="text-muted text-xs"> · capped</span>
+</ng-template>
+
+<ng-template #eligibleTpl let-row>
+  <hrm-status-badge
+    [variant]="row.isEligible ? 'eligible' : 'ineligible'"
+    [label]="row.isEligible ? 'Yes' : 'No'"
+  ></hrm-status-badge>
+</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge [variant]="row.status" [label]="row.statusLabel || row.status"></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <button
+    *ngIf="row.status === 'Draft' && row.isEligible"
+    type="button"
+    class="btn btn--ghost btn--sm"
+    style="color: #16A34A"
+    (click)="finalize(row)"
+  >
+    <ng-icon name="heroCheck" size="14" />
+    Finalize
+  </button>
+  <button
+    *ngIf="row.status === 'Draft'"
+    type="button"
+    class="btn btn--ghost-neutral btn--sm"
+    (click)="cancel(row)"
+  >
+    <ng-icon name="heroXMark" size="14" />
+    Cancel
+  </button>
+  <span *ngIf="row.status !== 'Draft'" class="text-muted text-xs">—</span>
+</ng-template>
+
+<hrm-compute-gratuity-drawer
+  *ngIf="drawerOpen()"
+  (saved)="onSaved()"
+  (dismiss)="closeDrawer()"
+></hrm-compute-gratuity-drawer>

@@ -1,0 +1,93 @@
+<hrm-drawer
+  title="Preview Gratuity"
+  subtitle="Run a hypothetical gratuity calculation without saving."
+  [locked]="running()"
+  (dismiss)="dismiss.emit()"
+>
+  <form [formGroup]="form" (ngSubmit)="preview()" autocomplete="off">
+    <div class="form-group" style="position: relative;">
+      <label class="form-label">Employee <span class="required">*</span></label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search employee by name or code…"
+        [value]="form.value.employeeLabel || ''"
+        (input)="onEmployeeSearch($any($event.target).value)"
+      />
+      <ul *ngIf="searchResults().length > 0" class="emp-autocomplete">
+        <li *ngFor="let emp of searchResults()" (click)="pickEmployee(emp)">
+          <strong>{{ emp.fullName }}</strong>
+          <span class="text-muted text-xs"> · {{ emp.employeeCode }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Separation Date <span class="required">*</span></label>
+      <input type="date" class="form-control" formControlName="separationDate" />
+    </div>
+
+    <button type="submit" class="btn btn--primary" [disabled]="running()" style="margin-bottom: 16px;">
+      {{ running() ? 'Calculating…' : 'Calculate Preview' }}
+    </button>
+  </form>
+
+  <div *ngIf="result() as r">
+    <div *ngIf="!r.isEligible" class="ineligible">
+      <strong>Not eligible:</strong> {{ r.ineligibilityReason || 'Service period below minimum.' }}
+    </div>
+
+    <div *ngIf="r.isEligible" class="summary">
+      <div class="summary__label">Gratuity Amount</div>
+      <div class="summary__value">{{ r.gratuityAmount | currencyBd }}</div>
+      <div *ngIf="r.isCapApplied" class="summary__cap">⚠ Maximum cap applied</div>
+    </div>
+
+    <div class="grid">
+      <div>
+        <div class="grid__label">Joining Date</div>
+        <div class="grid__value">{{ r.joiningDateFormatted || (r.joiningDate | date: 'mediumDate') }}</div>
+      </div>
+      <div>
+        <div class="grid__label">Separation Date</div>
+        <div class="grid__value">{{ r.separationDateFormatted || (r.separationDate | date: 'mediumDate') }}</div>
+      </div>
+      <div>
+        <div class="grid__label">Service Period</div>
+        <div class="grid__value">{{ r.servicePeriodLabel || (r.totalServiceYears + ' years') }}</div>
+      </div>
+      <div>
+        <div class="grid__label">Eligible Years</div>
+        <div class="grid__value">{{ r.eligibleYears }}</div>
+      </div>
+      <div>
+        <div class="grid__label">Calculation Basis</div>
+        <div class="grid__value">{{ r.calculationBasis }}</div>
+      </div>
+      <div>
+        <div class="grid__label">Rule Applied</div>
+        <div class="grid__value">{{ r.ruleName }}</div>
+      </div>
+      <div>
+        <div class="grid__label">Monthly Salary</div>
+        <div class="grid__value">{{ r.monthlySalaryUsed | currencyBd }}</div>
+      </div>
+      <div>
+        <div class="grid__label">Daily Salary</div>
+        <div class="grid__value">{{ r.dailySalary | currencyBd }}</div>
+      </div>
+      <div>
+        <div class="grid__label">Days/Year Rate</div>
+        <div class="grid__value">{{ r.ratePerYear }}</div>
+      </div>
+      <div *ngIf="r.isCapApplied">
+        <div class="grid__label">Before Cap</div>
+        <div class="grid__value">{{ r.gratuityBeforeCap | currencyBd }}</div>
+      </div>
+    </div>
+  </div>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--secondary" (click)="dismiss.emit()">Close</button>
+  </ng-container>
+</hrm-drawer>

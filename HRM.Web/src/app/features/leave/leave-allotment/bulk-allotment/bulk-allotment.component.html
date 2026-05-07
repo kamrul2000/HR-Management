@@ -1,0 +1,172 @@
+<hrm-page-header title="Bulk Leave Allotment" subtitle="Allocate the same leave days to many employees in one action.">
+  <a routerLink="../allotments" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <ng-container *ngIf="!result(); else resultTpl">
+    <!-- Configuration card -->
+    <div class="card">
+      <div class="card__header"><h3>Allotment Details</h3></div>
+      <div class="card__body">
+        <div class="form-grid form-grid--3">
+          <div class="form-group">
+            <label class="form-label">Year <span class="required">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              min="2000"
+              max="2100"
+              [ngModel]="year()"
+              (ngModelChange)="year.set(+$event)"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Leave Type <span class="required">*</span></label>
+            <select
+              class="form-control"
+              [ngModel]="leaveTypeId()"
+              (ngModelChange)="leaveTypeId.set($event ? +$event : null)"
+            >
+              <option [ngValue]="null">Select a leave type</option>
+              <option *ngFor="let t of leaveTypeOptions()" [ngValue]="t.id">
+                {{ t.name }} ({{ t.code }})
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Allocated Days <span class="required">*</span></label>
+            <input
+              type="number"
+              class="form-control"
+              min="0"
+              max="365"
+              step="0.5"
+              [ngModel]="allocatedDays()"
+              (ngModelChange)="allocatedDays.set(+$event)"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audience card -->
+    <div class="card mt-md">
+      <div class="card__header">
+        <h3>Audience</h3>
+        <div class="bulk-allot__scope">
+          <button
+            type="button"
+            class="bulk-allot__scope-btn"
+            [class.is-active]="scope() === 'branch'"
+            (click)="setScope('branch')"
+          >
+            <ng-icon name="heroBuildingOffice2" size="14" />
+            All in Branch
+          </button>
+          <button
+            type="button"
+            class="bulk-allot__scope-btn"
+            [class.is-active]="scope() === 'manual'"
+            (click)="setScope('manual')"
+          >
+            <ng-icon name="heroUsers" size="14" />
+            Pick Manually
+          </button>
+        </div>
+      </div>
+      <div class="card__body">
+        <div *ngIf="scope() === 'branch'" class="form-group" style="max-width: 360px;">
+          <label class="form-label">Branch <span class="required">*</span></label>
+          <select
+            class="form-control"
+            [ngModel]="branchId()"
+            (ngModelChange)="onBranchChange($event ? +$event : null)"
+          >
+            <option [ngValue]="null">Select a branch</option>
+            <option *ngFor="let b of branchOptions()" [ngValue]="b.id">{{ b.name }}</option>
+          </select>
+          <span class="form-hint" *ngIf="branchId()">{{ employees$().length }} active employees in this branch.</span>
+        </div>
+
+        <div *ngIf="scope() === 'manual'">
+          <div class="bulk-allot__pick-head">
+            <span class="text-muted text-sm">{{ selectedIds().size }} of {{ employees$().length }} selected</span>
+            <div>
+              <button type="button" class="btn btn--ghost btn--sm" (click)="selectAll()">Select all</button>
+              <button type="button" class="btn btn--ghost-neutral btn--sm" (click)="clearSelection()">Clear</button>
+            </div>
+          </div>
+
+          <hrm-loading-skeleton *ngIf="loadingEmployees()" rows="4"></hrm-loading-skeleton>
+
+          <div *ngIf="!loadingEmployees()" class="bulk-allot__grid">
+            <label *ngFor="let emp of employees$()" class="bulk-allot__chip" [class.is-selected]="isSelected(emp.id)">
+              <input type="checkbox" [checked]="isSelected(emp.id)" (change)="toggleEmployee(emp.id)" />
+              <hrm-avatar [name]="emp.fullName" [size]="28"></hrm-avatar>
+              <div>
+                <div class="text-strong">{{ emp.fullName }}</div>
+                <div class="text-muted text-xs text-mono">{{ emp.employeeCode }}</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="card__footer">
+        <span class="text-muted text-sm">{{ targetCount() }} employees will receive {{ allocatedDays() }} day(s) of leave.</span>
+        <button
+          type="button"
+          class="btn btn--primary"
+          [disabled]="!canSubmit()"
+          (click)="submit()"
+        >
+          {{ submitting() ? 'Submitting…' : 'Submit Bulk Allotment' }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Result -->
+  <ng-template #resultTpl>
+    <div *ngIf="result() as r" class="card bulk-allot__result">
+      <div class="card__body">
+        <div class="bulk-allot__result-icon">
+          <ng-icon name="heroCheckCircle" size="44" />
+        </div>
+        <h3>Bulk allotment completed</h3>
+
+        <div class="bulk-allot__stats">
+          <div class="bulk-allot__stat" data-tone="success">
+            <span class="text-label">Created</span>
+            <strong>{{ r.successCount }}</strong>
+          </div>
+          <div class="bulk-allot__stat" data-tone="warn">
+            <span class="text-label">Skipped</span>
+            <strong>{{ r.skippedCount }}</strong>
+          </div>
+          <div class="bulk-allot__stat" data-tone="danger">
+            <span class="text-label">Failed</span>
+            <strong>{{ r.failedCount }}</strong>
+          </div>
+        </div>
+
+        <div *ngIf="r.skippedReasons?.length" class="bulk-allot__reasons">
+          <h4 class="text-label">Skipped</h4>
+          <ul><li *ngFor="let m of r.skippedReasons">{{ m }}</li></ul>
+        </div>
+
+        <div *ngIf="r.failedReasons?.length" class="bulk-allot__reasons">
+          <h4 class="text-label">Failed</h4>
+          <ul><li *ngFor="let m of r.failedReasons">{{ m }}</li></ul>
+        </div>
+
+        <div class="bulk-allot__result-actions">
+          <button type="button" class="btn btn--secondary" (click)="startOver()">Run another</button>
+          <button type="button" class="btn btn--primary" (click)="goToList()">View Allotments</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

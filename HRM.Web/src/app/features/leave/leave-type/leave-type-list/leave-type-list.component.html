@@ -1,0 +1,103 @@
+<hrm-page-header title="Leave Types" subtitle="Categories of leave and their policies.">
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    Add Leave Type
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field toolbar__field--grow">
+      <div class="leave-type-search">
+        <ng-icon name="heroMagnifyingGlass" size="16" />
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Search by name, code, description…"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+        />
+      </div>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="filtered()"
+    [loading]="loading()"
+    [showPagination]="false"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No leave types yet"
+    emptyMessage="Create your first leave type — Annual, Sick, Casual, etc."
+  ></hrm-data-table>
+</div>
+
+<ng-template #paidCellTpl let-row>
+  <span class="leave-type-pill" [class.is-yes]="row.isPaid" [class.is-no]="!row.isPaid">
+    {{ row.isPaid ? 'Paid' : 'Unpaid' }}
+  </span>
+</ng-template>
+
+<ng-template #carryCellTpl let-row>
+  <ng-container *ngIf="row.isCarryForward; else dashTpl">
+    <span class="text-strong">{{ row.maxCarryForwardDays }}</span>
+    <span class="text-muted text-xs"> days</span>
+  </ng-container>
+</ng-template>
+
+<ng-template #approvalCellTpl let-row>
+  <ng-icon
+    *ngIf="row.requiresApproval"
+    name="heroCheck"
+    size="16"
+    class="leave-type-icon leave-type-icon--yes"
+  />
+  <ng-icon
+    *ngIf="!row.requiresApproval"
+    name="heroXMark"
+    size="16"
+    class="leave-type-icon leave-type-icon--no"
+  />
+</ng-template>
+
+<ng-template #docCellTpl let-row>
+  <ng-icon
+    *ngIf="row.requiresDocument"
+    name="heroCheck"
+    size="16"
+    class="leave-type-icon leave-type-icon--yes"
+  />
+  <ng-icon
+    *ngIf="!row.requiresDocument"
+    name="heroXMark"
+    size="16"
+    class="leave-type-icon leave-type-icon--no"
+  />
+</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge
+    [variant]="row.isActive ? 'active' : 'inactive'"
+    [label]="row.isActive ? 'Active' : 'Inactive'"
+  ></hrm-status-badge>
+</ng-template>
+
+<ng-template #dashTpl><span class="text-muted">—</span></ng-template>
+
+<ng-template #actionsTpl let-row>
+  <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="openEdit(row)" aria-label="Edit">
+    <ng-icon name="heroPencilSquare" size="16" />
+  </button>
+  <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="delete(row)" aria-label="Delete">
+    <ng-icon name="heroTrash" size="16" />
+  </button>
+</ng-template>
+
+<ng-container *ngIf="drawerOpen()">
+  <hrm-leave-type-form
+    [leaveType]="editing()"
+    (saved)="onSaved($event)"
+    (dismiss)="closeDrawer()"
+  ></hrm-leave-type-form>
+</ng-container>

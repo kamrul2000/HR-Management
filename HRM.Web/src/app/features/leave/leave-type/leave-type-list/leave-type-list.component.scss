@@ -1,0 +1,31 @@
+@use 'styles/variables' as *;
+
+.leave-type-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  ng-icon {
+    position: absolute;
+    left: 12px;
+    color: $neutral-400;
+    pointer-events: none;
+  }
+  .form-control { padding-left: 36px; }
+}
+
+.leave-type-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: $text-xs;
+  font-weight: 600;
+
+  &.is-yes { background: $success-light; color: $success; }
+  &.is-no  { background: $neutral-100;   color: $neutral-600; }
+}
+
+.leave-type-icon {
+  &--yes { color: $success; }
+  &--no  { color: $neutral-300; }
+}

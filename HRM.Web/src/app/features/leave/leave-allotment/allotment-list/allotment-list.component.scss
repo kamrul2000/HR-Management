@@ -1,0 +1,52 @@
+@use 'styles/variables' as *;
+
+.allot-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  ng-icon {
+    position: absolute;
+    left: 12px;
+    color: $neutral-400;
+    pointer-events: none;
+  }
+  .form-control { padding-left: 36px; }
+}
+
+.allot-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.allot-remaining {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &__bar {
+    flex: 1;
+    height: 8px;
+    background: $neutral-100;
+    border-radius: 99px;
+    overflow: hidden;
+    min-width: 80px;
+
+    span {
+      display: block;
+      height: 100%;
+      background: $success;
+      border-radius: 99px;
+      transition: width $transition-base;
+    }
+
+    &[data-tone="warn"] span { background: $warning; }
+    &[data-tone="low"]  span { background: $danger; }
+  }
+
+  &__text {
+    white-space: nowrap;
+    font-size: $text-sm;
+  }
+}

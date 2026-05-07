@@ -1,0 +1,120 @@
+<hrm-drawer
+  [title]="isEdit ? 'Edit Leave Type' : 'Add Leave Type'"
+  [subtitle]="isEdit ? 'Update policy and rules.' : 'Create a new leave category and its rules.'"
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label class="form-label">Name <span class="required">*</span></label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="name"
+          placeholder="Annual Leave"
+          [class.is-invalid]="hasError('name', 'required')"
+        />
+        <span class="form-error" *ngIf="hasError('name', 'required')">Required.</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Code <span class="required">*</span></label>
+        <input
+          type="text"
+          class="form-control text-mono"
+          formControlName="code"
+          placeholder="AL"
+          maxlength="20"
+          [class.is-invalid]="hasError('code', 'required')"
+        />
+        <span class="form-hint">Short, unique within the tenant.</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-control" formControlName="description" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Policy</label>
+
+      <div class="leave-type-form__toggles">
+        <label class="company-form__toggle">
+          <input type="checkbox" formControlName="isPaid" />
+          <span>Paid leave</span>
+        </label>
+        <label class="company-form__toggle">
+          <input type="checkbox" formControlName="requiresApproval" />
+          <span>Requires HR approval</span>
+        </label>
+        <label class="company-form__toggle">
+          <input type="checkbox" formControlName="requiresDocument" />
+          <span>Requires supporting document</span>
+        </label>
+        <label class="company-form__toggle">
+          <input type="checkbox" formControlName="isCarryForward" />
+          <span>Carries forward to next year</span>
+        </label>
+      </div>
+    </div>
+
+    <div *ngIf="form.value.isCarryForward" class="form-group">
+      <label class="form-label">Max Carry Forward Days <span class="required">*</span></label>
+      <input
+        type="number"
+        class="form-control"
+        formControlName="maxCarryForwardDays"
+        min="0"
+        max="365"
+      />
+    </div>
+
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label class="form-label">Min Notice (days) <span class="required">*</span></label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="minNoticeDays"
+          min="0"
+          max="90"
+        />
+        <span class="form-hint">Apply at least N days before the start date.</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Max Consecutive Days</label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="maxConsecutiveDays"
+          min="1"
+          max="365"
+          placeholder="No limit"
+        />
+        <span class="form-hint">Optional cap on a single application.</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Gender Restriction</label>
+      <select class="form-control" formControlName="genderRestriction">
+        <option *ngFor="let g of genders" [value]="g.value">{{ g.label }}</option>
+      </select>
+    </div>
+
+    <div *ngIf="isEdit" class="form-group">
+      <label class="company-form__toggle">
+        <input type="checkbox" formControlName="isActive" />
+        <span>Leave type is active</span>
+      </label>
+    </div>
+  </form>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="dismiss.emit()">Cancel</button>
+    <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+      {{ saving() ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Leave Type' }}
+    </button>
+  </ng-container>
+</hrm-drawer>

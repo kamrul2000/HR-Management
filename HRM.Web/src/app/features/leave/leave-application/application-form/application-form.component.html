@@ -1,0 +1,106 @@
+<hrm-page-header title="New Leave Application" subtitle="Submit a leave request for an employee.">
+  <a routerLink="/leave/applications" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="card app-form">
+    <div class="card__body">
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-group" style="position: relative;">
+          <label class="form-label">Employee <span class="required">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            [ngModel]="form.value.employeeLabel"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onEmployeeSearch($event)"
+            placeholder="Search by name or code…"
+            [class.is-invalid]="hasError('employeeId', 'min')"
+          />
+          <ul *ngIf="searchResults().length > 0" class="emp-autocomplete">
+            <li *ngFor="let emp of searchResults()" (click)="pickEmployee(emp)">
+              <strong>{{ emp.fullName }}</strong>
+              <span class="text-muted text-mono"> · {{ emp.employeeCode }}</span>
+            </li>
+          </ul>
+          <span class="form-error" *ngIf="hasError('employeeId', 'min')">Please pick an employee.</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Leave Type <span class="required">*</span></label>
+          <select
+            class="form-control"
+            formControlName="leaveTypeId"
+            [class.is-invalid]="hasError('leaveTypeId', 'min')"
+          >
+            <option [ngValue]="0" disabled>Select a leave type</option>
+            <option *ngFor="let t of leaveTypeOptions()" [ngValue]="t.id">
+              {{ t.name }} ({{ t.code }})
+            </option>
+          </select>
+          <div class="app-form__balance" *ngIf="balance() as b">
+            Balance: <strong>{{ b.remainingDays }} day(s)</strong>
+            <span class="text-muted text-xs"> · {{ b.usedDays }} used / {{ b.allocatedDays }} allocated</span>
+          </div>
+          <div class="app-form__balance app-form__balance--loading" *ngIf="balanceLoading()">Checking balance…</div>
+        </div>
+
+        <div class="form-grid form-grid--2">
+          <div class="form-group">
+            <label class="form-label">From Date <span class="required">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="fromDate"
+              [class.is-invalid]="hasError('fromDate', 'required')"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">To Date <span class="required">*</span></label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="toDate"
+              [class.is-invalid]="hasError('toDate', 'required')"
+            />
+          </div>
+        </div>
+
+        <div *ngIf="workingDays() !== null" class="app-form__effective">
+          <ng-container *ngIf="workingDays()! > 0; else noEffective">
+            Effective working days: <strong>{{ workingDays() }}</strong>
+            <span class="text-muted text-xs"> (excludes weekends &amp; holidays)</span>
+          </ng-container>
+          <ng-template #noEffective>
+            <div class="app-form__warning">
+              <ng-icon name="heroExclamationTriangle" size="16" />
+              All selected days are off-days or holidays — adjust the dates.
+            </div>
+          </ng-template>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason <span class="required">*</span></label>
+          <textarea
+            class="form-control"
+            formControlName="reason"
+            rows="4"
+            placeholder="Describe the reason for the leave"
+            [class.is-invalid]="hasError('reason', 'required')"
+          ></textarea>
+          <span class="form-error" *ngIf="hasError('reason', 'required')">Required.</span>
+        </div>
+      </form>
+    </div>
+    <div class="card__footer">
+      <a routerLink="/leave/applications" class="btn btn--secondary">Cancel</a>
+      <button type="button" class="btn btn--primary" [disabled]="!canSubmit()" (click)="submit()">
+        <ng-icon name="heroCheck" size="14" />
+        {{ saving() ? 'Submitting…' : 'Submit Application' }}
+      </button>
+    </div>
+  </div>
+</div>

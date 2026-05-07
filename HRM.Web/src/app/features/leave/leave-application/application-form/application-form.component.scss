@@ -1,0 +1,57 @@
+@use 'styles/variables' as *;
+
+.app-form {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.emp-autocomplete {
+  position: absolute;
+  z-index: 5;
+  background: #fff;
+  border: 1px solid $neutral-200;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  margin-top: 4px;
+  width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 4px;
+
+  li {
+    padding: 8px 10px;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    font-size: $text-sm;
+
+    &:hover { background: $neutral-100; }
+  }
+}
+
+.app-form__balance {
+  margin-top: 6px;
+  font-size: $text-sm;
+  color: $brand-primary;
+
+  &--loading { color: $neutral-500; }
+}
+
+.app-form__effective {
+  background: $brand-primary-light;
+  border: 1px solid rgba($brand-primary, 0.15);
+  border-radius: $radius-md;
+  padding: 12px 14px;
+  margin-bottom: $spacing-md;
+  font-size: $text-sm;
+}
+
+.app-form__warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: $danger;
+  font-weight: 500;
+}
+
+.card__footer { justify-content: space-between; }

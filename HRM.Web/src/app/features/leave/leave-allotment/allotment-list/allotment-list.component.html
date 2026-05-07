@@ -1,0 +1,100 @@
+<hrm-page-header title="Leave Allotments" subtitle="Per-employee leave allocations by year.">
+  <a routerLink="../allotments/bulk" class="btn btn--secondary">
+    <ng-icon name="heroSquaresPlus" size="14" />
+    Bulk Allotment
+  </a>
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    Add Allotment
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field toolbar__field--grow">
+      <div class="allot-search">
+        <ng-icon name="heroMagnifyingGlass" size="16" />
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Search by employee or leave type…"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+        />
+      </div>
+    </div>
+
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="leaveTypeFilter()"
+        (ngModelChange)="onLeaveTypeChange($event ? +$event : null)"
+      >
+        <option [ngValue]="null">All leave types</option>
+        <option *ngFor="let t of leaveTypeOptions()" [ngValue]="t.id">{{ t.name }}</option>
+      </select>
+    </div>
+
+    <div class="toolbar__field">
+      <input
+        type="number"
+        class="form-control"
+        min="2000"
+        max="2100"
+        [ngModel]="yearFilter()"
+        (ngModelChange)="onYearChange(+$event)"
+        aria-label="Year"
+      />
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="filtered()"
+    [loading]="loading()"
+    [showPagination]="false"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No allotments yet"
+    emptyMessage="Create individual allotments here, or use Bulk Allotment to assign many at once."
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div class="allot-person">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #remainingCellTpl let-row>
+  <div class="allot-remaining">
+    <div class="allot-remaining__bar" [attr.data-tone]="remainingTone(row)">
+      <span [style.width.%]="remainingPct(row)"></span>
+    </div>
+    <div class="allot-remaining__text">
+      <span class="text-strong">{{ row.remainingDays }}</span>
+      <span class="text-muted text-xs"> / {{ row.allocatedDays + (row.carriedForwardDays || 0) }} days</span>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="openEdit(row)" aria-label="Edit">
+    <ng-icon name="heroPencilSquare" size="16" />
+  </button>
+  <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="delete(row)" aria-label="Delete">
+    <ng-icon name="heroTrash" size="16" />
+  </button>
+</ng-template>
+
+<ng-container *ngIf="drawerOpen()">
+  <hrm-allotment-form
+    [allotment]="editing()"
+    (saved)="onSaved()"
+    (dismiss)="closeDrawer()"
+  ></hrm-allotment-form>
+</ng-container>

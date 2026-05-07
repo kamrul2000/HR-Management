@@ -1,0 +1,83 @@
+<hrm-page-header title="Separations" subtitle="Resignations, terminations, retirements, and final settlements.">
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    New Separation
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="typeFilter()"
+        (ngModelChange)="typeFilter.set($event); onAnyFilterChange()"
+      >
+        <option value="">All types</option>
+        <option *ngFor="let t of typeOptions" [value]="t">{{ t }}</option>
+      </select>
+    </div>
+    <div class="toolbar__field">
+      <select
+        class="form-control"
+        [ngModel]="statusFilter()"
+        (ngModelChange)="statusFilter.set($event); onAnyFilterChange()"
+      >
+        <option value="">All statuses</option>
+        <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
+      </select>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="rows()"
+    [loading]="loading()"
+    [page]="pageState()"
+    [showPagination]="true"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No separations"
+    emptyMessage="Initiate a separation to record a resignation, termination, or retirement."
+    (pageChange)="onPageChange($event)"
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div style="display: inline-flex; align-items: center; gap: 10px;">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #typeCellTpl let-row>
+  <span class="text-sm">{{ row.separationTypeLabel || row.separationType }}</span>
+</ng-template>
+
+<ng-template #lwdCellTpl let-row>
+  {{ row.lastWorkingDateFormatted || (row.lastWorkingDate | date: 'mediumDate') }}
+</ng-template>
+
+<ng-template #settlementTpl let-row>
+  <strong class="text-mono">{{ row.totalSettlementAmount | currencyBd }}</strong>
+</ng-template>
+
+<ng-template #statusCellTpl let-row>
+  <hrm-status-badge [variant]="row.status" [label]="row.statusLabel || row.status"></hrm-status-badge>
+</ng-template>
+
+<ng-template #actionsTpl let-row>
+  <a class="btn btn--ghost btn--sm" [routerLink]="['/separation', row.id]">
+    <ng-icon name="heroEye" size="14" />
+    View
+  </a>
+</ng-template>
+
+<hrm-separation-form
+  *ngIf="drawerOpen()"
+  (saved)="onCreated()"
+  (dismiss)="closeDrawer()"
+></hrm-separation-form>

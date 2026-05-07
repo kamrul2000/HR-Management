@@ -1,0 +1,83 @@
+<hrm-drawer
+  title="New Separation"
+  subtitle="Initiate the separation workflow for an employee."
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" autocomplete="off">
+    <div class="form-group" style="position: relative;">
+      <label class="form-label">Employee <span class="required">*</span></label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search employee by name or code…"
+        [value]="form.value.employeeLabel || ''"
+        (input)="onEmployeeSearch($any($event.target).value)"
+      />
+      <ul *ngIf="searchResults().length > 0" class="emp-autocomplete">
+        <li *ngFor="let emp of searchResults()" (click)="pickEmployee(emp)">
+          <strong>{{ emp.fullName }}</strong>
+          <span class="text-muted text-xs"> · {{ emp.employeeCode }}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="form-group">
+        <label class="form-label">Type <span class="required">*</span></label>
+        <select class="form-control" formControlName="separationType">
+          <option *ngFor="let t of typeOptions" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Reason <span class="required">*</span></label>
+        <select class="form-control" formControlName="separationReasonId">
+          <option [ngValue]="0">— Select reason —</option>
+          <option *ngFor="let r of availableReasons()" [ngValue]="r.id">{{ r.reasonName }}</option>
+        </select>
+        <span *ngIf="availableReasons().length === 0" class="form-hint">No reasons defined for this type.</span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="form-group">
+        <label class="form-label">Application Date <span class="required">*</span></label>
+        <input type="date" class="form-control" formControlName="applicationDate" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Working Date <span class="required">*</span></label>
+        <input type="date" class="form-control" formControlName="lastWorkingDate" />
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="form-group">
+        <label class="form-label">Notice Period (Days) <span class="required">*</span></label>
+        <input type="number" class="form-control" min="0" max="365" formControlName="noticePeriodDays" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notice Period Buyout</label>
+        <input type="number" class="form-control" min="0" step="0.01" formControlName="noticePeriodBuyout" />
+        <span class="form-hint">Amount paid to waive shortfall.</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Other Settlement</label>
+      <input type="number" class="form-control" min="0" step="0.01" formControlName="otherSettlementAmount" />
+      <span class="form-hint">Bonuses, leave encashment, etc. Gratuity is computed automatically on approval.</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Remarks</label>
+      <textarea class="form-control" rows="2" formControlName="remarks"></textarea>
+    </div>
+  </form>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="dismiss.emit()">Cancel</button>
+    <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+      {{ saving() ? 'Submitting…' : 'Initiate Separation' }}
+    </button>
+  </ng-container>
+</hrm-drawer>

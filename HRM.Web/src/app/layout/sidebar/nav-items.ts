@@ -115,7 +115,14 @@ export const NAV_ITEMS: NavItem[] = [
       { label: 'Calculate', path: '/gratuity/calculations', module: 'GRATUITY' },
     ],
   },
-  { label: 'Separation', path: '/separation', icon: 'heroArrowLeftOnRectangle', module: 'SEPARATION' },
+  {
+    label: 'Separation',
+    icon: 'heroArrowLeftOnRectangle',
+    children: [
+      { label: 'Separations', path: '/separation',         module: 'SEPARATION' },
+      { label: 'Reasons',     path: '/separation/reasons', module: 'SEPARATION' },
+    ],
+  },
   {
     label: 'Access Control',
     icon: 'heroLockClosed',

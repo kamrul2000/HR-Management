@@ -1,0 +1,160 @@
+<hrm-page-header
+  [title]="record() ? record()!.employeeFullName + ' · ' + (record()!.separationTypeLabel || record()!.separationType) : 'Separation'"
+  [subtitle]="record() ? 'Last working ' + (record()!.lastWorkingDateFormatted || (record()!.lastWorkingDate | date: 'mediumDate')) : ''"
+>
+  <a routerLink="/separation" class="btn btn--secondary">
+    <ng-icon name="heroArrowLeft" size="14" />
+    Back
+  </a>
+  <button *ngIf="canCancel()" type="button" class="btn btn--ghost-neutral" [disabled]="busy()" (click)="openCancel()">
+    <ng-icon name="heroXMark" size="14" />
+    Cancel
+  </button>
+  <button *ngIf="canApprove()" type="button" class="btn btn--primary" [disabled]="busy()" (click)="openApprove()">
+    <ng-icon name="heroCheck" size="14" />
+    Approve
+  </button>
+  <button *ngIf="canProcess()" type="button" class="btn btn--primary" [disabled]="busy()" (click)="process()">
+    <ng-icon name="heroPaperAirplane" size="14" />
+    Process Settlement
+  </button>
+</hrm-page-header>
+
+<div class="page-content" *ngIf="loading()">
+  <div class="card"><div class="card__body"><hrm-loading-skeleton rows="6"></hrm-loading-skeleton></div></div>
+</div>
+
+<div *ngIf="!loading() && record() as r" class="page-content">
+  <div class="loan-detail__cols">
+    <div class="card">
+      <div class="card__body loan-detail__head">
+        <hrm-avatar [name]="r.employeeFullName" [size]="56"></hrm-avatar>
+        <div class="loan-detail__head-info">
+          <h2>{{ r.employeeFullName }} <span class="text-muted text-sm text-mono">{{ r.employeeCode }}</span></h2>
+          <p class="text-muted">
+            Joined {{ r.employeeJoiningDateFormatted || (r.employeeJoiningDate | date: 'mediumDate') }} · Reason: {{ r.separationReasonName }}
+          </p>
+        </div>
+        <hrm-status-badge [variant]="r.status" [label]="r.statusLabel || r.status" class="loan-detail__status"></hrm-status-badge>
+      </div>
+
+      <div class="loan-detail__grid">
+        <div>
+          <span class="text-label">Application Date</span>
+          <strong>{{ r.applicationDateFormatted || (r.applicationDate | date: 'mediumDate') }}</strong>
+        </div>
+        <div>
+          <span class="text-label">Last Working Date</span>
+          <strong>{{ r.lastWorkingDateFormatted || (r.lastWorkingDate | date: 'mediumDate') }}</strong>
+        </div>
+        <div>
+          <span class="text-label">Notice Period</span>
+          <strong>{{ r.actualNoticeDays }} / {{ r.noticePeriodDays }} days</strong>
+          <span *ngIf="r.noticePeriodShortfall > 0" class="text-muted text-xs">
+            {{ r.noticePeriodShortfallLabel || (r.noticePeriodShortfall + ' day shortfall') }}
+          </span>
+        </div>
+      </div>
+
+      <div class="loan-detail__grid">
+        <div>
+          <span class="text-label">Notice Buyout</span>
+          <strong>{{ r.noticePeriodBuyout | currencyBd }}</strong>
+        </div>
+        <div>
+          <span class="text-label">Gratuity</span>
+          <strong>{{ r.gratuityAmount | currencyBd }}</strong>
+        </div>
+        <div>
+          <span class="text-label">Other Settlement</span>
+          <strong>{{ r.otherSettlementAmount | currencyBd }}</strong>
+        </div>
+        <div>
+          <span class="text-label">Total Settlement</span>
+          <strong class="text-primary">{{ r.totalSettlementAmount | currencyBd }}</strong>
+        </div>
+      </div>
+
+      <div *ngIf="r.remarks" class="loan-detail__purpose">
+        <h4 class="text-label">Remarks</h4>
+        <p>{{ r.remarks }}</p>
+      </div>
+
+      <div *ngIf="r.attachmentUrl" class="loan-detail__attachment">
+        <a [href]="r.attachmentUrl" target="_blank" rel="noopener" class="btn btn--ghost btn--sm">
+          <ng-icon name="heroDocumentText" size="14" />
+          View attachment
+        </a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card__header"><h3>Workflow</h3></div>
+      <div class="card__body">
+        <ol class="loan-timeline">
+          <li *ngFor="let ev of timeline()" [class]="'loan-timeline__item loan-timeline__item--' + ev.state">
+            <span class="loan-timeline__dot"></span>
+            <div class="loan-timeline__body">
+              <div class="loan-timeline__title">{{ ev.title }}</div>
+              <div *ngIf="ev.date" class="loan-timeline__date">{{ ev.date | date: 'medium' }}</div>
+              <div *ngIf="ev.description" class="loan-timeline__desc">{{ ev.description }}</div>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Approve drawer -->
+<ng-container *ngIf="action().kind === 'approve'">
+  <hrm-drawer
+    title="Approve Separation"
+    [subtitle]="record()?.employeeFullName || ''"
+    [locked]="busy()"
+    (dismiss)="closeAction()"
+  >
+    <div class="form-group">
+      <label class="form-label">Remarks (optional)</label>
+      <textarea
+        class="form-control"
+        rows="3"
+        [ngModel]="remarks()"
+        (ngModelChange)="remarks.set($event)"
+      ></textarea>
+    </div>
+    <ng-container drawer-footer>
+      <button type="button" class="btn btn--secondary" [disabled]="busy()" (click)="closeAction()">Cancel</button>
+      <button type="button" class="btn btn--primary" [disabled]="busy()" (click)="confirmApprove()">
+        {{ busy() ? 'Approving…' : 'Approve' }}
+      </button>
+    </ng-container>
+  </hrm-drawer>
+</ng-container>
+
+<!-- Cancel drawer -->
+<ng-container *ngIf="action().kind === 'cancel'">
+  <hrm-drawer
+    title="Cancel Separation"
+    [subtitle]="record()?.employeeFullName || ''"
+    [locked]="busy()"
+    (dismiss)="closeAction()"
+  >
+    <div class="form-group">
+      <label class="form-label">Reason <span class="required">*</span></label>
+      <textarea
+        class="form-control"
+        rows="3"
+        [ngModel]="cancelReason()"
+        (ngModelChange)="cancelReason.set($event)"
+        placeholder="Why is this separation being cancelled?"
+      ></textarea>
+    </div>
+    <ng-container drawer-footer>
+      <button type="button" class="btn btn--secondary" [disabled]="busy()" (click)="closeAction()">Back</button>
+      <button type="button" class="btn btn--danger" [disabled]="busy()" (click)="confirmCancel()">
+        {{ busy() ? 'Cancelling…' : 'Cancel Separation' }}
+      </button>
+    </ng-container>
+  </hrm-drawer>
+</ng-container>

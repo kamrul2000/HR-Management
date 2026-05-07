@@ -57,6 +57,14 @@ export const routes: Routes = [
         path: 'pf',
         loadChildren: () => import('./features/pf/pf.routes'),
       },
+      {
+        path: 'gratuity',
+        loadChildren: () => import('./features/gratuity/gratuity.routes'),
+      },
+      {
+        path: 'separation',
+        loadChildren: () => import('./features/separation/separation.routes'),
+      },
     ],
   },
   { path: '**', redirectTo: '' },

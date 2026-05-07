@@ -1,0 +1,42 @@
+@use 'styles/variables' as *;
+
+.head-section {
+  > header {
+    margin-bottom: $spacing-sm;
+    h3 { margin: 0; font-size: $text-md; font-weight: 600; }
+  }
+}
+
+.head-table {
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: 12px 16px;
+    border-bottom: 1px solid $neutral-100;
+
+    &:last-child { border-bottom: none; }
+    &:hover:not(.head-table__row--header) { background: $neutral-50; }
+
+    &--header {
+      background: $neutral-50;
+      font-size: $text-xs;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: $neutral-500;
+    }
+  }
+
+  &__order {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  &__empty {
+    padding: $spacing-xl;
+    text-align: center;
+    font-size: $text-sm;
+  }
+}

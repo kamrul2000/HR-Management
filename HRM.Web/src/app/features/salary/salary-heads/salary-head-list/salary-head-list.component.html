@@ -1,0 +1,83 @@
+<hrm-page-header title="Salary Heads" subtitle="Earnings and deductions used in salary structures.">
+  <button type="button" class="btn btn--primary" (click)="openCreate()">
+    <ng-icon name="heroPlus" size="14" />
+    Add Head
+  </button>
+</hrm-page-header>
+
+<div class="page-content">
+  <hrm-loading-skeleton *ngIf="loading()" rows="4"></hrm-loading-skeleton>
+
+  <ng-container *ngIf="!loading()">
+    <section class="head-section">
+      <header>
+        <h3>Earnings <span class="text-muted text-sm">({{ earnings().length }})</span></h3>
+      </header>
+      <ng-container *ngTemplateOutlet="rows; context: { items: earnings() }"></ng-container>
+    </section>
+
+    <section class="head-section mt-md">
+      <header>
+        <h3>Deductions <span class="text-muted text-sm">({{ deductions().length }})</span></h3>
+      </header>
+      <ng-container *ngTemplateOutlet="rows; context: { items: deductions() }"></ng-container>
+    </section>
+  </ng-container>
+</div>
+
+<ng-template #rows let-items="items">
+  <div class="card head-table">
+    <div class="head-table__row head-table__row--header">
+      <span style="width: 80px">Code</span>
+      <span style="flex: 1">Name</span>
+      <span style="flex: 1">Method</span>
+      <span style="width: 80px">Order</span>
+      <span style="width: 90px">Status</span>
+      <span style="width: 120px; text-align: right">Actions</span>
+    </div>
+
+    <div *ngIf="items.length === 0" class="head-table__empty text-muted">
+      No heads in this section.
+    </div>
+
+    <div *ngFor="let h of items" class="head-table__row">
+      <span class="text-mono text-sm" style="width: 80px">{{ h.headCode }}</span>
+      <span style="flex: 1">
+        <div class="text-strong">{{ h.headName }}</div>
+        <div class="text-muted text-xs" *ngIf="h.description">{{ h.description }}</div>
+      </span>
+      <span style="flex: 1; font-size: 13px">{{ describeMethod(h) }}</span>
+      <span style="width: 80px" class="head-table__order">
+        {{ h.displayOrder }}
+        <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="reorder(h, -1)" title="Move up">
+          <ng-icon name="heroArrowUp" size="12" />
+        </button>
+        <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="reorder(h, 1)" title="Move down">
+          <ng-icon name="heroArrowDown" size="12" />
+        </button>
+      </span>
+      <span style="width: 90px">
+        <hrm-status-badge
+          [variant]="h.isActive ? 'active' : 'inactive'"
+          [label]="h.isActive ? 'Active' : 'Inactive'"
+        ></hrm-status-badge>
+      </span>
+      <span style="width: 120px; text-align: right">
+        <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="openEdit(h)" aria-label="Edit">
+          <ng-icon name="heroPencilSquare" size="16" />
+        </button>
+        <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="delete(h)" aria-label="Delete">
+          <ng-icon name="heroTrash" size="16" />
+        </button>
+      </span>
+    </div>
+  </div>
+</ng-template>
+
+<ng-container *ngIf="drawerOpen()">
+  <hrm-salary-head-form
+    [head]="editing()"
+    (saved)="onSaved($event)"
+    (dismiss)="closeDrawer()"
+  ></hrm-salary-head-form>
+</ng-container>

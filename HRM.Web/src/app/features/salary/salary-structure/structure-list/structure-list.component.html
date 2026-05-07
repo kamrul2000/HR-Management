@@ -1,0 +1,57 @@
+<hrm-page-header title="Salary Structures" subtitle="Per-employee salary configurations.">
+  <a routerLink="../structures/new" class="btn btn--primary">
+    <ng-icon name="heroPlus" size="14" />
+    New Structure
+  </a>
+</hrm-page-header>
+
+<div class="page-content">
+  <div class="toolbar">
+    <div class="toolbar__field toolbar__field--grow">
+      <div class="struct-search">
+        <ng-icon name="heroMagnifyingGlass" size="16" />
+        <input
+          type="search"
+          class="form-control"
+          placeholder="Search by employee name or code…"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event)"
+        />
+      </div>
+    </div>
+  </div>
+
+  <hrm-data-table
+    [columns]="columns"
+    [rows]="filtered()"
+    [loading]="loading()"
+    [showPagination]="false"
+    [actionsTemplate]="actionsTpl"
+    rowKey="id"
+    emptyTitle="No salary structures yet"
+    emptyMessage="Create a structure to define an employee's salary breakdown."
+  ></hrm-data-table>
+</div>
+
+<ng-template #employeeCellTpl let-row>
+  <div class="struct-person">
+    <hrm-avatar [name]="row.employeeFullName || ''" [size]="32"></hrm-avatar>
+    <div>
+      <div class="text-strong">{{ row.employeeFullName || '—' }}</div>
+      <div class="text-muted text-xs text-mono">{{ row.employeeCode }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #basicCellTpl let-row>{{ row.basicSalary | currencyBd }}</ng-template>
+<ng-template #grossCellTpl let-row>{{ row.estimatedGrossSalary | currencyBd }}</ng-template>
+<ng-template #netCellTpl let-row><strong>{{ row.estimatedNetSalary | currencyBd }}</strong></ng-template>
+
+<ng-template #actionsTpl let-row>
+  <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="view(row)" aria-label="View">
+    <ng-icon name="heroEye" size="16" />
+  </button>
+  <button type="button" class="btn btn--icon btn--ghost-neutral" (click)="edit(row)" aria-label="Edit">
+    <ng-icon name="heroPencilSquare" size="16" />
+  </button>
+</ng-template>

@@ -1,0 +1,35 @@
+@use 'styles/variables' as *;
+
+.head-form {
+  &__warning {
+    background: $warning-light;
+    border: 1px solid rgba($warning, 0.2);
+    border-radius: $radius-md;
+    padding: 10px 12px;
+    color: $warning;
+    font-size: $text-sm;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: $spacing-md;
+    line-height: 1.5;
+  }
+
+  &__preview {
+    background: $brand-primary-light;
+    border: 1px solid rgba($brand-primary, 0.15);
+    border-radius: $radius-md;
+    padding: 10px 12px;
+    margin-bottom: $spacing-md;
+    font-size: $text-sm;
+
+    .text-label { display: block; margin-bottom: 4px; }
+    strong { color: $brand-primary; }
+  }
+
+  &__toggles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+  }
+}

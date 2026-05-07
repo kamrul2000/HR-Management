@@ -1,0 +1,130 @@
+<hrm-drawer
+  [title]="isEdit ? 'Edit Salary Head' : 'Add Salary Head'"
+  [subtitle]="isEdit ? 'Update head configuration.' : 'Define an earning or deduction line item.'"
+  size="lg"
+  [locked]="saving()"
+  (dismiss)="dismiss.emit()"
+>
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label class="form-label">Name <span class="required">*</span></label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="headName"
+          placeholder="House Rent"
+          [class.is-invalid]="hasError('headName', 'required')"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Code <span class="required">*</span></label>
+        <input
+          type="text"
+          class="form-control text-mono"
+          formControlName="headCode"
+          placeholder="HRA"
+          maxlength="20"
+          [class.is-invalid]="hasError('headCode', 'required')"
+        />
+        <span class="form-hint">Short, unique within the tenant.</span>
+      </div>
+    </div>
+
+    <div class="form-grid form-grid--2">
+      <div class="form-group">
+        <label class="form-label">Type <span class="required">*</span></label>
+        <select class="form-control" formControlName="headType">
+          <option *ngFor="let t of typeOptions" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Display Order <span class="required">*</span></label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="displayOrder"
+          min="1"
+          max="999"
+        />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Calculation Method <span class="required">*</span></label>
+      <select class="form-control" formControlName="calculationMethod">
+        <option *ngFor="let m of methodOptions" [value]="m.value">{{ m.label }}</option>
+      </select>
+    </div>
+
+    <div *ngIf="showNetWarning()" class="head-form__warning">
+      <ng-icon name="heroExclamationTriangle" size="16" />
+      <strong>Heads-up:</strong> "% of Net" can produce circular dependencies if not configured carefully. Prefer "% of Basic" or "% of Gross" when possible.
+    </div>
+
+    <div class="form-grid form-grid--2" *ngIf="needsPercentage()">
+      <div class="form-group">
+        <label class="form-label">Percentage <span class="required">*</span></label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="percentage"
+          min="0.01"
+          max="100"
+          step="0.01"
+        />
+      </div>
+      <div class="form-group" *ngIf="needsBaseHead()">
+        <label class="form-label">Base Head <span class="required">*</span></label>
+        <select class="form-control" formControlName="baseHeadId">
+          <option [ngValue]="null">Select a head</option>
+          <option *ngFor="let h of headOptions()" [ngValue]="h.id">{{ h.headName }} ({{ h.headCode }})</option>
+        </select>
+      </div>
+    </div>
+
+    <div *ngIf="preview() as p" class="head-form__preview">
+      <span class="text-label">Preview</span>
+      <strong>{{ formValue().percentage }}% of {{ p.baseLabel }} ({{ p.baseAmount | currencyBd }})</strong>
+      <span> = </span>
+      <strong>{{ p.computed | currencyBd }}</strong>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Flags</label>
+      <div class="head-form__toggles">
+        <label class="company-form__toggle">
+          <input type="checkbox" formControlName="isFixed" />
+          <span>Fixed line (always present)</span>
+        </label>
+        <label class="company-form__toggle">
+          <input type="checkbox" formControlName="isTaxable" />
+          <span>Taxable income</span>
+        </label>
+        <label class="company-form__toggle">
+          <input type="checkbox" formControlName="isProvidentFundApplicable" />
+          <span>PF applicable</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-control" formControlName="description" rows="2"></textarea>
+    </div>
+
+    <div *ngIf="isEdit" class="form-group">
+      <label class="company-form__toggle">
+        <input type="checkbox" formControlName="isActive" />
+        <span>Head is active</span>
+      </label>
+    </div>
+  </form>
+
+  <ng-container drawer-footer>
+    <button type="button" class="btn btn--secondary" [disabled]="saving()" (click)="dismiss.emit()">Cancel</button>
+    <button type="button" class="btn btn--primary" [disabled]="saving()" (click)="submit()">
+      {{ saving() ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Head' }}
+    </button>
+  </ng-container>
+</hrm-drawer>
